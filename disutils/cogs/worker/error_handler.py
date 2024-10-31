@@ -4,16 +4,16 @@ import sys
 
 from discord import Interaction, app_commands
 from discord.ext import commands
+from typing import Optional
 
-from core import Bot
-from data.constants.bot_const import BUG_REPORT_CHANNEL
-from utils import *
+from utils import ErrorEmbed
+from disutils import UtilConfig
 
 
 class ErrorHandler(commands.Cog, name="Error Handler"):
-    """Error Handling for commands"""
+    """Error handler for global application commands."""
 
-    def __init__(self, bot: Bot) -> None:
+    def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.default_error_handler = app_commands.CommandTree.on_error
 
@@ -24,11 +24,12 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
     async def cog_unload(self) -> None:
         app_commands.CommandTree.on_error = self.default_error_handler
 
-    async def send_msg(
+    async def send_response(
         self,
+        *,
         interaction: Interaction,
-        embed: None | discord.Embed = None,
-        msg: None | str = None,
+        embed: Optional[discord.Embed] = None,
+        msg: Optional[str] = None,
         ephemeral: bool = False,
     ) -> None:
         """Handles the error response to user."""
@@ -52,9 +53,9 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             type(error), error, error.__traceback__, file=sys.stderr
         )
 
-        channel = self.bot.get_channel(BUG_REPORT_CHANNEL)
+        channel = self.bot.get_channel(UtilConfig.BUG_REPORT_CHANNEL)
         if channel is None:
-            channel = await self.bot.fetch_channel(BUG_REPORT_CHANNEL)
+            channel = await self.bot.fetch_channel(UtilConfig.BUG_REPORT_CHANNEL)
 
         if channel is not None:
             await channel.send(
@@ -69,9 +70,9 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             )
         embed = ErrorEmbed(
             title="Sorry...",
-            description="An unexpected error has occurred. The developers have been notified of it.",
+            description="An unexpected error has occurred.\nThe developers have been notified of it.",
         )
-        await self.send_msg(interaction=interaction, embed=embed)
+        await self.send_response(interaction=interaction, embed=embed)
 
     async def on_error(
         self, interaction: discord.Interaction, error: app_commands.AppCommandError
@@ -96,21 +97,7 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
                 description="You do not have the required permissions to use this command.\n"
                 "This command is only available to owners!",
             )
-            await self.send_msg(interaction=interaction, embed=error_embed)
-
-        # elif isinstance(error, commands.MissingRequiredArgument):
-        #    param = error.param.name
-        #    command = interaction.command.qualified_name if interaction.command else None
-        #    description = command.help or "No description available."
-        #
-        #    embed = MainEmbed(
-        #        title="Information", description=f"Missing Argument: `{param}`"
-        #    )
-        #    embed.set_thumbnail(
-        #        url="https://images.disutils.com/bot_assets/assets/missing_arg.png"
-        #    )
-        #    embed.add_field(name="Description", value=description, inline=False)
-        #    await ctx.send(embed=embed, ephemeral=True)
+            await self.send_response(interaction=interaction, embed=error_embed)
 
         elif isinstance(error, commands.BotMissingPermissions):
             missing_permissions = ", ".join(error.missing_permissions)
@@ -122,7 +109,7 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             error_embed.set_thumbnail(
                 url="https://images.disutils.com/bot_assets/assets/missing_perms.png"
             )
-            await self.send_msg(
+            await self.send_response(
                 interaction=interaction, embed=error_embed, ephemeral=True
             )
 
@@ -137,30 +124,9 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             error_embed.set_thumbnail(
                 url="https://images.disutils.com/bot_assets/assets/access_denied.png"
             )
-            await self.send_msg(
+            await self.send_response(
                 interaction=interaction, embed=error_embed, ephemeral=True
             )
-
-        # elif isinstance(
-        #    error, (commands.CommandInvokeError, commands.errors.HybridCommandError)
-        # ):
-        #    original = getattr(error, "original", error)
-        #    if isinstance(original, discord.Forbidden):
-        #        member = ctx.message.mentions[0] if ctx.message.mentions else None
-        #
-        #        if member:
-        #            if ctx.author.top_role < member.top_role:
-        #                error_embed = ErrorEmbed(
-        #                    title="Error",
-        #                    description="You cannot perform this action due to role hierarchy.",
-        #                )
-        #                await ctx.send(embed=error_embed, ephemeral=True)
-        #            elif ctx.guild.me.top_role <= member.top_role:
-        #                error_embed = ErrorEmbed(
-        #                    title="Error",
-        #                    description="I cannot perform this action due to role hierarchy.",
-        #                )
-        #                await ctx.send(embed=error_embed, ephemeral=True)
 
         elif isinstance(
             error, (commands.ChannelNotFound, commands.errors.ChannelNotFound)
@@ -170,11 +136,11 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
                 description=f"The specified channel {error.argument} was not found."
                 "Please pass in a valid channel.",
             )
-            await self.send_msg(interaction=interaction, embed=error_embed)
+            await self.send_response(interaction=interaction, embed=error_embed)
 
         else:
             await self.throw_err(interaction=interaction, error=error)
 
 
-async def setup(bot: Bot) -> None:
+async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(ErrorHandler(bot))
