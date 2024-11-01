@@ -12,8 +12,4 @@ async def dis_load_extension(
     for cog in cogs:
         await bot.load_extension(cog.value)
         if debug_message:
-            print(
-                debug_message.format(
-                    cog.name.title().replace(" ", "")
-                )
-            )
+            print(debug_message.format(cog.name.title().replace(" ", "")))
