@@ -7,7 +7,7 @@ from discord.ext import commands
 from typing import Optional
 
 from utils import ErrorEmbed
-from disutils import UtilConfig
+from disutils.config import UtilConfig
 
 
 class ErrorHandler(commands.Cog, name="Error Handler"):
