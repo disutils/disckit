@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands, tasks
 
-from disutils import UtilConfig
+from disutils.config import UtilConfig
 
 
 class StatusHandler(commands.Cog):
