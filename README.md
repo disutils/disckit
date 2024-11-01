@@ -1,4 +1,5 @@
 # disutil-dpy
 An open source utilities library for the disutils bots
 
-**Note:** <u>This package exclusively supports **App Commands**. It does **NOT** support **Hybrid**, **Context**, **or any other types of commands**. **Only** App Commands / Tree Commands are supported.</u>
+> **Note:** This package exclusively supports **Application Commands only** for the API wrapper [discord.py](https://github.com/Rapptz/discord.py).\
+This package may cause unexepected behaviour if used with any other API wrapper or forks of `discord.py`.
