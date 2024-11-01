@@ -1,7 +1,7 @@
 from discord import Embed, utils
 from typing import Optional
 
-from disutils import UtilConfig
+from disutils.config import UtilConfig
 
 
 class MainEmbed(Embed):
