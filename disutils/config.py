@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import inspect
 from discord import Colour
-from typing import Optional, TypeAlias, Union, Callable, Any, Type
+from typing import Optional, TypeAlias, Union, ClassVar, Type, Any
 from enum import StrEnum
 
 TypeColor: TypeAlias = Union[int, Colour]
@@ -10,7 +10,7 @@ _BASE_COG_PATH: str = "disutils/cogs/"
 
 
 class _ClassPropertyDescriptor:
-    def __init__(self, fget: Callable, fset: Optional[Callable] = None) -> None:
+    def __init__(self, fget, fset=None):
         self.fget = fget
         self.fset = fset
 
@@ -54,14 +54,14 @@ class _MetaClassProperty(type):
 
 
 class UtilConfig(metaclass=_MetaClassProperty):
-    _MAIN_COLOR: Optional[TypeColor] = None
-    _SUCCESS_COLOR: Optional[TypeColor] = None
-    _ERROR_COLOR: Optional[TypeColor] = None
-    _FOOTER_TEXT: Optional[str] = None
-    _GREEN_CHECK: Optional[str] = None
-    _AVATAR_URL: Optional[str] = None
-    _VERSION: Optional[str] = None
-    _BUG_REPORT_CHANNEL: Optional[int] = None
+    _MAIN_COLOR: ClassVar[Optional[TypeColor]] = None
+    _SUCCESS_COLOR: ClassVar[Optional[TypeColor]] = None
+    _ERROR_COLOR: ClassVar[Optional[TypeColor]] = None
+    _FOOTER_TEXT: ClassVar[Optional[str]] = None
+    _GREEN_CHECK: ClassVar[Optional[str]] = None
+    _AVATAR_URL: ClassVar[Optional[str]] = None
+    _VERSION: ClassVar[Optional[str]] = None
+    _BUG_REPORT_CHANNEL: ClassVar[Optional[int]] = None
 
     @staticmethod
     def __validator(val: Any, typ: Any) -> None:
