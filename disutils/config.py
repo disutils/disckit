@@ -103,7 +103,6 @@ class UtilConfig(metaclass=_MetaClassProperty):
 
     @GREEN_CHECK.setter
     def GREEN_CHECK(cls: Type[UtilConfig], value: Optional[str]) -> None:
-        print(__annotations__(value))
         UtilConfig.__validator(value, Optional[str])
         cls._GREEN_CHECK = value
 
