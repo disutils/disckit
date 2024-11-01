@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-__version__ = "0.1"
-
 import inspect
 from discord import Colour
 from typing import Optional, TypeAlias, Union, Callable, Any, Type
