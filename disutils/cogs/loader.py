@@ -17,13 +17,13 @@ async def dis_load_extension(
     ----------
     bot: :class:`commands.Bot`
         The bot instance.
-        
+
     *cogs: :class:`CogEnum`
         The cogs to be loaded from disutil-dpy package.
 
     debug_message: :class:`Optional[str]`
         The debug message to be printed out when the cog is loaded.
-        
+
     Raises
     ------
     :class:`CogLoadError`
@@ -44,7 +44,6 @@ async def dis_load_extension(
 
         if message:
             raise CogLoadError(message=message, cog=cog)
-    
 
         await bot.load_extension(cog.value)
         if debug_message:
