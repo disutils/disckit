@@ -31,16 +31,20 @@ async def dis_load_extension(
     """
 
     message = None
-    for cog in cogs:
+    for cog in set(cogs):
         if cog == CogEnum.STATUS_HANDLER:
             if UtilConfig.STATUS_COOLDOWN is None:
-                message = f"Attribute: `UtilConfig.STATUS_COOLDOWN` needs"
-                " to be set before runtime to use StatusHandler cog."
+                message = (
+                    f"Attribute: `UtilConfig.STATUS_COOLDOWN` needs"
+                    " to be set to use StatusHandler cog."
+                )
 
         if cog == CogEnum.ERROR_HANDLER:
             if UtilConfig.BUG_REPORT_CHANNEL is None:
-                message = f"Attribute: `UtilConfig.BUG_REPORT_CHANNEL` needs"
-                " to be set before runtime to use ErrorHandler cog."
+                message = (
+                    f"Attribute: `UtilConfig.BUG_REPORT_CHANNEL` needs"
+                    " to be set to use ErrorHandler cog."
+                )
 
         if message:
             raise CogLoadError(message=message, cog=cog)
