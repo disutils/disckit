@@ -1,7 +1,10 @@
 from discord import Embed, utils
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
-from disutil.config import UtilConfig
+import disutil
+
+if TYPE_CHECKING:
+    import disutil.config
 
 
 class MainEmbed(Embed):
@@ -21,12 +24,12 @@ class MainEmbed(Embed):
         super().__init__(
             title=title,
             description=description,
-            color=UtilConfig.MAIN_COLOR,
+            color=disutil.config.UtilConfig.MAIN_COLOR,
             timestamp=utils.utcnow(),
         )
         self.set_footer(
-            text=UtilConfig.FOOTER_TEXT,
-            icon_url=UtilConfig.AVATAR_URL,
+            text=disutil.config.UtilConfig.FOOTER_TEXT,
+            icon_url=disutil.config.UtilConfig.FOOTER_IMAGE,
         )
 
 
@@ -45,16 +48,16 @@ class SuccessEmbed(Embed):
         """
 
         if title:
-            title = f"{UtilConfig.SUCCESS_EMOJI} {title}"
+            title = f"{disutil.config.UtilConfig.SUCCESS_EMOJI} {title}"
         super().__init__(
             title=title,
             description=description,
-            color=UtilConfig.SUCCESS_COLOR,
+            color=disutil.config.UtilConfig.SUCCESS_COLOR,
             timestamp=utils.utcnow(),
         )
         self.set_footer(
-            text=UtilConfig.FOOTER_TEXT,
-            icon_url=UtilConfig.AVATAR_URL,
+            text=disutil.config.UtilConfig.FOOTER_TEXT,
+            icon_url=disutil.config.UtilConfig.FOOTER_IMAGE,
         )
 
 
@@ -77,10 +80,10 @@ class ErrorEmbed(Embed):
         super().__init__(
             title=title,
             description=description,
-            color=UtilConfig.ERROR_COLOR,
+            color=disutil.config.UtilConfig.ERROR_COLOR,
             timestamp=utils.utcnow(),
         )
         self.set_footer(
-            text=UtilConfig.FOOTER_TEXT,
-            icon_url=UtilConfig.AVATAR_URL,
+            text=disutil.config.UtilConfig.FOOTER_TEXT,
+            icon_url=disutil.config.UtilConfig.FOOTER_IMAGE,
         )
