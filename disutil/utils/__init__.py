@@ -1,6 +1,6 @@
 from typing import Tuple, Any
 from discord.ext import commands
-from utils.embeds import *
+from disutil.utils.embeds import *
 
 
 async def default_status_handler(bot: commands.Bot, *args: Any) -> Tuple[str, ...]:
@@ -27,16 +27,15 @@ async def default_status_handler(bot: commands.Bot, *args: Any) -> Tuple[str, ..
         Heehee hawhaw
     """
 
+    print("ENTER")
     users = len(bot.users)
     guilds = len(bot.guilds)
-    status = iter(
+    status = (
         # Prefixed by "Listening to" as the default ActivityType
         # (UtilConfig.STATUS_TYPE = ActivityType.listening).
-        (
-            f"{users:,} users",
-            f"humans from {guilds:,} servers",
-            f"Slash commands!",
-        )
+        f"{users:,} users",
+        f"humans from {guilds:,} servers",
+        f"Slash commands!",
     )
 
     return status
