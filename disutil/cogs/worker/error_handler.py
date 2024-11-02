@@ -6,7 +6,7 @@ from discord import Interaction, app_commands
 from discord.ext import commands
 from typing import Optional
 
-from utils import ErrorEmbed
+from disutil.utils import ErrorEmbed
 from disutil.config import UtilConfig
 
 
