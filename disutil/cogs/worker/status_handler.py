@@ -1,5 +1,7 @@
 import discord
+
 from discord.ext import commands, tasks
+from typing import Iterator
 
 from disutil.config import UtilConfig
 
@@ -24,26 +26,21 @@ class StatusHandler(commands.Cog):
         await self.bot.wait_until_ready()
 
         if self.status is None:
-            self.status = iter(
-                await UtilConfig.STATUS_FUNC[0](
-                    self.bot, *await UtilConfig.STATUS_FUNC[1]
-                )
-            )
+            self.status = await self.__get_iter()
 
         try:
             current_status = next(self.status)
         except StopIteration:
-            self.status = iter(
-                await UtilConfig.STATUS_FUNC[0](
-                    self.bot, *await UtilConfig.STATUS_FUNC[1]
-                )
-            )
+            self.status = await self.__get_iter()
             current_status = next(self.status)
 
         await self.bot.change_presence(
-            activity=discord.Activity(
-                type=discord.ActivityType.listening, name=current_status
-            )
+            activity=discord.Activity(type=UtilConfig.STATUS_TYPE, name=current_status)
+        )
+
+    async def __get_iter(self) -> Iterator[str]:
+        return iter(
+            await UtilConfig.STATUS_FUNC[0](self.bot, *UtilConfig.STATUS_FUNC[1])
         )
 
 
