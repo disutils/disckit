@@ -23,6 +23,7 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
 
     async def cog_unload(self) -> None:
         app_commands.CommandTree.on_error = self.default_error_handler
+        print(f"{self.__class__.__name__} has been unloaded.")
 
     async def send_response(
         self,

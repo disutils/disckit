@@ -5,7 +5,7 @@ from disutils.config import UtilConfig
 
 
 class MainEmbed(Embed):
-    """Represents a main embed with a title, description, and other properties."""
+    """Represents a main embed for general use."""
 
     def __init__(self, description: Optional[str] = None, title: Optional[str] = None):
         """
@@ -45,7 +45,7 @@ class SuccessEmbed(Embed):
         """
 
         if title:
-            title = f"{UtilConfig.GREEN_CHECK} {title}"
+            title = f"{UtilConfig.SUCCESS_EMOJI} {title}"
         super().__init__(
             title=title,
             description=description,
