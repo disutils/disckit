@@ -15,10 +15,10 @@ from typing import (
     Any,
 )
 from enum import StrEnum
-from utils import default_status_handler
+from disutil.utils import default_status_handler
 
 TypeColor: TypeAlias = Union[int, Colour]
-_BASE_COG_PATH: str = "disutils/cogs/"
+_BASE_COG_PATH: str = "disutil.cogs."
 
 
 class _ClassPropertyDescriptor:
@@ -75,7 +75,9 @@ class UtilConfig(metaclass=_MetaClassProperty):
     _ERROR_EMOJI: ClassVar[Optional[str]] = None
     _FOOTER_IMAGE: ClassVar[Optional[str]] = None
     _FOOTER_TEXT: ClassVar[Optional[str]] = None
-    _STATUS_FUNC: ClassVar[Tuple[Awaitable[Union[Tuple, List, Set]], Tuple]] = (
+    _STATUS_FUNC: ClassVar[
+        Tuple[Awaitable[Union[Tuple[str, ...], List[str], Set[str]]], Tuple]
+    ] = (
         default_status_handler,
         (),
     )
@@ -258,7 +260,7 @@ class UtilConfig(metaclass=_MetaClassProperty):
 
             The channel ID to where the bug reports will be sent to by the `ErrorHandler` cog.
         """
-        return cls.BUG_REPORT_CHANNEL
+        return cls._BUG_REPORT_CHANNEL
 
     @BUG_REPORT_CHANNEL.setter
     def BUG_REPORT_CHANNEL(cls: Type[UtilConfig], value: Optional[int]) -> None:
@@ -267,8 +269,8 @@ class UtilConfig(metaclass=_MetaClassProperty):
 
 
 class CogEnum(StrEnum):
-    ERROR_HANDLER: str = _BASE_COG_PATH + "worker/error_handler"
+    ERROR_HANDLER: str = _BASE_COG_PATH + "worker.error_handler"
     """An extension for error handling."""
 
-    STATUS_HANDLER: str = _BASE_COG_PATH + "worker/status_handler"
+    STATUS_HANDLER: str = _BASE_COG_PATH + "worker.status_handler"
     """An extension for the bot's status handling."""
