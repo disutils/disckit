@@ -19,38 +19,30 @@ class StatusHandler(commands.Cog):
         self.status_task.cancel()
         print(f"{self.__class__.__name__} has been unloaded.")
 
-    @tasks.loop(seconds=600.0)  # Changes status every 10 minutes
+    @tasks.loop(seconds=UtilConfig.STATUS_COOLDOWN)
     async def status_task(self) -> None:
         await self.bot.wait_until_ready()
 
         if self.status is None:
-            await self.__calculate_stats()
+            self.status = iter(
+                await UtilConfig.STATUS_FUNC[0](
+                    self.bot, *await UtilConfig.STATUS_FUNC[1]
+                )
+            )
 
         try:
             current_status = next(self.status)
         except StopIteration:
-            await self.__calculate_stats()
+            self.status = iter(
+                await UtilConfig.STATUS_FUNC[0](
+                    self.bot, *await UtilConfig.STATUS_FUNC[1]
+                )
+            )
             current_status = next(self.status)
 
         await self.bot.change_presence(
             activity=discord.Activity(
                 type=discord.ActivityType.listening, name=current_status
-            )
-        )
-
-    async def __calculate_stats(self) -> None:
-        """Method for calculating bot stats. This is only executed on startup &
-        when the bot is done iterating through all of its current statuses"""
-
-        users = len(self.bot.users)
-        guilds = len(self.bot.guilds)
-        self.status = iter(
-            # Prefixed by "Listening to"
-            (
-                f"version {UtilConfig.VERSION}",
-                f"over {users:,} users | {guilds:,} servers",
-                f"/bugreport to report bugs",
-                f"/suggest to suggest features",
             )
         )
 
