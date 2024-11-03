@@ -29,8 +29,8 @@ classifiers = [
 dependencies = { file = "requirements.txt" }
 
 [project.urls]
-Homepage = "https://github.com/disutils/disutil-dpy"
-Issues = "https://github.com/disutils/disutil-dpy/issues"
+Homepage = "https://github.com/disutils/disckit"
+Issues = "https://github.com/disutils/disckit/issues"
 
 [build-system]
 requires = ["setuptools>=61.0"]
