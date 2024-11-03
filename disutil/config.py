@@ -68,11 +68,11 @@ class _MetaClassProperty(type):
 class UtilConfig(metaclass=_MetaClassProperty):
     """The utility class which configures disutils utilities."""
 
-    _MAIN_COLOR: ClassVar[Optional[TypeColor]] = None
-    _SUCCESS_COLOR: ClassVar[Optional[TypeColor]] = None
-    _ERROR_COLOR: ClassVar[Optional[TypeColor]] = None
-    _SUCCESS_EMOJI: ClassVar[Optional[str]] = None
-    _ERROR_EMOJI: ClassVar[Optional[str]] = None
+    _MAIN_COLOR: ClassVar[TypeColor] = 0x5865F2
+    _SUCCESS_COLOR: ClassVar[TypeColor] = 0x00FF00
+    _ERROR_COLOR: ClassVar[TypeColor] = 0xFF0000
+    _SUCCESS_EMOJI: ClassVar[str] = "✅"
+    _ERROR_EMOJI: ClassVar[str] = "❌"
     _FOOTER_IMAGE: ClassVar[Optional[str]] = None
     _FOOTER_TEXT: ClassVar[Optional[str]] = None
     _STATUS_FUNC: ClassVar[
@@ -93,7 +93,7 @@ class UtilConfig(metaclass=_MetaClassProperty):
             )
 
     @_classproperty
-    def MAIN_COLOR(cls: Type[UtilConfig]) -> Optional[TypeColor]:
+    def MAIN_COLOR(cls: Type[UtilConfig]) -> TypeColor:
         """Class Attribute
         ---
         MAIN_COLOR: :class:`Optional[int, discord.color.Color]`
@@ -103,12 +103,12 @@ class UtilConfig(metaclass=_MetaClassProperty):
         return cls._MAIN_COLOR
 
     @MAIN_COLOR.setter
-    def MAIN_COLOR(cls: Type[UtilConfig], value: Optional[TypeColor]) -> None:
+    def MAIN_COLOR(cls: Type[UtilConfig], value: TypeColor) -> None:
         UtilConfig.__validator(value, TypeColor)
         cls._MAIN_COLOR = value
 
     @_classproperty
-    def SUCCESS_COLOR(cls: Type[UtilConfig]) -> Optional[TypeColor]:
+    def SUCCESS_COLOR(cls: Type[UtilConfig]) -> TypeColor:
         """Class Attribute
         ---
         SUCCESS_COLOR: :class:`Optional[int, discord.color.Color]`
@@ -118,12 +118,12 @@ class UtilConfig(metaclass=_MetaClassProperty):
         return cls._SUCCESS_COLOR
 
     @SUCCESS_COLOR.setter
-    def SUCCESS_COLOR(cls: Type[UtilConfig], value: Optional[TypeColor]) -> None:
+    def SUCCESS_COLOR(cls: Type[UtilConfig], value: TypeColor) -> None:
         UtilConfig.__validator(value, TypeColor)
         cls._MAIN_COLOR = value
 
     @_classproperty
-    def ERROR_COLOR(cls: Type[UtilConfig]) -> Optional[TypeColor]:
+    def ERROR_COLOR(cls: Type[UtilConfig]) -> TypeColor:
         """Class Attribute
         ---
         ERROR_COLOR: :class:`Optional[int, discord.color.Color]`
@@ -133,12 +133,12 @@ class UtilConfig(metaclass=_MetaClassProperty):
         return cls._ERROR_COLOR
 
     @ERROR_COLOR.setter
-    def ERROR_COLOR(cls: Type[UtilConfig], value: Optional[TypeColor]) -> None:
+    def ERROR_COLOR(cls: Type[UtilConfig], value: TypeColor) -> None:
         UtilConfig.__validator(value, TypeColor)
         cls._ERROR_COLOR = value
 
     @_classproperty
-    def SUCCESS_EMOJI(cls: Type[UtilConfig]) -> Optional[str]:
+    def SUCCESS_EMOJI(cls: Type[UtilConfig]) -> str:
         """Class Attribute
         ---
         SUCCESS_EMOJI: :class:`Optional[str]`
@@ -148,7 +148,7 @@ class UtilConfig(metaclass=_MetaClassProperty):
         return cls._SUCCESS_EMOJI
 
     @SUCCESS_EMOJI.setter
-    def SUCCESS_EMOJI(cls: Type[UtilConfig], value: Optional[str]) -> None:
+    def SUCCESS_EMOJI(cls: Type[UtilConfig], value: str) -> None:
         UtilConfig.__validator(value, str)
         cls._SUCCESS_EMOJI = value
 
@@ -163,7 +163,7 @@ class UtilConfig(metaclass=_MetaClassProperty):
         return cls._ERROR_EMOJI
 
     @ERROR_EMOJI.setter
-    def ERROR_EMOJI(cls: Type[UtilConfig], value: Optional[str]) -> None:
+    def ERROR_EMOJI(cls: Type[UtilConfig], value: str) -> None:
         UtilConfig.__validator(value, str)
         cls._ERROR_EMOJI = value
 
@@ -178,7 +178,7 @@ class UtilConfig(metaclass=_MetaClassProperty):
         return cls._FOOTER_IMAGE
 
     @FOOTER_IMAGE.setter
-    def FOOTER_IMAGE(cls: Type[UtilConfig], value: Optional[str]) -> None:
+    def FOOTER_IMAGE(cls: Type[UtilConfig], value: str) -> None:
         UtilConfig.__validator(value, str)
         cls._FOOTER_IMAGE = value
 
@@ -193,8 +193,8 @@ class UtilConfig(metaclass=_MetaClassProperty):
         return cls._FOOTER_TEXT
 
     @FOOTER_TEXT.setter
-    def FOOTER_TEXT(cls: Type[UtilConfig], value: Optional[str]) -> None:
-        UtilConfig.__validator(value, Optional[str])
+    def FOOTER_TEXT(cls: Type[UtilConfig], value: str) -> None:
+        UtilConfig.__validator(value, str)
         cls._FOOTER_TEXT = value
 
     @_classproperty
@@ -243,12 +243,12 @@ class UtilConfig(metaclass=_MetaClassProperty):
         ---
         STATUS_COOLDOWN: :class:`Optional[int]`
 
-            A cooldown for how long a status will play before changing in the `StatusHandler` cog.
+            A cooldown in seconds for how long a status will play before changing in the `StatusHandler` cog.
         """
         return cls._STATUS_COOLDOWN
 
     @STATUS_COOLDOWN.setter
-    def STATUS_COOLDOWN(cls: Type[UtilConfig], value: Optional[int]) -> None:
+    def STATUS_COOLDOWN(cls: Type[UtilConfig], value: int) -> None:
         UtilConfig.__validator(value, int)
         cls._STATUS_COOLDOWN = value
 
@@ -263,7 +263,7 @@ class UtilConfig(metaclass=_MetaClassProperty):
         return cls._BUG_REPORT_CHANNEL
 
     @BUG_REPORT_CHANNEL.setter
-    def BUG_REPORT_CHANNEL(cls: Type[UtilConfig], value: Optional[int]) -> None:
+    def BUG_REPORT_CHANNEL(cls: Type[UtilConfig], value: int) -> None:
         UtilConfig.__validator(value, int)
         cls._BUG_REPORT_CHANNEL = value
 
