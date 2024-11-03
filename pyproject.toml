@@ -1,10 +1,10 @@
 [project]
-name = "disutil-dpy"
+name = "disckit"
 version = "0.1"
 authors = [
   { name="Jiggly Balls", email="jigglyballs9000@gmail.com" },
 ]
-description = "A pygame utility package that allows you to handle different screens in an organized manner."
+description = "An open source utilities library for the disutils bots."
 readme = "README.md"
 requires-python = ">=3.8"
 classifiers = [
