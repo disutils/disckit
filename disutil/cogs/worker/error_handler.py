@@ -10,7 +10,7 @@ from disutil.utils import ErrorEmbed
 from disutil.config import UtilConfig
 
 
-class ErrorHandler(commands.Cog, name="Error Handler"):
+class ErrorHandler(commands.Cog):
     """Error handler for global application commands."""
 
     def __init__(self, bot: commands.Bot) -> None:

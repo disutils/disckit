@@ -27,7 +27,6 @@ async def default_status_handler(bot: commands.Bot, *args: Any) -> Tuple[str, ..
         Heehee hawhaw
     """
 
-    print("ENTER")
     users = len(bot.users)
     guilds = len(bot.guilds)
     status = (
