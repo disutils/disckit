@@ -14,5 +14,4 @@ def derive_version() -> str:
 
     return version
 
-
 setup(version=derive_version())
