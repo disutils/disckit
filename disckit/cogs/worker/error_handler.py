@@ -54,9 +54,9 @@ class ErrorHandler(commands.Cog):
             type(error), error, error.__traceback__, file=sys.stderr
         )
 
-        channel = self.bot.get_channel(UtilConfig.BUG_REPORT_CHANNEL)
-        if channel is None:
-            channel = await self.bot.fetch_channel(UtilConfig.BUG_REPORT_CHANNEL)
+        channel = self.bot.get_channel(
+            UtilConfig.BUG_REPORT_CHANNEL
+        ) or await self.bot.fetch_channel(UtilConfig.BUG_REPORT_CHANNEL)
 
         if channel is not None:
             await channel.send(

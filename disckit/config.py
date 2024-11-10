@@ -17,7 +17,7 @@ from typing import (
 from enum import StrEnum
 from disckit.utils import default_status_handler
 
-TypeColor: TypeAlias = Union[int, Colour]
+TypeColor: TypeAlias = Union[int, Colour, Tuple[int, int, int]]
 _BASE_COG_PATH: str = "disckit.cogs."
 
 
@@ -96,7 +96,7 @@ class UtilConfig(metaclass=_MetaClassProperty):
     def MAIN_COLOR(cls: Type[UtilConfig]) -> TypeColor:
         """Class Attribute
         ---
-        MAIN_COLOR: :class:`Optional[int, discord.color.Color]`
+        MAIN_COLOR: :class:`Optional[int, discord.color.Color, Tuple[int, int, int]]`
 
             The color of the MainEmbed.
         """
@@ -111,7 +111,7 @@ class UtilConfig(metaclass=_MetaClassProperty):
     def SUCCESS_COLOR(cls: Type[UtilConfig]) -> TypeColor:
         """Class Attribute
         ---
-        SUCCESS_COLOR: :class:`Optional[int, discord.color.Color]`
+        SUCCESS_COLOR: :class:`Optional[int, discord.color.Color, Tuple[int, int, int]]`
 
             The color of the SuccessEmbed.
         """
@@ -126,7 +126,7 @@ class UtilConfig(metaclass=_MetaClassProperty):
     def ERROR_COLOR(cls: Type[UtilConfig]) -> TypeColor:
         """Class Attribute
         ---
-        ERROR_COLOR: :class:`Optional[int, discord.color.Color]`
+        ERROR_COLOR: :class:`Optional[int, discord.color.Color, Tuple[int, int, int]]`
 
             The color of the ErrorEmbed.
         """
