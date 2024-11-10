@@ -23,6 +23,8 @@ async def dis_load_extension(
 
     debug_message: :class:`Optional[str]`
         The debug message to be printed out when the cog is loaded.
+        Needs to contain one `{}` which is formatted to the cog name
+        being loaded.
 
     Raises
     ------
