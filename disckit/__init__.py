@@ -1,4 +1,4 @@
-__version__ = "0.1"
+__version__ = "0.2"
 
 from disckit.config import UtilConfig, CogEnum
 from disckit.errors import DisException, CogLoadError
