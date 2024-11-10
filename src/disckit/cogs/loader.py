@@ -1,8 +1,8 @@
 from discord.ext import commands
 from typing import Optional
 
-from disckit.config import CogEnum, UtilConfig
-from disckit.errors import CogLoadError
+from src.disckit.config import CogEnum, UtilConfig
+from src.disckit.errors import CogLoadError
 
 
 async def dis_load_extension(

@@ -1,6 +1,6 @@
 from typing import Tuple, Any
 from discord.ext import commands
-from disckit.utils.embeds import *
+from src.disckit.utils.embeds import *
 
 
 async def default_status_handler(bot: commands.Bot, *args: Any) -> Tuple[str, ...]:

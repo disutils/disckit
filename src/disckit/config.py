@@ -12,7 +12,7 @@ from typing import (
     Set,
 )
 from enum import StrEnum
-from disckit.utils import default_status_handler
+from src.disckit.utils import default_status_handler
 
 TypeColor: TypeAlias = Union[int, Colour, Tuple[int, int, int]]
 _BASE_COG_PATH: str = "disckit.cogs."

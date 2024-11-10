@@ -6,8 +6,8 @@ from discord import Interaction, app_commands
 from discord.ext import commands
 from typing import Optional
 
-from disckit.utils import ErrorEmbed
-from disckit.config import UtilConfig
+from src.disckit.utils import ErrorEmbed
+from src.disckit.config import UtilConfig
 
 
 class ErrorHandler(commands.Cog):
