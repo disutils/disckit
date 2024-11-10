@@ -6,8 +6,8 @@ from discord import Interaction, app_commands
 from discord.ext import commands
 from typing import Optional
 
-from src.disckit.utils import ErrorEmbed
-from src.disckit.config import UtilConfig
+from disckit.utils import ErrorEmbed
+from disckit.config import UtilConfig
 
 
 class ErrorHandler(commands.Cog):
@@ -59,6 +59,11 @@ class ErrorHandler(commands.Cog):
         ) or await self.bot.fetch_channel(UtilConfig.BUG_REPORT_CHANNEL)
 
         if channel is not None:
+            title = (
+                f"Error in command: {interaction.command.name}"
+                if interaction.command
+                else "Command Not Found"
+            )
             await channel.send(
                 embed=ErrorEmbed(
                     f"```\nError caused by-\nAuthor Name: {interaction.user}"
@@ -66,7 +71,7 @@ class ErrorHandler(commands.Cog):
                     f"\nError Type-\n{type(error)}\n"
                     f"\nError Type Description-\n{error.__traceback__.tb_frame}\n"
                     f"\nCause-\n{error.with_traceback(error.__traceback__)}```",
-                    f"Error in command: {interaction.command.name}",
+                    title=title,
                 )
             )
         embed = ErrorEmbed(

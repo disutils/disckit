@@ -12,7 +12,7 @@ from typing import (
     Set,
 )
 from enum import StrEnum
-from src.disckit.utils import default_status_handler
+from disckit.utils import default_status_handler
 
 TypeColor: TypeAlias = Union[int, Colour, Tuple[int, int, int]]
 _BASE_COG_PATH: str = "disckit.cogs."
@@ -76,6 +76,7 @@ class UtilConfig:
 
         The footer text of `MainEmbed`, `SuccessEmbed` and `ErrorEmbed`.
     """
+    
     STATUS_FUNC: ClassVar[
         Tuple[Awaitable[Union[Tuple[str, ...], List[str], Set[str]]], Tuple]
     ] = (

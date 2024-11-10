@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands, tasks
 from typing import Iterator
 
-from src.disckit.config import UtilConfig
+from disckit.config import UtilConfig
 
 
 class StatusHandler(commands.Cog):

@@ -1,4 +1,4 @@
-from src.disckit.config import CogEnum
+from disckit.config import CogEnum
 
 
 class DisException(Exception):

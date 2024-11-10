@@ -1,10 +1,10 @@
 from discord import Embed, utils
 from typing import Optional, TYPE_CHECKING
 
-import src
+import disckit
 
 if TYPE_CHECKING:
-    import src.disckit.config
+    import disckit.config
 
 
 class MainEmbed(Embed):
@@ -24,12 +24,12 @@ class MainEmbed(Embed):
         super().__init__(
             title=title,
             description=description,
-            color=src.src.disckit.config.UtilConfig.MAIN_COLOR,
+            color=disckit.config.UtilConfig.MAIN_COLOR,
             timestamp=utils.utcnow(),
         )
         self.set_footer(
-            text=src.disckit.config.UtilConfig.FOOTER_TEXT,
-            icon_url=src.disckit.config.UtilConfig.FOOTER_IMAGE,
+            text=disckit.config.UtilConfig.FOOTER_TEXT,
+            icon_url=disckit.config.UtilConfig.FOOTER_IMAGE,
         )
 
 
@@ -48,16 +48,16 @@ class SuccessEmbed(Embed):
         """
 
         if title:
-            title = f"{src.disckit.config.UtilConfig.SUCCESS_EMOJI} {title}"
+            title = f"{disckit.config.UtilConfig.SUCCESS_EMOJI} {title}"
         super().__init__(
             title=title,
             description=description,
-            color=src.disckit.config.UtilConfig.SUCCESS_COLOR,
+            color=disckit.config.UtilConfig.SUCCESS_COLOR,
             timestamp=utils.utcnow(),
         )
         self.set_footer(
-            text=src.disckit.config.UtilConfig.FOOTER_TEXT,
-            icon_url=src.disckit.config.UtilConfig.FOOTER_IMAGE,
+            text=disckit.config.UtilConfig.FOOTER_TEXT,
+            icon_url=disckit.config.UtilConfig.FOOTER_IMAGE,
         )
 
 
@@ -80,10 +80,10 @@ class ErrorEmbed(Embed):
         super().__init__(
             title=title,
             description=description,
-            color=src.disckit.config.UtilConfig.ERROR_COLOR,
+            color=disckit.config.UtilConfig.ERROR_COLOR,
             timestamp=utils.utcnow(),
         )
         self.set_footer(
-            text=src.disckit.config.UtilConfig.FOOTER_TEXT,
-            icon_url=src.disckit.config.UtilConfig.FOOTER_IMAGE,
+            text=disckit.config.UtilConfig.FOOTER_TEXT,
+            icon_url=disckit.config.UtilConfig.FOOTER_IMAGE,
         )
