@@ -1,6 +1,8 @@
 from typing import Tuple, Any
 from discord.ext import commands
-from disckit.utils.embeds import *
+from disckit.utils.embeds import SuccessEmbed, MainEmbed, ErrorEmbed
+
+__all__ = ("MainEmbed", "SuccessEmbed", "ErrorEmbed", "default_status_handler")
 
 
 async def default_status_handler(bot: commands.Bot, *args: Any) -> Tuple[str, ...]:
