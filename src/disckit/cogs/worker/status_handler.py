@@ -1,17 +1,17 @@
 import discord
 
 from discord.ext import commands, tasks
-from typing import Iterator
+from typing import Iterator, Optional
 
 from disckit.config import UtilConfig
 
 
-class StatusHandler(commands.Cog):
+class StatusHandler(commands.Cog, name="Status Handler"):
     """Cog for handling bot's dynamic status."""
 
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
-        self.status = None
+        self.status: Optional[Iterator[str]] = None
 
     async def cog_load(self) -> None:
         self.status_task.start()

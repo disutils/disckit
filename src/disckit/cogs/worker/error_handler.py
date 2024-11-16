@@ -10,7 +10,7 @@ from disckit.utils import ErrorEmbed
 from disckit.config import UtilConfig
 
 
-class ErrorHandler(commands.Cog):
+class ErrorHandler(commands.Cog, name="Error Handler"):
     """Error handler for global application commands."""
 
     def __init__(self, bot: commands.Bot) -> None:
