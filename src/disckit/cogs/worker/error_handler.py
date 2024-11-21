@@ -90,7 +90,7 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
         elif (
             isinstance(error, commands.CommandError)
             and str(error) == "User is blacklisted."
-        ):
+        ):  # Custom error that is raised by disutils bots for blacklisting users.
             return
 
         elif isinstance(error, discord.NotFound):
