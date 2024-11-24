@@ -46,7 +46,7 @@ async def dis_load_extension(
                     f"Attribute - `UtilConfig.STATUS_TYPE` needs"
                     "to be set to use StatusHandler cog"
                 )
-            
+
             elif not UtilConfig.STATUS_COOLDOWN:
                 message = (
                     f"Attribute - `UtilConfig.STATUS_COOLDOWN` needs"

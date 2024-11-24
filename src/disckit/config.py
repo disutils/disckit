@@ -130,6 +130,7 @@ class UtilConfig:
         LemmaTranslator only works for translating command paramters and description only.
     """
 
+
 class CogEnum(StrEnum):
     ERROR_HANDLER: str = _BASE_WORKER_COG_PATH + "error_handler"
     """An extension for error handling."""
