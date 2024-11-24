@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from discord import Colour, ActivityType
+from discord import Colour, ActivityType, Locale
 from typing import (
     Optional,
     TypeAlias,
@@ -8,6 +8,7 @@ from typing import (
     ClassVar,
     Awaitable,
     Tuple,
+    Dict,
     List,
     Set,
 )
@@ -15,7 +16,7 @@ from enum import StrEnum
 from disckit.utils import default_status_handler
 
 TypeColor: TypeAlias = Union[int, Colour, Tuple[int, int, int]]
-_BASE_COG_PATH: str = "disckit.cogs."
+_BASE_WORKER_COG_PATH: str = "disckit.cogs.worker."
 
 
 class UtilConfig:
@@ -119,10 +120,19 @@ class UtilConfig:
         The channel ID to where the bug reports will be sent to by the `ErrorHandler` cog.
     """
 
+    LEMMA_TRANS_PATHS: ClassVar[Optional[Dict[Locale, str]]] = None
+    """Class Attribute
+    ---
+
+    LEMMA_TRANS_PATHS: :class:`Optional[Dict[Locale, str]]`
+
+        A `discord.Locale` object mapping to the path of it's respective translation. The
+        LemmaTranslator only works for translating command paramters and description only.
+    """
 
 class CogEnum(StrEnum):
-    ERROR_HANDLER: str = _BASE_COG_PATH + "worker.error_handler"
+    ERROR_HANDLER: str = _BASE_WORKER_COG_PATH + "error_handler"
     """An extension for error handling."""
 
-    STATUS_HANDLER: str = _BASE_COG_PATH + "worker.status_handler"
+    STATUS_HANDLER: str = _BASE_WORKER_COG_PATH + "status_handler"
     """An extension for the bot's status handling."""
