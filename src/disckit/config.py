@@ -120,14 +120,26 @@ class UtilConfig:
         The channel ID to where the bug reports will be sent to by the `ErrorHandler` cog.
     """
 
-    LEMMA_TRANS_PATHS: ClassVar[Optional[Dict[Locale, str]]] = None
+    LEMMA_TRANS_GROUPS: ClassVar[Optional[Dict[Locale, str]]] = None
     """Class Attribute
     ---
 
     LEMMA_TRANS_PATHS: :class:`Optional[Dict[Locale, str]]`
 
-        A `discord.Locale` object mapping to the path of it's respective translation. The
-        LemmaTranslator only works for translating command paramters and description only.
+        A :class:`discord.Locale` object mapping to the folder / file containing it's respective group
+        translation files only. The LemmaTranslator only works for translating command paramters and
+        description only.
+    """
+
+    LEMMA_TRANS_COMMANDS: ClassVar[Optional[Dict[Locale, str]]] = None
+    """Class Attribute
+    ---
+
+    LEMMA_TRANS_PATHS: :class:`Optional[Dict[Locale, str]]`
+
+        A :class:`discord.Locale` object mapping to the folder / file containing it's respective command
+        translation files. The LemmaTranslator only works for translating command paramters and description
+        only.
     """
 
 
