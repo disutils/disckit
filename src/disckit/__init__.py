@@ -19,6 +19,8 @@ from disckit.config import UtilConfig, CogEnum
 from disckit.errors import DisException, CogLoadError
 from typing import NamedTuple, Literal
 
+__all__ = ("UtilConfig", "CogEnum", "DisException", "CogLoadError")
+
 
 class VersionInfo(NamedTuple):
     major: int
