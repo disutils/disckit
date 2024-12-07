@@ -1,8 +1,19 @@
-from typing import Tuple, Any
+from typing import Tuple, List, Any, Callable, Awaitable, Union
+from discord import Interaction
 from discord.ext import commands
+from discord.app_commands import Choice
 from disckit.utils.embeds import SuccessEmbed, MainEmbed, ErrorEmbed
 
-__all__ = ("MainEmbed", "SuccessEmbed", "ErrorEmbed", "default_status_handler")
+# from disckit.utils.translator import LemmaTranslator
+
+__all__ = (
+    "MainEmbed",
+    "SuccessEmbed",
+    "ErrorEmbed",
+    #    "LemmaTranslator",
+    "default_status_handler",
+    "make_autocomplete",
+)
 
 
 async def default_status_handler(bot: commands.Bot, *args: Any) -> Tuple[str, ...]:
@@ -40,3 +51,34 @@ async def default_status_handler(bot: commands.Bot, *args: Any) -> Tuple[str, ..
     )
 
     return status
+
+
+def make_autocomplete(
+    *args: Union[str, int, float],
+) -> Callable[[Interaction, str], Awaitable[list[Choice[str]]]]:
+    """
+    Creates an autocomplete function for the given arguments.
+
+    Parameters
+    ----------
+        *args: :class:`str`: Options for the autocomplete
+
+    Returns
+    --------
+        A function that can be put in @discord.app_commands.autocomplete
+
+    Usage
+    ------
+        ```
+        @app_commands.autocomplete(choice=make_autocomplete("Heads", "Tails"))
+        @app_commands.command(name="coin-flip")
+        async def coin_flip(self, interaction: discord.Interaction, choice: str):
+            ...
+        ```
+    """
+    choices = [Choice(name=str(arg), value=arg) for arg in args]
+
+    async def autocomplete(_, __) -> List[Choice[str]]:
+        return choices
+
+    return autocomplete
