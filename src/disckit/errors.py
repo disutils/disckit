@@ -17,6 +17,20 @@ class CogLoadError(DisException):
         The cog that failed loading.
     """
 
-    def __init__(self, message: str, cog: CogEnum) -> None:
-        super().__init__(message)
+    def __init__(self, message: str, cog: CogEnum, **kwargs) -> None:
+        super().__init__(message, **kwargs)
         self.cog = cog
+
+
+class LemmaLoadError(DisException):
+    """Raised when an error occurs in loading the translator
+
+    Attributes
+    ------------
+    error_code: :class:`int`
+        The error code of the exception.
+    """
+
+    def __init__(self, message: str, error_code: int, **kwargs) -> None:
+        super().__init__(message, **kwargs)
+        self.error_code = error_code
