@@ -57,13 +57,9 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
         except discord.InteractionResponded:
             await interaction.followup.send(**load)
 
-    async def throw_err(
-        self, interaction: Interaction, error: discord.DiscordException
-    ) -> None:
+    async def throw_err(self, interaction: Interaction, error: discord.DiscordException) -> None:
         print(f"Ignoring exception in command {interaction.command}:", file=sys.stderr)
-        traceback.print_exception(
-            type(error), error, error.__traceback__, file=sys.stderr
-        )
+        traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
         channel = self.bot.get_channel(
             UtilConfig.BUG_REPORT_CHANNEL
@@ -104,8 +100,7 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             return
 
         elif (
-            isinstance(error, commands.CommandError)
-            and str(error) == "User is blacklisted."
+            isinstance(error, commands.CommandError) and str(error) == "User is blacklisted."
         ):  # Custom error that is raised by disutils bots for blacklisting users.
             return
 
@@ -129,12 +124,9 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             error_embed.set_thumbnail(
                 url="https://images.disutils.com/bot_assets/assets/missing_perms.png"
             )
-            await self.send_response(
-                interaction=interaction, embed=error_embed, ephemeral=True
-            )
+            await self.send_response(interaction=interaction, embed=error_embed, ephemeral=True)
 
         elif isinstance(error, commands.errors.MissingPermissions):
-
             missing_permissions = ", ".join(error.missing_permissions)
             error_embed.description = (
                 f"You don't have the required permissions for this command, "
@@ -143,13 +135,9 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             error_embed.set_thumbnail(
                 url="https://images.disutils.com/bot_assets/assets/access_denied.png"
             )
-            await self.send_response(
-                interaction=interaction, embed=error_embed, ephemeral=True
-            )
+            await self.send_response(interaction=interaction, embed=error_embed, ephemeral=True)
 
-        elif isinstance(
-            error, (commands.ChannelNotFound, commands.errors.ChannelNotFound)
-        ):
+        elif isinstance(error, (commands.ChannelNotFound, commands.errors.ChannelNotFound)):
             error_embed.description = (
                 f"The specified channel {error.argument} was not found."
                 "Please pass in a valid channel."

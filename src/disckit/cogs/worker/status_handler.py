@@ -39,9 +39,7 @@ class StatusHandler(commands.Cog, name="Status Handler"):
         )
 
     async def __get_iter(self) -> Iterator[str]:
-        return iter(
-            await UtilConfig.STATUS_FUNC[0](self.bot, *UtilConfig.STATUS_FUNC[1])
-        )
+        return iter(await UtilConfig.STATUS_FUNC[0](self.bot, *UtilConfig.STATUS_FUNC[1]))
 
 
 async def setup(bot: commands.Bot) -> None:

@@ -78,9 +78,7 @@ class UtilConfig:
         The footer text of `MainEmbed`, `SuccessEmbed` and `ErrorEmbed`.
     """
 
-    STATUS_FUNC: ClassVar[
-        Tuple[Awaitable[Union[Tuple[str, ...], List[str], Set[str]]], Tuple]
-    ] = (
+    STATUS_FUNC: ClassVar[Tuple[Awaitable[Union[Tuple[str, ...], List[str], Set[str]]], Tuple]] = (
         default_status_handler,
         (),
     )

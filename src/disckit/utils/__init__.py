@@ -70,10 +70,13 @@ def make_autocomplete(
     Usage
     ------
         ```
-        @app_commands.autocomplete(choice=make_autocomplete("Heads", "Tails"))
+        @app_commands.autocomplete(
+            choice=make_autocomplete("Heads", "Tails")
+        )
         @app_commands.command(name="coin-flip")
-        async def coin_flip(self, interaction: discord.Interaction, choice: str):
-            ...
+        async def coin_flip(
+            self, interaction: discord.Interaction, choice: str
+        ): ...
         ```
     """
     choices = [Choice(name=str(arg), value=arg) for arg in args]
