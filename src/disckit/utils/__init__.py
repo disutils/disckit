@@ -47,7 +47,7 @@ async def default_status_handler(bot: commands.Bot, *args: Any) -> Tuple[str, ..
         # (UtilConfig.STATUS_TYPE = ActivityType.listening).
         f"{users:,} users",
         f"humans from {guilds:,} servers",
-        f"Slash commands!",
+        "Slash commands!",
     )
 
     return status
@@ -81,7 +81,7 @@ def make_autocomplete(
     """
     choices = [Choice(name=str(arg), value=arg) for arg in args]
 
-    async def autocomplete(_, __) -> List[Choice[str]]:
+    async def autocomplete(_, __) -> List[Choice[str]]:  # noqa ANN001
         return choices
 
     return autocomplete

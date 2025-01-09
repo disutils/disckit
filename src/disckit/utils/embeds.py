@@ -10,7 +10,7 @@ if TYPE_CHECKING:
 class MainEmbed(Embed):
     """Represents a main embed for general use."""
 
-    def __init__(self, description: Optional[str] = None, title: Optional[str] = None):
+    def __init__(self, description: Optional[str] = None, title: Optional[str] = None) -> None:
         """
         Parameters
         ----------
@@ -36,7 +36,7 @@ class MainEmbed(Embed):
 class SuccessEmbed(Embed):
     """Represents a success embed."""
 
-    def __init__(self, description: Optional[str] = None, title: Optional[str] = None):
+    def __init__(self, description: Optional[str] = None, title: Optional[str] = None) -> None:
         """
         Parameters
         ----------
@@ -64,7 +64,7 @@ class SuccessEmbed(Embed):
 class ErrorEmbed(Embed):
     """Represents an error embed."""
 
-    def __init__(self, description: Optional[str] = None, title: Optional[str] = None):
+    def __init__(self, description: Optional[str] = None, title: Optional[str] = None) -> None:
         """
         Parameters
         ----------
