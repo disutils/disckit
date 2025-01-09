@@ -25,8 +25,8 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
         app_commands.CommandTree.on_error = self.default_error_handler
         print(f"{self.__class__.__name__} has been unloaded.")
 
+    @staticmethod
     def __get_group_names(
-        self,
         group: app_commands.Group,
         all_groups: Optional[List[app_commands.Group]] = None,
     ) -> List[str]:
@@ -34,7 +34,7 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
         all_groups.append(group.name)
         if group.parent is None:
             return all_groups
-        self.__get_groups(group.parent, all_groups)
+        ErrorHandler.__get_group_names(group.parent, all_groups)
 
     @staticmethod
     async def send_response(
@@ -57,19 +57,20 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
         except discord.InteractionResponded:
             await interaction.followup.send(**load)
 
-    async def throw_err(self, interaction: Interaction, error: discord.DiscordException) -> None:
+    @staticmethod
+    async def throw_err(interaction: Interaction, error: discord.DiscordException) -> None:
         print(f"Ignoring exception in command {interaction.command}:", file=sys.stderr)
         traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
 
-        channel = self.bot.get_channel(
+        channel = interaction.client.get_channel(
             UtilConfig.BUG_REPORT_CHANNEL
-        ) or await self.bot.fetch_channel(UtilConfig.BUG_REPORT_CHANNEL)
+        ) or await interaction.client.fetch_channel(UtilConfig.BUG_REPORT_CHANNEL)
 
         if channel is not None:
             if interaction.command:
                 final_name = []
                 if interaction.command.parent:
-                    final_name = self.__get_group_names(interaction.command.parent)
+                    final_name = ErrorHandler.__get_group_names(interaction.command.parent)
                 final_name.append(interaction.command.name)
                 name = "/" + (" ".join(final_name))
             else:
