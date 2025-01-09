@@ -36,12 +36,12 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             return all_groups
         self.__get_groups(group.parent, all_groups)
 
+    @staticmethod
     async def send_response(
-        self,
         *,
         interaction: Interaction,
         embed: Optional[discord.Embed] = None,
-        msg: Optional[str] = None,
+        content: Optional[str] = None,
         ephemeral: bool = False,
     ) -> None:
         """Handles the error response to user."""
@@ -49,8 +49,8 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
         load = {"ephemeral": ephemeral}
         if embed:
             load["embed"] = embed
-        if msg:
-            load["content"] = msg
+        if content:
+            load["content"] = content
 
         try:
             await interaction.response.send_message(**load)
@@ -89,7 +89,7 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             title="Sorry...",
             description="An unexpected error has occurred.\nThe developers have been notified of it.",
         )
-        await self.send_response(interaction=interaction, embed=embed)
+        await ErrorHandler.send_response(interaction=interaction, embed=embed)
 
     async def on_error(
         self, interaction: discord.Interaction, error: app_commands.AppCommandError
@@ -113,9 +113,9 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
                 "You do not have the required permissions to use this command.\n"
                 "This command is only available to owners!",
             )
-            await self.send_response(interaction=interaction, embed=error_embed)
+            await ErrorHandler.send_response(interaction=interaction, embed=error_embed)
 
-        elif isinstance(error, commands.BotMissingPermissions):
+        elif isinstance(error, app_commands.BotMissingPermissions):
             missing_permissions = ", ".join(error.missing_permissions)
             error_embed.description = (
                 f"I don't have the required permissions for this command, "
@@ -124,9 +124,9 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             error_embed.set_thumbnail(
                 url="https://images.disutils.com/bot_assets/assets/missing_perms.png"
             )
-            await self.send_response(interaction=interaction, embed=error_embed, ephemeral=True)
+            await ErrorHandler.send_response(interaction=interaction, embed=error_embed, ephemeral=True)
 
-        elif isinstance(error, commands.errors.MissingPermissions):
+        elif isinstance(error, app_commands.MissingPermissions):
             missing_permissions = ", ".join(error.missing_permissions)
             error_embed.description = (
                 f"You don't have the required permissions for this command, "
@@ -135,22 +135,22 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             error_embed.set_thumbnail(
                 url="https://images.disutils.com/bot_assets/assets/access_denied.png"
             )
-            await self.send_response(interaction=interaction, embed=error_embed, ephemeral=True)
+            await ErrorHandler.send_response(interaction=interaction, embed=error_embed, ephemeral=True)
 
-        elif isinstance(error, (commands.ChannelNotFound, commands.errors.ChannelNotFound)):
+        elif isinstance(error, commands.ChannelNotFound):
             error_embed.description = (
                 f"The specified channel {error.argument} was not found."
                 "Please pass in a valid channel."
             )
-            await self.send_response(interaction=interaction, embed=error_embed)
+            await ErrorHandler.send_response(interaction=interaction, embed=error_embed)
 
-        elif isinstance(error, app_commands.errors.CommandSignatureMismatch):
+        elif isinstance(error, app_commands.CommandSignatureMismatch):
             error_embed.description = (
                 f"The signature of the command {error.command.name} seems to be different"
-                " by the one provided by discord. To fix this issue please restart your "
-                "discord. If the issue still persists please contact the devs."
+                " by the one provided by discord. To fix this issue please request the developers"
+                " to sync the commands. If the issue still persists please contact the devs."
             )
-            await self.send_response(interaction=interaction, embed=error_embed)
+            await ErrorHandler.send_response(interaction=interaction, embed=error_embed)
 
         else:
             await self.throw_err(interaction=interaction, error=error)
