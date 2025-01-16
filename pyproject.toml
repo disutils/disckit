@@ -1,6 +1,6 @@
 [project]
 name = "disckit"
-version = "0.4"
+version = "0.5"
 authors = [
   { name="Jiggly Balls", email="jigglyballs9000@gmail.com" },
 ]
@@ -38,7 +38,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [tool.ruff]
-line-length = 100
+line-length = 79
 lint.extend-select = ["ANN"]
 lint.ignore = ["ANN401"]
 
@@ -46,4 +46,4 @@ lint.ignore = ["ANN401"]
 quote-style = "double"
 indent-style = "space"
 docstring-code-format = true
-docstring-code-line-length = 60
+docstring-code-line-length = 72
