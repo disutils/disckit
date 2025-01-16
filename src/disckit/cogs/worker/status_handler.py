@@ -35,11 +35,17 @@ class StatusHandler(commands.Cog, name="Status Handler"):
             current_status = next(self.status)
 
         await self.bot.change_presence(
-            activity=discord.Activity(type=UtilConfig.STATUS_TYPE, name=current_status)
+            activity=discord.Activity(
+                type=UtilConfig.STATUS_TYPE, name=current_status
+            )
         )
 
     async def __get_iter(self) -> Iterator[str]:
-        return iter(await UtilConfig.STATUS_FUNC[0](self.bot, *UtilConfig.STATUS_FUNC[1]))
+        return iter(
+            await UtilConfig.STATUS_FUNC[0](
+                self.bot, *UtilConfig.STATUS_FUNC[1]
+            )
+        )
 
 
 async def setup(bot: commands.Bot) -> None:

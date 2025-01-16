@@ -58,19 +58,30 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             await interaction.followup.send(**load)
 
     @staticmethod
-    async def throw_err(interaction: Interaction, error: discord.DiscordException) -> None:
-        print(f"Ignoring exception in command {interaction.command}:", file=sys.stderr)
-        traceback.print_exception(type(error), error, error.__traceback__, file=sys.stderr)
+    async def throw_err(
+        interaction: Interaction, error: discord.DiscordException
+    ) -> None:
+        print(
+            f"Ignoring exception in command {interaction.command}:",
+            file=sys.stderr,
+        )
+        traceback.print_exception(
+            type(error), error, error.__traceback__, file=sys.stderr
+        )
 
         channel = interaction.client.get_channel(
             UtilConfig.BUG_REPORT_CHANNEL
-        ) or await interaction.client.fetch_channel(UtilConfig.BUG_REPORT_CHANNEL)
+        ) or await interaction.client.fetch_channel(
+            UtilConfig.BUG_REPORT_CHANNEL
+        )
 
         if channel is not None:
             if interaction.command:
                 final_name = []
                 if interaction.command.parent:
-                    final_name = ErrorHandler.__get_group_names(interaction.command.parent)
+                    final_name = ErrorHandler.__get_group_names(
+                        interaction.command.parent
+                    )
                 final_name.append(interaction.command.name)
                 name = "/" + (" ".join(final_name))
             else:
@@ -93,7 +104,9 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
         await ErrorHandler.send_response(interaction=interaction, embed=embed)
 
     async def on_error(
-        self, interaction: discord.Interaction, error: app_commands.AppCommandError
+        self,
+        interaction: discord.Interaction,
+        error: app_commands.AppCommandError,
     ) -> None:
         error_embed = ErrorEmbed("Error")
 
@@ -101,7 +114,8 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             return
 
         elif (
-            isinstance(error, commands.CommandError) and str(error) == "User is blacklisted."
+            isinstance(error, commands.CommandError)
+            and str(error) == "User is blacklisted."
         ):  # Custom error that is raised by disutils bots for blacklisting users.
             return
 
@@ -114,7 +128,9 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
                 "You do not have the required permissions to use this command.\n"
                 "This command is only available to owners!",
             )
-            await ErrorHandler.send_response(interaction=interaction, embed=error_embed)
+            await ErrorHandler.send_response(
+                interaction=interaction, embed=error_embed
+            )
 
         elif isinstance(error, app_commands.BotMissingPermissions):
             missing_permissions = ", ".join(error.missing_permissions)
@@ -125,7 +141,9 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             error_embed.set_thumbnail(
                 url="https://images.disutils.com/bot_assets/assets/missing_perms.png"
             )
-            await ErrorHandler.send_response(interaction=interaction, embed=error_embed, ephemeral=True)
+            await ErrorHandler.send_response(
+                interaction=interaction, embed=error_embed, ephemeral=True
+            )
 
         elif isinstance(error, app_commands.MissingPermissions):
             missing_permissions = ", ".join(error.missing_permissions)
@@ -136,14 +154,18 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             error_embed.set_thumbnail(
                 url="https://images.disutils.com/bot_assets/assets/access_denied.png"
             )
-            await ErrorHandler.send_response(interaction=interaction, embed=error_embed, ephemeral=True)
+            await ErrorHandler.send_response(
+                interaction=interaction, embed=error_embed, ephemeral=True
+            )
 
         elif isinstance(error, commands.ChannelNotFound):
             error_embed.description = (
                 f"The specified channel {error.argument} was not found."
                 "Please pass in a valid channel."
             )
-            await ErrorHandler.send_response(interaction=interaction, embed=error_embed)
+            await ErrorHandler.send_response(
+                interaction=interaction, embed=error_embed
+            )
 
         elif isinstance(error, app_commands.CommandSignatureMismatch):
             error_embed.description = (
@@ -151,7 +173,9 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
                 " by the one provided by discord. To fix this issue please request the developers"
                 " to sync the commands. If the issue still persists please contact the devs."
             )
-            await ErrorHandler.send_response(interaction=interaction, embed=error_embed)
+            await ErrorHandler.send_response(
+                interaction=interaction, embed=error_embed
+            )
 
         else:
             await self.throw_err(interaction=interaction, error=error)

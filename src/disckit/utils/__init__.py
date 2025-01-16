@@ -16,7 +16,9 @@ __all__ = (
 )
 
 
-async def default_status_handler(bot: commands.Bot, *args: Any) -> Tuple[str, ...]:
+async def default_status_handler(
+    bot: commands.Bot, *args: Any
+) -> Tuple[str, ...]:
     """The default status handler. The first parameter will always be the
     bot instance which will automatically be passed as argument in the
     status handler.
@@ -70,9 +72,7 @@ def make_autocomplete(
     Usage
     ------
         ```
-        @app_commands.autocomplete(
-            choice=make_autocomplete("Heads", "Tails")
-        )
+        @app_commands.autocomplete(choice=make_autocomplete("Heads", "Tails"))
         @app_commands.command(name="coin-flip")
         async def coin_flip(
             self, interaction: discord.Interaction, choice: str
