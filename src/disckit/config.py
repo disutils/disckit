@@ -88,9 +88,11 @@ class UtilConfig:
     ---
     STATUS_FUNC: :class:`Tuple[Awaitable[Union[Tuple, List, Set]], Tuple]`
 
-        A tuple having its first element as a coroutine object which will be awaited when-<br>
-        - When the cog first loads.<br>
-        - When the handler is done iterating through all statuses returned from the function.<br>
+        A tuple having its first element as a coroutine object which will be awaited when-
+        
+        - When the cog first loads.
+        - When the handler is done iterating through all statuses returned from the function.
+
         The second element is a tuple containing the extra arguments that can be passed to your
         custom status handler function. If no arguments have to be passed an empty tuple
         should suffice.
