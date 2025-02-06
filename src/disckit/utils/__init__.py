@@ -134,11 +134,11 @@ def disallow_bots(
 
     @functools.wraps(func)
     async def wrapper(*args: Any, **kwargs: Any) -> None:
-        interaction: None | Interaction = None
+        interaction: None | discord.Interaction = None
         bot_user: bool = False
 
         for arg in args + tuple(kwargs.values()):
-            if isinstance(arg, Interaction):
+            if isinstance(arg, discord.Interaction):
                 interaction = arg
 
             elif isinstance(arg, (discord.Member, discord.User)):
@@ -165,10 +165,10 @@ def is_owner(
 
     @functools.wraps(func)
     async def wrapper(*args: Any, **kwargs: Any) -> None:
-        interaction: None | Interaction[Bot] = None
+        interaction: None | discord.Interaction[Bot] = None
 
         for arg in args + tuple(kwargs.values()):
-            if isinstance(arg, Interaction):
+            if isinstance(arg, discord.Interaction):
                 interaction = arg
                 break
 
