@@ -9,7 +9,7 @@ A utility package made for the disutils bots.
 
 """
 
-__version__ = "0.5"
+__version__ = "0.6"
 __title__ = "disckit"
 __author__ = "Jiggly Balls"
 __license__ = "MIT"
