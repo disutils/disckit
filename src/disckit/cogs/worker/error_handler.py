@@ -149,7 +149,7 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             missing_permissions = ", ".join(error.missing_permissions)
             error_embed.description = (
                 f"You don't have the required permissions for this command, "
-                f"you need ``{missing_permissions}`` permission to use this command.",
+                f"you need ``{missing_permissions}`` permission to use this command."
             )
             error_embed.set_thumbnail(
                 url="https://images.disutils.com/bot_assets/assets/access_denied.png"
