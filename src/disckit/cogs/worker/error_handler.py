@@ -126,7 +126,7 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
         elif isinstance(error, commands.errors.NotOwner):
             error_embed.description = (
                 "You do not have the required permissions to use this command.\n"
-                "This command is only available to owners!",
+                "This command is only available to owners!"
             )
             await ErrorHandler.send_response(
                 interaction=interaction, embed=error_embed
