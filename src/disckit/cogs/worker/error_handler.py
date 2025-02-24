@@ -136,7 +136,7 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             missing_permissions = ", ".join(error.missing_permissions)
             error_embed.description = (
                 f"I don't have the required permissions for this command, "
-                f"I need ``{missing_permissions}`` permission to proceed with this command.",
+                f"I need ``{missing_permissions}`` permission to proceed with this command."
             )
             error_embed.set_thumbnail(
                 url="https://images.disutils.com/bot_assets/assets/missing_perms.png"
