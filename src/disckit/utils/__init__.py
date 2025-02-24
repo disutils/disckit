@@ -20,7 +20,7 @@ if TYPE_CHECKING:
         TypeVar,
     )
 
-    _T = TypeVar("T", str, int, float)
+    _T = TypeVar("_T", str, int, float)
 
 
 __all__ = (
@@ -129,7 +129,7 @@ async def sku_check(bot: Bot, sku_id: int, user_id: int) -> bool:
 
 def disallow_bots(
     func: Coroutine[Any, Any, _T],
-) -> Coroutine[Any, Any, _T]:
+) -> None | Coroutine[Any, Any, _T]:
     """A decorator used for not allowing members to pass in a bot user into command params"""
 
     @functools.wraps(func)
@@ -160,7 +160,7 @@ def disallow_bots(
 
 def is_owner(
     func: Coroutine[Any, Any, _T],
-) -> Coroutine[Any, Any, _T]:
+) -> None | Coroutine[Any, Any, _T]:
     """A decorator for owner-only slash commands"""
 
     @functools.wraps(func)
