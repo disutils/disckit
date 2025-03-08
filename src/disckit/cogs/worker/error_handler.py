@@ -158,15 +158,6 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
                 interaction=interaction, embed=error_embed, ephemeral=True
             )
 
-        elif isinstance(error, commands.ChannelNotFound):
-            error_embed.description = (
-                f"The specified channel {error.argument} was not found."
-                "Please pass in a valid channel."
-            )
-            await ErrorHandler.send_response(
-                interaction=interaction, embed=error_embed
-            )
-
         elif isinstance(error, app_commands.CommandSignatureMismatch):
             error_embed.description = (
                 f"The signature of the command {error.command.name} seems to be different"
