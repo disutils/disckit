@@ -53,7 +53,10 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             load["content"] = content
 
         try:
-            await interaction.response.send_message(**load)
+            if interaction.response.is_done():
+                await interaction.followup.send(**load)
+            else:
+                await interaction.response.send_message(**load)
         except discord.InteractionResponded:
             await interaction.followup.send(**load)
 
