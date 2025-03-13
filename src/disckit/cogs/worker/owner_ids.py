@@ -3,6 +3,8 @@ import logging
 
 from discord.ext import commands, tasks
 
+from disckit.config import UtilConfig
+
 logger = logging.getLogger(__name__)
 
 
@@ -20,7 +22,7 @@ class OwnerIDs(commands.Cog):
 
     @tasks.loop(hours=12)
     async def fetch_owner_ids(self) -> None:
-        url = "https://images.disutils.com/bot_assets/assets/owners.txt"
+        url = f"{UtilConfig.OWNER_LIST_URL}"
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 if response.status == 200:
