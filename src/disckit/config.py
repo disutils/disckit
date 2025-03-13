@@ -144,6 +144,14 @@ class UtilConfig:
         only.
     """
 
+    OWNER_LIST_URL: ClassVar[Optional[str]] = None
+    """Class Attribute
+    ---
+    OWNER_LIST_URL: :class:`Optional[str]`
+
+        The URL from which to fetch the list of owner IDs for the bot. If not set, no fetching will occur.
+    """
+
 
 class CogEnum(StrEnum):
     ERROR_HANDLER: str = _BASE_WORKER_COG_PATH + "error_handler"
@@ -151,3 +159,6 @@ class CogEnum(StrEnum):
 
     STATUS_HANDLER: str = _BASE_WORKER_COG_PATH + "status_handler"
     """An extension for the bot's status handling."""
+
+    OWNER_IDS_HANDLER: str = _BASE_WORKER_COG_PATH + "owner_ids"
+    """An extension for fetching multiple IDs in a URL."
