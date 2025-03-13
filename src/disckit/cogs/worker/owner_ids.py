@@ -7,7 +7,6 @@ from disckit.config import UtilConfig
 
 logger = logging.getLogger(__name__)
 
-
 class OwnerIDs(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
@@ -23,6 +22,11 @@ class OwnerIDs(commands.Cog):
     @tasks.loop(hours=12)
     async def fetch_owner_ids(self) -> None:
         url = f"{UtilConfig.OWNER_LIST_URL}"
+        
+        if not url:
+            logger.warning("OWNER_LIST_URL is not set in the configuration.")
+            return
+        
         async with aiohttp.ClientSession() as session:
             async with session.get(url) as response:
                 if response.status == 200:
@@ -39,6 +43,5 @@ class OwnerIDs(commands.Cog):
     async def before_fetch_owner_ids(self) -> None:
         await self.bot.wait_until_ready()
 
-
-async def setup(bot: Bot) -> None:
+async def setup(bot: commands.Bot) -> None:
     await bot.add_cog(OwnerIDs(bot))
