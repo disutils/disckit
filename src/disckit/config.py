@@ -161,4 +161,4 @@ class CogEnum(StrEnum):
     """An extension for the bot's status handling."""
 
     OWNER_IDS_HANDLER: str = _BASE_WORKER_COG_PATH + "owner_ids"
-    """An extension for fetching multiple IDs in a URL."
+    """An extension for fetching multiple IDs in a URL."""
