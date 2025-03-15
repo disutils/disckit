@@ -60,6 +60,13 @@ async def dis_load_extension(
                     " to be set to use ErrorHandler cog."
                 )
 
+        if cog == CogEnum.OWNER_IDS_HANDLER:
+            if not UtilConfig.OWNER_LIST_URL:
+                message = (
+                    "Attribute - `UtilConfig.OWNER_LIST_URL` needs to be"
+                    "set to use OwnerIDSHandler cog"
+                )
+
         if message:
             raise CogLoadError(message=message, cog=cog)
 
