@@ -8,7 +8,7 @@ from disckit.config import UtilConfig
 logger = logging.getLogger(__name__)
 
 
-class OwnerIDs(commands.Cog):
+class OwnerIDsHandler(commands.Cog):
     def __init__(self, bot: commands.Bot) -> None:
         self.bot = bot
         self.fetch_owner_ids.start()
@@ -22,7 +22,7 @@ class OwnerIDs(commands.Cog):
 
     @tasks.loop(hours=12)
     async def fetch_owner_ids(self) -> None:
-        url = f"{UtilConfig.OWNER_LIST_URL}"
+        url = UtilConfig.OWNER_LIST_URL
 
         if not url:
             logger.warning("OWNER_LIST_URL is not set in the configuration.")
@@ -38,8 +38,8 @@ class OwnerIDs(commands.Cog):
                     self.bot.owner_ids = OWNER_IDS
                     logger.info("Owner IDs successfully fetched.")
                 else:
-                    logger.info(
-                        f"Failed to fetch owner IDs: {response.status}"
+                    logger.error(
+                        f"Failed to fetch owner IDs. Response Status: {response.status}"
                     )
 
     @fetch_owner_ids.before_loop
@@ -48,4 +48,4 @@ class OwnerIDs(commands.Cog):
 
 
 async def setup(bot: commands.Bot) -> None:
-    await bot.add_cog(OwnerIDs(bot))
+    await bot.add_cog(OwnerIDsHandler(bot))
