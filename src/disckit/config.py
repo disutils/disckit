@@ -1,19 +1,22 @@
 from __future__ import annotations
 
-from discord import Colour, ActivityType, Locale
-from typing import (
-    Optional,
-    Union,
-    ClassVar,
-    Awaitable,
-    Tuple,
-    Dict,
-    List,
-    Set,
-)
+from discord import ActivityType, Colour, Locale
 from enum import StrEnum
+from typing import TYPE_CHECKING
+
 from disckit.utils import default_status_handler
 
+if TYPE_CHECKING:
+    from typing import (
+        Optional,
+        Union,
+        ClassVar,
+        Awaitable,
+        Tuple,
+        Dict,
+        List,
+        Set,
+    )
 
 _BASE_WORKER_COG_PATH: str = "disckit.cogs.worker."
 
