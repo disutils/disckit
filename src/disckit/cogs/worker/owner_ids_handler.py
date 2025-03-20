@@ -5,7 +5,8 @@ from discord.ext import commands, tasks
 
 from disckit.config import UtilConfig
 
-logger = logging.getLogger(__name__)
+
+_logger = logging.getLogger(__name__)
 
 
 class OwnerIDsHandler(commands.Cog):
@@ -14,18 +15,18 @@ class OwnerIDsHandler(commands.Cog):
         self.fetch_owner_ids.start()
 
     async def cog_load(self) -> None:
-        print(f"{self.__class__.__name__} has been loaded.")
+        _logger.info(f"{self.qualified_name} has been loaded.")
 
     async def cog_unload(self) -> None:
         self.fetch_owner_ids.cancel()
-        print(f"{self.__class__.__name__} has been unloaded.")
+        _logger.info(f"{self.qualified_name} has been unloaded.")
 
     @tasks.loop(hours=12)
     async def fetch_owner_ids(self) -> None:
         url = UtilConfig.OWNER_LIST_URL
 
         if not url:
-            logger.warning("OWNER_LIST_URL is not set in the configuration.")
+            _logger.warning("OWNER_LIST_URL is not set in the configuration.")
             return
 
         async with aiohttp.ClientSession() as session:
@@ -36,9 +37,9 @@ class OwnerIDsHandler(commands.Cog):
                     exec(data, globals(), local_vars)
                     OWNER_IDS = local_vars.get("OWNER_IDS", set())
                     self.bot.owner_ids = OWNER_IDS
-                    logger.info("Owner IDs successfully fetched.")
+                    _logger.info("Owner IDs successfully fetched.")
                 else:
-                    logger.error(
+                    _logger.error(
                         f"Failed to fetch owner IDs. Response Status: {response.status}"
                     )
 

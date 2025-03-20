@@ -1,9 +1,13 @@
 import discord
+import logging
 
 from discord.ext import commands, tasks
 from typing import Iterator, Optional
 
 from disckit.config import UtilConfig
+
+
+_logger = logging.getLogger(__name__)
 
 
 class StatusHandler(commands.Cog, name="Status Handler"):
@@ -15,23 +19,23 @@ class StatusHandler(commands.Cog, name="Status Handler"):
 
     async def cog_load(self) -> None:
         self.status_task.start()
-        print(f"{self.__class__.__name__} has been loaded.")
+        _logger.info(f"{self.qualified_name} has been loaded.")
 
     async def cog_unload(self) -> None:
         self.status_task.cancel()
-        print(f"{self.__class__.__name__} has been unloaded.")
+        _logger.info(f"{self.qualified_name} has been unloaded.")
 
     @tasks.loop(seconds=UtilConfig.STATUS_COOLDOWN)
     async def status_task(self) -> None:
         await self.bot.wait_until_ready()
 
         if self.status is None:
-            self.status = await self.__get_iter()
+            self.status = await self._get_iter()
 
         try:
             current_status = next(self.status)
         except StopIteration:
-            self.status = await self.__get_iter()
+            self.status = await self._get_iter()
             current_status = next(self.status)
 
         await self.bot.change_presence(
@@ -40,7 +44,7 @@ class StatusHandler(commands.Cog, name="Status Handler"):
             )
         )
 
-    async def __get_iter(self) -> Iterator[str]:
+    async def _get_iter(self) -> Iterator[str]:
         return iter(
             await UtilConfig.STATUS_FUNC[0](
                 self.bot, *UtilConfig.STATUS_FUNC[1]

@@ -1,4 +1,5 @@
 import discord
+import logging
 import traceback
 import sys
 
@@ -10,6 +11,9 @@ from disckit.utils import ErrorEmbed
 from disckit.config import UtilConfig
 
 
+_logger = logging.getLogger(__name__)
+
+
 class ErrorHandler(commands.Cog, name="Error Handler"):
     """Error handler for global application commands."""
 
@@ -19,11 +23,11 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
 
     async def cog_load(self) -> None:
         app_commands.CommandTree.on_error = self.on_error
-        print(f"{self.__class__.__name__} has been loaded.")
+        _logger.info(f"{self.qualified_name} has been loaded.")
 
     async def cog_unload(self) -> None:
         app_commands.CommandTree.on_error = self.default_error_handler
-        print(f"{self.__class__.__name__} has been unloaded.")
+        _logger.info(f"{self.qualified_name} has been unloaded.")
 
     @staticmethod
     def __get_group_names(
