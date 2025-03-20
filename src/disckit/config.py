@@ -22,6 +22,9 @@ _BASE_WORKER_COG_PATH: str = "disckit.cogs.worker."
 class UtilConfig:
     """The utility class which configures disckit's utilities."""
 
+    def __init__(self):
+        raise RuntimeError("Cannot instantiate UtilConfig.")
+
     MAIN_COLOR: ClassVar[TypeColor] = 0x5865F2
     """Class Attribute
     ---
