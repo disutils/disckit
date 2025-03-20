@@ -39,7 +39,7 @@ class LemmaTranslator(app_commands.Translator):
 
         if group.parent is None:
             return all_groups
-        
+
         self.__get_groups(group.parent, all_groups)
 
     async def load(self) -> None:

@@ -12,7 +12,7 @@ class CogLoadError(DisException):
     """Raised when loading a cog fails.
 
     Attributes
-    ------------
+    ----------
     cog: :class:`CogEnum`
         The cog that failed loading.
     """
@@ -26,7 +26,7 @@ class LemmaLoadError(DisException):
     """Raised when an error occurs in loading the translator
 
     Attributes
-    ------------
+    ----------
     error_code: :class:`int`
         The error code of the exception.
     """

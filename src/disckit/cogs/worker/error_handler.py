@@ -134,7 +134,6 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             )
 
         elif isinstance(error, commands.errors.MissingPermissions):
-
             missing_permissions = ", ".join(error.missing_permissions)
             error_embed.description = (
                 f"You don't have the required permissions for this command, "
