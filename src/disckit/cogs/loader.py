@@ -6,7 +6,7 @@ from disckit.config import CogEnum, UtilConfig
 from disckit.errors import CogLoadError
 
 
-_log = logging.getLogger(__name__)
+_logger = logging.getLogger(__name__)
 
 
 async def dis_load_extension(
@@ -76,6 +76,6 @@ async def dis_load_extension(
 
         await bot.load_extension(cog.value)
         if debug_message:
-            _log.info(
+            _logger.info(
                 f"Loading extension: {cog.name.title().replace(' ', '')}"
             )
