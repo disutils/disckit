@@ -1,14 +1,18 @@
+import logging
+
 from discord.ext import commands
-from typing import Optional
 
 from disckit.config import CogEnum, UtilConfig
 from disckit.errors import CogLoadError
 
 
+_log = logging.getLogger(__name__)
+
+
 async def dis_load_extension(
     bot: commands.Bot,
     *cogs: CogEnum,
-    debug_message: Optional[str] = "Loading extension: {}",
+    debug_message: bool = True,
 ) -> None:
     """|coro|
     A custom extension loader specifically for the disckit cogs.
@@ -28,7 +32,7 @@ async def dis_load_extension(
 
     Raises
     ------
-    :class:`CogLoadError`
+    :exc:`CogLoadError`
         Raised when an error occurrs in loading the cog.
     """
 
@@ -72,4 +76,6 @@ async def dis_load_extension(
 
         await bot.load_extension(cog.value)
         if debug_message:
-            print(debug_message.format(cog.name.title().replace(" ", "")))
+            _log.info(
+                f"Loading extension: {cog.name.title().replace(' ', '')}"
+            )
