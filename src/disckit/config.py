@@ -1,21 +1,21 @@
 from __future__ import annotations
 
-from discord import ActivityType, Colour, Locale
 from enum import StrEnum
 from typing import TYPE_CHECKING
+
+from discord import ActivityType, Colour
 
 from disckit.utils import default_status_handler
 
 if TYPE_CHECKING:
     from typing import (
-        Optional,
-        Union,
-        ClassVar,
         Awaitable,
-        Tuple,
-        Dict,
+        ClassVar,
         List,
+        Optional,
         Set,
+        Tuple,
+        Union,
     )
 
 _BASE_WORKER_COG_PATH: str = "disckit.cogs.worker."
@@ -64,11 +64,6 @@ class UtilConfig:
     BUG_REPORT_CHANNEL: Optional[int]
         | The channel ID to where the bug reports will be sent to by the `ErrorHandler` cog.
 
-    LEMMA_TRANS_COMMANDS : Optional[Dict[Locale, str]]
-        | A :class:`discord.Locale` object mapping to the folder / file containing it's respective group
-        | translation files only. The LemmaTranslator only works for translating command paramters and
-        | description only.
-
     OWNER_LIST_URL : Optional[str]
         | The URL from which to fetch the list of owner IDs for the bot. If not set, no fetching will occur.
     """
@@ -105,19 +100,15 @@ class UtilConfig:
 
     BUG_REPORT_CHANNEL: ClassVar[Optional[int]] = None
 
-    LEMMA_TRANS_GROUPS: ClassVar[Optional[Dict[Locale, str]]] = None
-
-    LEMMA_TRANS_COMMANDS: ClassVar[Optional[Dict[Locale, str]]] = None
-
     OWNER_LIST_URL: ClassVar[Optional[str]] = None
 
 
 class CogEnum(StrEnum):
-    ERROR_HANDLER: str = _BASE_WORKER_COG_PATH + "error_handler"
+    ERROR_HANDLER = _BASE_WORKER_COG_PATH + "error_handler"
     """An extension for error handling."""
 
-    STATUS_HANDLER: str = _BASE_WORKER_COG_PATH + "status_handler"
+    STATUS_HANDLER = _BASE_WORKER_COG_PATH + "status_handler"
     """An extension for the bot's status handling."""
 
-    OWNER_IDS_HANDLER: str = _BASE_WORKER_COG_PATH + "owner_ids_handler"
+    OWNER_IDS_HANDLER = _BASE_WORKER_COG_PATH + "owner_ids_handler"
     """An extension for fetching owner IDs in a URL."""

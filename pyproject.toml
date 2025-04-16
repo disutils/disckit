@@ -37,6 +37,10 @@ Issues = "https://github.com/disutils/disckit/issues"
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
+[tool.isort]
+multi_line_output = 3
+include_trailing_comma = true
+
 [tool.ruff]
 line-length = 79
 lint.extend-select = ["ANN"]
@@ -47,3 +51,15 @@ quote-style = "double"
 indent-style = "space"
 docstring-code-format = true
 docstring-code-line-length = 72
+
+[tool.basedpyright]
+exclude = ["**/node_modules", "**/__pycache__", "**/.*", "test*.py"]
+reportImportCycles = false
+reportUnnecessaryIsInstance = false
+reportImplicitStringConcatenation = false
+reportUnusedCallResult = false
+reportMissingTypeStubs = false
+reportAssignmentType = false
+reportRedeclaration = false
+reportAny = false
+reportExplicitAny = false

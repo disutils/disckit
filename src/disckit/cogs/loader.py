@@ -5,7 +5,6 @@ from discord.ext import commands
 from disckit.config import CogEnum, UtilConfig
 from disckit.errors import CogLoadError
 
-
 _logger = logging.getLogger(__name__)
 
 

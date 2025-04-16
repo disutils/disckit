@@ -15,9 +15,10 @@ __author__ = "Jiggly Balls"
 __license__ = "MIT"
 __copyright__ = "Copyright 2024-present Disutils Team"
 
-from disckit.config import UtilConfig, CogEnum
-from disckit.errors import DisException, CogLoadError
-from typing import NamedTuple, Literal
+from typing import Literal, NamedTuple
+
+from disckit.config import CogEnum, UtilConfig
+from disckit.errors import CogLoadError, DisException
 
 __all__ = ("UtilConfig", "CogEnum", "DisException", "CogLoadError")
 

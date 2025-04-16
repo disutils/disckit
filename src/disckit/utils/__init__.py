@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-import discord
 import functools
-
 from typing import TYPE_CHECKING
+
+import discord
 from discord.app_commands import Choice
-from disckit.utils.embeds import SuccessEmbed, MainEmbed, ErrorEmbed
+
+from disckit.utils.embeds import ErrorEmbed, MainEmbed, SuccessEmbed
 
 if TYPE_CHECKING:
-    from discord import Interaction
-    from discord.ext.commands import Bot
     from typing import (
         Any,
         Awaitable,
@@ -19,6 +18,9 @@ if TYPE_CHECKING:
         Tuple,
         TypeVar,
     )
+
+    from discord import Interaction
+    from discord.ext.commands import Bot
 
     _T = TypeVar("_T", str, int, float)
 

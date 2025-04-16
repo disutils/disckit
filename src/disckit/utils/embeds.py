@@ -1,5 +1,6 @@
+from typing import TYPE_CHECKING, Optional
+
 from discord import Embed, utils
-from typing import Optional, TYPE_CHECKING
 
 import disckit
 

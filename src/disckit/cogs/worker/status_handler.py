@@ -1,11 +1,10 @@
-import discord
 import logging
-
-from discord.ext import commands, tasks
 from typing import Iterator, Optional
 
-from disckit.config import UtilConfig
+import discord
+from discord.ext import commands, tasks
 
+from disckit.config import UtilConfig
 
 _logger = logging.getLogger(__name__)
 
