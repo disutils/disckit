@@ -1,16 +1,20 @@
-import aiohttp
 import logging
+from typing import TYPE_CHECKING
 
+import aiohttp
 from discord.ext import commands, tasks
 
 from disckit.config import UtilConfig
+
+if TYPE_CHECKING:
+    from discord.ext.commands import Bot
 
 
 _logger = logging.getLogger(__name__)
 
 
 class OwnerIDsHandler(commands.Cog):
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.fetch_owner_ids.start()
 
@@ -48,5 +52,5 @@ class OwnerIDsHandler(commands.Cog):
         await self.bot.wait_until_ready()
 
 
-async def setup(bot: commands.Bot) -> None:
+async def setup(bot: Bot) -> None:
     await bot.add_cog(OwnerIDsHandler(bot))
