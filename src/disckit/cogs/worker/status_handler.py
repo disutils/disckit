@@ -1,10 +1,17 @@
+from __future__ import annotations
+
 import logging
-from typing import Iterator, Optional
+from typing import TYPE_CHECKING
 
 import discord
 from discord.ext import commands, tasks
 
 from disckit.config import UtilConfig
+
+if TYPE_CHECKING:
+    from typing import Iterator, Optional
+
+    from discord.ext.commands import Bot
 
 _logger = logging.getLogger(__name__)
 
@@ -12,7 +19,7 @@ _logger = logging.getLogger(__name__)
 class StatusHandler(commands.Cog, name="Status Handler"):
     """Cog for handling bot's dynamic status."""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.status: Optional[Iterator[str]] = None
 
@@ -51,5 +58,5 @@ class StatusHandler(commands.Cog, name="Status Handler"):
         )
 
 
-async def setup(bot: commands.Bot) -> None:
+async def setup(bot: Bot) -> None:
     await bot.add_cog(StatusHandler(bot))

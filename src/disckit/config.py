@@ -8,15 +8,7 @@ from discord import ActivityType, Colour
 from disckit.utils import default_status_handler
 
 if TYPE_CHECKING:
-    from typing import (
-        Awaitable,
-        ClassVar,
-        List,
-        Optional,
-        Set,
-        Tuple,
-        Union,
-    )
+    from typing import Awaitable, ClassVar, List, Optional, Set, Tuple, Union
 
 _BASE_WORKER_COG_PATH: str = "disckit.cogs.worker."
 

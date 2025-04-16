@@ -1,15 +1,17 @@
 import logging
-
-from discord.ext import commands
+from typing import TYPE_CHECKING
 
 from disckit.config import CogEnum, UtilConfig
 from disckit.errors import CogLoadError
+
+if TYPE_CHECKING:
+    from discord.ext.commands import Bot
 
 _logger = logging.getLogger(__name__)
 
 
 async def dis_load_extension(
-    bot: commands.Bot,
+    bot: Bot,
     *cogs: CogEnum,
     debug_message: bool = True,
 ) -> None:

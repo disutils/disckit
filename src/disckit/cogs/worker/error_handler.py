@@ -1,7 +1,9 @@
+from __future__ import annotations
+
 import logging
 import sys
 import traceback
-from typing import List, Optional
+from typing import TYPE_CHECKING
 
 import discord
 from discord import Interaction, app_commands
@@ -10,13 +12,18 @@ from discord.ext import commands
 from disckit.config import UtilConfig
 from disckit.utils import ErrorEmbed
 
+if TYPE_CHECKING:
+    from typing import List, Optional
+
+    from discord.ext.commands import Bot
+
 _logger = logging.getLogger(__name__)
 
 
 class ErrorHandler(commands.Cog, name="Error Handler"):
     """Error handler for global application commands."""
 
-    def __init__(self, bot: commands.Bot) -> None:
+    def __init__(self, bot: Bot) -> None:
         self.bot = bot
         self.default_error_handler = app_commands.CommandTree.on_error
 
@@ -178,5 +185,5 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
             await self.throw_err(interaction=interaction, error=error)
 
 
-async def setup(bot: commands.Bot) -> None:
+async def setup(bot: Bot) -> None:
     await bot.add_cog(ErrorHandler(bot))
