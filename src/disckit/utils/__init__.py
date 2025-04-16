@@ -9,15 +9,10 @@ from discord.app_commands import Choice
 from disckit.utils.embeds import ErrorEmbed, MainEmbed, SuccessEmbed
 
 if TYPE_CHECKING:
-    from typing import (
-        Any,
-        Awaitable,
-        Callable,
-        Coroutine,
-        List,
-        Tuple,
-        TypeVar,
-    )
+    from collections.abc import Awaitable, Callable, Coroutine
+    from functools import _Wrapped  # pyright:ignore[reportPrivateUsage]
+    from types import CoroutineType
+    from typing import Any, TypeVar
 
     from discord import Interaction
     from discord.ext.commands import Bot
@@ -37,7 +32,7 @@ __all__ = (
 )
 
 
-async def default_status_handler(bot: Bot, *args: Any) -> Tuple[str, ...]:
+async def default_status_handler(bot: Bot, *args: Any) -> tuple[str, ...]:  # pyright:ignore[reportUnusedParameter]
     """The default status handler. The first parameter will always be the
     bot instance which will automatically be passed as argument in the
     status handler.
@@ -100,7 +95,7 @@ def make_autocomplete(
     """
     choices = [Choice(name=str(arg), value=arg) for arg in args]
 
-    async def autocomplete(_, __) -> List[Choice[_T]]:  # noqa ANN001
+    async def autocomplete(*args: Any) -> list[Choice[_T]]:  # pyright:ignore[reportUnusedParameter]
         return choices
 
     return autocomplete
@@ -133,8 +128,8 @@ async def sku_check(bot: Bot, sku_id: int, user_id: int) -> bool:
 
 
 def disallow_bots(
-    func: Coroutine[Any, Any, _T],
-) -> None | Coroutine[Any, Any, _T]:
+    func: Callable[..., Coroutine[Any, Any, None]],
+) -> None | _Wrapped[..., Any, ..., CoroutineType[Any, Any, None]]:
     """A decorator used for not allowing members to pass in a bot user into command params"""
 
     @functools.wraps(func)
@@ -164,8 +159,8 @@ def disallow_bots(
 
 
 def is_owner(
-    func: Coroutine[Any, Any, _T],
-) -> None | Coroutine[Any, Any, _T]:
+    func: Callable[..., Coroutine[Any, Any, None]],
+) -> None | _Wrapped[..., Any, ..., CoroutineType[Any, Any, None]]:
     """A decorator for owner-only slash commands"""
 
     @functools.wraps(func)
@@ -177,16 +172,21 @@ def is_owner(
                 interaction = arg
                 break
 
-        if interaction and interaction.user.id in interaction.client.owner_ids:
-            await func(*args, **kwargs)
+        if interaction and interaction.client.owner_ids:
+            if interaction.user.id in interaction.client.owner_ids:
+                await func(*args, **kwargs)
+
+            else:
+                embed = ErrorEmbed("This command is owner only!")
+                try:
+                    await interaction.response.send_message(
+                        embed=embed, ephemeral=True
+                    )
+                except discord.InteractionResponded:
+                    await interaction.followup.send(
+                        embed=embed, ephemeral=True
+                    )
         else:
-            embed = ErrorEmbed("This command is owner only!")
-            try:
-                await interaction.response.send_message(
-                    embed=embed, ephemeral=True
-                )
-            except discord.InteractionResponded:
-                await interaction.followup.send(embed=embed, ephemeral=True)
-            return
+            await func(*args, **kwargs)
 
     return wrapper

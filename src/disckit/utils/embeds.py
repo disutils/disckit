@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Optional
+from typing import TYPE_CHECKING
 
 from discord import Embed, utils
 
@@ -12,7 +12,7 @@ class MainEmbed(Embed):
     """Represents a main embed for general use."""
 
     def __init__(
-        self, description: Optional[str] = None, title: Optional[str] = None
+        self, description: None | str = None, title: None | str = None
     ) -> None:
         """
         Parameters
@@ -40,7 +40,7 @@ class SuccessEmbed(Embed):
     """Represents a success embed."""
 
     def __init__(
-        self, description: Optional[str] = None, title: Optional[str] = None
+        self, description: None | str = None, title: None | str = None
     ) -> None:
         """
         Parameters
@@ -70,7 +70,7 @@ class ErrorEmbed(Embed):
     """Represents an error embed."""
 
     def __init__(
-        self, description: Optional[str] = None, title: Optional[str] = None
+        self, description: None | str = None, title: None | str = None
     ) -> None:
         """
         Parameters

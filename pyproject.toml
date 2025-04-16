@@ -53,7 +53,7 @@ docstring-code-format = true
 docstring-code-line-length = 72
 
 [tool.basedpyright]
-exclude = ["**/node_modules", "**/__pycache__", "**/.*", "test*.py"]
+exclude = ["**/node_modules", "**/__pycache__", "**/.*", "test*.py", "venv/", "build/", "dist/", "local/"]
 reportImportCycles = false
 reportUnnecessaryIsInstance = false
 reportImplicitStringConcatenation = false
@@ -63,3 +63,4 @@ reportAssignmentType = false
 reportRedeclaration = false
 reportAny = false
 reportExplicitAny = false
+reportUnknownVariableType=false

@@ -18,7 +18,7 @@ class UtilConfig:
 
     Attributes
     ----------
-    MAIN_COLOR : Union[int, Colour, Tuple[int, int, int]]
+    MAIN_COLOR : Union[int, Colour, None]
         | The color of the MainEmbed.
 
     SUCCESS_COLOR : Optional[int, discord.color.Color, Tuple[int, int, int]]
@@ -63,13 +63,11 @@ class UtilConfig:
     def __init__(self) -> None:
         raise RuntimeError("Cannot instantiate UtilConfig.")
 
-    MAIN_COLOR: ClassVar[Union[int, Colour, Tuple[int, int, int]]] = 0x5865F2
+    MAIN_COLOR: ClassVar[Union[int, Colour, None]] = 0x5865F2
 
-    SUCCESS_COLOR: ClassVar[Union[int, Colour, Tuple[int, int, int]]] = (
-        0x00FF00
-    )
+    SUCCESS_COLOR: ClassVar[Union[int, Colour, None]] = 0x00FF00
 
-    ERROR_COLOR: ClassVar[Union[int, Colour, Tuple[int, int, int]]] = 0xFF0000
+    ERROR_COLOR: ClassVar[Union[int, Colour, None]] = 0xFF0000
 
     SUCCESS_EMOJI: ClassVar[str] = "✅"
 
