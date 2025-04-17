@@ -5,11 +5,12 @@ from typing import TYPE_CHECKING
 
 import discord
 from discord.ext import commands, tasks
+from typing_extensions import override
 
 from disckit.config import UtilConfig
 
 if TYPE_CHECKING:
-    from typing import Iterator, Optional
+    from collections.abc import Iterator
 
     from discord.ext.commands import Bot
 
@@ -20,18 +21,20 @@ class StatusHandler(commands.Cog, name="Status Handler"):
     """Cog for handling bot's dynamic status."""
 
     def __init__(self, bot: Bot) -> None:
-        self.bot = bot
-        self.status: Optional[Iterator[str]] = None
+        self.bot: Bot = bot
+        self.status: None | Iterator[str] = None
 
+    @override
     async def cog_load(self) -> None:
         self.status_task.start()
         _logger.info(f"{self.qualified_name} has been loaded.")
 
+    @override
     async def cog_unload(self) -> None:
         self.status_task.cancel()
         _logger.info(f"{self.qualified_name} has been unloaded.")
 
-    @tasks.loop(seconds=UtilConfig.STATUS_COOLDOWN)
+    @tasks.loop(seconds=UtilConfig.STATUS_COOLDOWN)  # pyright:ignore[reportArgumentType]
     async def status_task(self) -> None:
         await self.bot.wait_until_ready()
 

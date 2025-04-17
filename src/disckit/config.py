@@ -8,7 +8,10 @@ from discord import ActivityType, Colour
 from disckit.utils import default_status_handler
 
 if TYPE_CHECKING:
-    from typing import Awaitable, ClassVar, List, Optional, Set, Tuple, Union
+    from collections.abc import Awaitable, Callable, Sequence
+    from typing import Any, ClassVar
+
+    from discord.ext.commands import Bot
 
 _BASE_WORKER_COG_PATH: str = "disckit.cogs.worker."
 
@@ -18,28 +21,28 @@ class UtilConfig:
 
     Attributes
     ----------
-    MAIN_COLOR : Union[int, Colour, None]
+    MAIN_COLOR : None | int | Colour
         | The color of the MainEmbed.
 
-    SUCCESS_COLOR : Optional[int, discord.color.Color, Tuple[int, int, int]]
+    SUCCESS_COLOR : Optional[int, discord.color.Color, tuple[int, int, int]]
         | The color of the SuccessEmbed.
 
-    ERROR_COLOR : Optional[int, discord.color.Color, Tuple[int, int, int]]
+    ERROR_COLOR : Optional[int, discord.color.Color, tuple[int, int, int]]
         | The color of the ErrorEmbed.
 
-    SUCCESS_EMOJI : Optional[str]
+    SUCCESS_EMOJI : None | str
         | An emoji used in the title of the SuccessEmbed.
 
-    ERROR_EMOJI : Optional[str]
+    ERROR_EMOJI : None | str
         | An emoji used in the title of the ErrorEmbed.
 
-    FOOTER_IMAGE : Optional[str]
+    FOOTER_IMAGE : None | str
         | A URL to an image for the footer of `MainEmbed`, `SuccessEmbed` and `ErrorEmbed`.
 
-    FOOTER_TEXT : Optional[str]
+    FOOTER_TEXT : None | str
         | The footer text of `MainEmbed`, `SuccessEmbed` and `ErrorEmbed`.
 
-    STATUS_FUNC : Tuple[Awaitable[Union[Tuple, List, Set]], Tuple]
+    STATUS_FUNC : tuple[Awaitable[Union[tuple, list, set]], tuple]
         | A tuple having its first element as a coroutine object which will be awaited when-
         | - When the cog first loads.
         | - When the handler is done iterating through all statuses returned from the function.
@@ -50,35 +53,38 @@ class UtilConfig:
     STATUS_TYPE : ActivityType
         | The discord acitvity type used by the StatusHandler.
 
-    STATUS_COOLDOWN: Optional[int]
+    STATUS_COOLDOWN: None | int
         | A cooldown in seconds for how long a status will play before changing in the `StatusHandler` cog.
 
-    BUG_REPORT_CHANNEL: Optional[int]
+    BUG_REPORT_CHANNEL: None | int
         | The channel ID to where the bug reports will be sent to by the `ErrorHandler` cog.
 
-    OWNER_LIST_URL : Optional[str]
+    OWNER_LIST_URL : None | str
         | The URL from which to fetch the list of owner IDs for the bot. If not set, no fetching will occur.
     """
 
     def __init__(self) -> None:
         raise RuntimeError("Cannot instantiate UtilConfig.")
 
-    MAIN_COLOR: ClassVar[Union[int, Colour, None]] = 0x5865F2
+    MAIN_COLOR: ClassVar[None | int | Colour] = 0x5865F2
 
-    SUCCESS_COLOR: ClassVar[Union[int, Colour, None]] = 0x00FF00
+    SUCCESS_COLOR: ClassVar[None | int | Colour] = 0x00FF00
 
-    ERROR_COLOR: ClassVar[Union[int, Colour, None]] = 0xFF0000
+    ERROR_COLOR: ClassVar[None | int | Colour] = 0xFF0000
 
     SUCCESS_EMOJI: ClassVar[str] = "✅"
 
     ERROR_EMOJI: ClassVar[str] = "❌"
 
-    FOOTER_IMAGE: ClassVar[Optional[str]] = None
+    FOOTER_IMAGE: ClassVar[None | str] = None
 
-    FOOTER_TEXT: ClassVar[Optional[str]] = None
+    FOOTER_TEXT: ClassVar[None | str] = None
 
     STATUS_FUNC: ClassVar[
-        Tuple[Awaitable[Union[Tuple[str, ...], List[str], Set[str]]], Tuple]
+        tuple[
+            Callable[[Bot, *tuple[Any, ...]], Awaitable[Sequence[str]]],
+            tuple[Any, ...],
+        ]
     ] = (
         default_status_handler,
         (),
@@ -86,11 +92,11 @@ class UtilConfig:
 
     STATUS_TYPE: ClassVar[ActivityType] = ActivityType.listening
 
-    STATUS_COOLDOWN: ClassVar[Optional[int]] = None
+    STATUS_COOLDOWN: ClassVar[None | float] = None
 
-    BUG_REPORT_CHANNEL: ClassVar[Optional[int]] = None
+    BUG_REPORT_CHANNEL: ClassVar[None | int] = None
 
-    OWNER_LIST_URL: ClassVar[Optional[str]] = None
+    OWNER_LIST_URL: ClassVar[None | str] = None
 
 
 class CogEnum(StrEnum):

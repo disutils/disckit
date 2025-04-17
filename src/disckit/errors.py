@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, final
 
 if TYPE_CHECKING:
     from typing import Any
@@ -15,6 +15,7 @@ class DisException(Exception):
         super().__init__(*args, **kwargs)
 
 
+@final
 class CogLoadError(DisException):
     """Raised when loading a cog fails.
 
@@ -27,17 +28,3 @@ class CogLoadError(DisException):
     def __init__(self, message: str, cog: CogEnum, **kwargs: Any) -> None:
         super().__init__(message, **kwargs)
         self.cog = cog
-
-
-class LemmaLoadError(DisException):
-    """Raised when an error occurs in loading the translator
-
-    Attributes
-    ------------
-    error_code: :class:`int`
-        The error code of the exception.
-    """
-
-    def __init__(self, message: str, error_code: int, **kwargs: Any) -> None:
-        super().__init__(message, **kwargs)
-        self.error_code = error_code

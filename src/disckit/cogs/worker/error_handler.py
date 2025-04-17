@@ -8,13 +8,16 @@ from typing import TYPE_CHECKING
 import discord
 from discord import Interaction, app_commands
 from discord.ext import commands
+from typing_extensions import override
 
 from disckit.config import UtilConfig
 from disckit.utils import ErrorEmbed
 
 if TYPE_CHECKING:
-    from typing import List, Optional
+    from typing import Any
 
+    from discord import Embed
+    from discord.app_commands import Group
     from discord.ext.commands import Bot
 
 _logger = logging.getLogger(__name__)
@@ -24,39 +27,41 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
     """Error handler for global application commands."""
 
     def __init__(self, bot: Bot) -> None:
-        self.bot = bot
-        self.default_error_handler = app_commands.CommandTree.on_error
+        self.bot: Bot = bot
+        self.default_error_handler = app_commands.CommandTree.on_error  # pyright:ignore[reportUnannotatedClassAttribute]
 
+    @override
     async def cog_load(self) -> None:
-        app_commands.CommandTree.on_error = self.on_error
+        app_commands.CommandTree.on_error = self.on_error  # pyright:ignore[reportAttributeAccessIssue]
         _logger.info(f"{self.qualified_name} has been loaded.")
 
+    @override
     async def cog_unload(self) -> None:
         app_commands.CommandTree.on_error = self.default_error_handler
         _logger.info(f"{self.qualified_name} has been unloaded.")
 
     @staticmethod
     def __get_group_names(
-        group: app_commands.Group,
-        all_groups: Optional[List[app_commands.Group]] = None,
-    ) -> List[str]:
+        group: Group,
+        all_groups: None | list[str] = None,
+    ) -> list[str]:
         all_groups = all_groups or []
         all_groups.append(group.name)
         if group.parent is None:
             return all_groups
-        ErrorHandler.__get_group_names(group.parent, all_groups)
+        return ErrorHandler.__get_group_names(group.parent, all_groups)
 
     @staticmethod
     async def send_response(
         *,
         interaction: Interaction,
-        embed: Optional[discord.Embed] = None,
-        content: Optional[str] = None,
+        embed: None | Embed = None,
+        content: None | str = None,
         ephemeral: bool = False,
     ) -> None:
         """Handles the error response to user."""
 
-        load = {"ephemeral": ephemeral}
+        load: dict[str, Any] = {"ephemeral": ephemeral}
         if embed:
             load["embed"] = embed
         if content:
@@ -83,33 +88,34 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
         )
 
         channel = interaction.client.get_channel(
-            UtilConfig.BUG_REPORT_CHANNEL
+            UtilConfig.BUG_REPORT_CHANNEL  # pyright:ignore[reportArgumentType]
         ) or await interaction.client.fetch_channel(
-            UtilConfig.BUG_REPORT_CHANNEL
+            UtilConfig.BUG_REPORT_CHANNEL  # pyright:ignore[reportArgumentType]
         )
 
-        if channel is not None:
-            if interaction.command:
-                final_name = []
-                if interaction.command.parent:
-                    final_name = ErrorHandler.__get_group_names(
-                        interaction.command.parent
-                    )
-                final_name.append(interaction.command.name)
-                name = "/" + (" ".join(final_name))
-            else:
-                name = "Command not found"
-
-            await channel.send(
-                embed=ErrorEmbed(
-                    f"```\nError caused by-\nAuthor Name: {interaction.user}"
-                    f"\nAuthor ID: {interaction.user.id}\n"
-                    f"\nError Type-\n{type(error)}\n"
-                    f"\nError Type Description-\n{error.__traceback__.tb_frame}\n"
-                    f"\nCause-\n{error.with_traceback(error.__traceback__)}```",
-                    title=name,
+        name: str = "Command not found"
+        if interaction.command:
+            final_name = []
+            if (
+                not isinstance(interaction.command, app_commands.ContextMenu)
+                and interaction.command.parent
+            ):
+                final_name = ErrorHandler.__get_group_names(
+                    interaction.command.parent
                 )
+            final_name.append(interaction.command.name)
+            name: str = "/" + (" ".join(final_name))
+
+        await channel.send(  # pyright:ignore[reportAttributeAccessIssue, reportUnknownMemberType]
+            embed=ErrorEmbed(
+                f"```\nError caused by-\nAuthor Name: {interaction.user}"
+                f"\nAuthor ID: {interaction.user.id}\n"
+                f"\nError Type-\n{type(error)}\n"
+                f"\nError Type Description-\n{error.__traceback__.tb_frame if error.__traceback__ else None}\n"
+                f"\nCause-\n{error.with_traceback(error.__traceback__)}```",
+                title=name,
             )
+        )
         embed = ErrorEmbed(
             title="Sorry...",
             description="An unexpected error has occurred.\nThe developers have been notified of it.",

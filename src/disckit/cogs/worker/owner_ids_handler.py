@@ -5,10 +5,13 @@ from typing import TYPE_CHECKING
 
 import aiohttp
 from discord.ext import commands, tasks
+from typing_extensions import override
 
 from disckit.config import UtilConfig
 
 if TYPE_CHECKING:
+    from typing import Any
+
     from discord.ext.commands import Bot
 
 
@@ -17,12 +20,14 @@ _logger = logging.getLogger(__name__)
 
 class OwnerIDsHandler(commands.Cog):
     def __init__(self, bot: Bot) -> None:
-        self.bot = bot
+        self.bot: Bot = bot
         self.fetch_owner_ids.start()
 
+    @override
     async def cog_load(self) -> None:
         _logger.info(f"{self.qualified_name} has been loaded.")
 
+    @override
     async def cog_unload(self) -> None:
         self.fetch_owner_ids.cancel()
         _logger.info(f"{self.qualified_name} has been unloaded.")
@@ -39,7 +44,7 @@ class OwnerIDsHandler(commands.Cog):
             async with session.get(url) as response:
                 if response.status == 200:
                     data = await response.text()
-                    local_vars = {}
+                    local_vars: dict[str, Any] = {}
                     exec(data, globals(), local_vars)
                     OWNER_IDS = local_vars.get("OWNER_IDS", set())
                     self.bot.owner_ids = OWNER_IDS
