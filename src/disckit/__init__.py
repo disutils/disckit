@@ -32,8 +32,13 @@ class VersionInfo(NamedTuple):
 def _expand() -> VersionInfo:
     v = __version__.split(".")
     level_types = {"a": "alpha", "b": "beta"}
-    level: Literal["alpha", "beta", "final"] = level_types.get(v[-1], "final")
-    return VersionInfo(major=int(v[0]), minor=int(v[1]), release_level=level)
+    level: Literal["alpha", "beta", "final"] = level_types.get(
+        v[-1][-1], "final"
+    )
+    minor_version = v[1] if level == "final" else v[1][0]
+    return VersionInfo(
+        major=int(v[0]), minor=int(minor_version), release_level=level
+    )
 
 
 version_info: VersionInfo = _expand()
