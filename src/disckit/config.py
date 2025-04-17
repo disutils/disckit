@@ -8,10 +8,12 @@ from discord import ActivityType, Colour
 from disckit.utils import default_status_handler
 
 if TYPE_CHECKING:
-    from collections.abc import Awaitable, Callable, Sequence
+    from collections.abc import Callable, Sequence
+    from types import CoroutineType
     from typing import Any, ClassVar
 
     from discord.ext.commands import Bot
+
 
 _BASE_WORKER_COG_PATH: str = "disckit.cogs.worker."
 
@@ -82,7 +84,9 @@ class UtilConfig:
 
     STATUS_FUNC: ClassVar[
         tuple[
-            Callable[[Bot, *tuple[Any, ...]], Awaitable[Sequence[str]]],
+            Callable[
+                [Bot, *tuple[Any, ...]], CoroutineType[Any, Any, Sequence[str]]
+            ],
             tuple[Any, ...],
         ]
     ] = (

@@ -95,7 +95,7 @@ def make_autocomplete(
     """
     choices = [Choice(name=str(arg), value=arg) for arg in args]
 
-    async def autocomplete(_p1: Any, _p2: Any) -> list[Choice[_T]]:  # pyright:ignore[reportUnusedParameter]
+    async def autocomplete(_p1: Any, _p2: Any) -> list[Choice[_T]]:
         return choices
 
     return autocomplete
