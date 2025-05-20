@@ -54,7 +54,7 @@ class Paginator(View):
 
     @discord.ui.button(disabled=True, style=ButtonStyle.gray)
     async def number_page_callback(
-        self, interaction: Interaction, button: Button
+        self, interaction: Interaction, button: Button 
     ) -> None: ...
 
     @discord.ui.button(emoji=UtilConfig.PAGINATOR_NEXT_PAGE, style=ButtonStyle.gray)
