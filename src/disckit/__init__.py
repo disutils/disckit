@@ -23,22 +23,22 @@ from disckit.errors import CogLoadError, DisException
 __all__ = ("UtilConfig", "CogEnum", "DisException", "CogLoadError")
 
 
-class VersionInfo(NamedTuple):
+class _VersionInfo(NamedTuple):
     major: int
     minor: int
     release_level: Literal["alpha", "beta", "final"]
 
 
-def _expand() -> VersionInfo:
+def _expand() -> _VersionInfo:
     v = __version__.split(".")
     level_types = {"a": "alpha", "b": "beta"}
     level: Literal["alpha", "beta", "final"] = level_types.get(
         v[-1][-1], "final"
     )
     minor_version = v[1] if level == "final" else v[1][0]
-    return VersionInfo(
+    return _VersionInfo(
         major=int(v[0]), minor=int(minor_version), release_level=level
     )
 
 
-version_info: VersionInfo = _expand()
+version_info: _VersionInfo = _expand()
