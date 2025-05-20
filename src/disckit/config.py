@@ -102,6 +102,14 @@ class UtilConfig:
 
     OWNER_LIST_URL: ClassVar[None | str] = None
 
+    PAGINATOR_FIRST_PAGE: ClassVar[str] = "⏪"
+
+    PAGINATOR_NEXT_PAGE: ClassVar[str] = "➡️"
+
+    PAGINATOR_PREVIOUS_PAGE: ClassVar[str] = "⬅️"
+
+    PAGINATOR_LAST_PAGE: ClassVar[str] = "⏩"
+
 
 class CogEnum(StrEnum):
     ERROR_HANDLER = _BASE_WORKER_COG_PATH + "error_handler"
