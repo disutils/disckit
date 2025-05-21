@@ -12,7 +12,6 @@ from disckit.errors import (
     PaginatorInvalidCurrentPage,
     PaginatorInvalidPages,
     PaginatorNoHomePage,
-    PaginatorNoHomeView,
 )
 
 if TYPE_CHECKING:
@@ -21,11 +20,19 @@ if TYPE_CHECKING:
     from discord import Interaction
 
 
+def create_empty_button() -> Button:
+    return Button(label="\u200b", style=ButtonStyle.gray, disabled=True)
+
+
 class HomeButton(Button):
     def __init__(
         self, home_page: str | Embed, new_view: None | View = None
     ) -> None:
-        super().__init__(label="Home", style=ButtonStyle.red)
+        super().__init__(
+            emoji=UtilConfig.PAGINATOR_HOME_PAGE_EMOJI,
+            label=UtilConfig.PAGINATOR_HOME_PAGE_LABEL,
+            style=ButtonStyle.red,
+        )
         self.home_page = home_page
         self.new_view = new_view
 
@@ -49,7 +56,7 @@ class Paginator(View):
         timeout: None | float = 180.0,
         home_button: Literal[False] = ...,
         home_page: None = ...,
-        home_view: None = ...,
+        home_view: None = None,
         extra_buttons: None | Sequence[Button] = None,
         ephemeral: bool = False,
     ) -> None: ...
@@ -63,7 +70,7 @@ class Paginator(View):
         timeout: None | float = 180.0,
         home_button: Literal[True] = ...,
         home_page: Embed | str = ...,
-        home_view: View = ...,
+        home_view: None | View = None,
         extra_buttons: None | Sequence[Button] = None,
         ephemeral: bool = False,
     ) -> None: ...
@@ -119,52 +126,44 @@ class Paginator(View):
                     f"Expected {type(str)} or {type(Embed)} or {type(None)}, instead got type {type(self.home_page)} "
                 )
 
-            if self.home_view is None:
-                raise PaginatorNoHomeView(
-                    f"Expected {type(View)} or {type(None)}, instead got type {type(self.home_view)} "
-                )
-
             self.extra_buttons.append(
                 HomeButton(self.home_page, self.home_view)
             )
 
-        empty_button = Button(
-            label="\u200b", style=ButtonStyle.gray, disabled=True
-        )
         total_extra_buttons = len(self.extra_buttons)
 
         if total_extra_buttons == 1:
-            self.add_item(empty_button)
-            self.add_item(empty_button)
+            self.add_item(create_empty_button())
+            self.add_item(create_empty_button())
             self.add_item(self.extra_buttons[0])
-            self.add_item(empty_button)
-            self.add_item(empty_button)
+            self.add_item(create_empty_button())
+            self.add_item(create_empty_button())
 
         elif total_extra_buttons == 2:
-            self.add_item(empty_button)
+            self.add_item(create_empty_button())
             self.add_item(self.extra_buttons[0])
-            self.add_item(empty_button)
+            self.add_item(create_empty_button())
             self.add_item(self.extra_buttons[1])
-            self.add_item(empty_button)
+            self.add_item(create_empty_button())
 
         elif total_extra_buttons == 3:
-            self.add_item(empty_button)
+            self.add_item(create_empty_button())
             self.add_item(self.extra_buttons[0])
             self.add_item(self.extra_buttons[1])
             self.add_item(self.extra_buttons[2])
-            self.add_item(empty_button)
+            self.add_item(create_empty_button())
 
         elif total_extra_buttons > 3:
             for button in self.extra_buttons:
                 self.add_item(button)
 
         element: Embed | str = self.pages[self.current_page]
-        kwargs = self.send_kwargs(element)
+        payload_kwargs = self.send_kwargs(element)
 
         if self.interaction.response.is_done():
-            await self.interaction.followup.send(**kwargs)
+            await self.interaction.followup.send(**payload_kwargs)
         else:
-            await self.interaction.response.send_message(**kwargs)
+            await self.interaction.response.send_message(**payload_kwargs)
 
     @discord.ui.button(
         emoji=UtilConfig.PAGINATOR_FIRST_PAGE, style=ButtonStyle.blurple
