@@ -15,6 +15,10 @@ class DisException(Exception):
         super().__init__(*args, **kwargs)
 
 
+class PaginatorError(DisException):
+    """Base exception of all paginator errors."""
+
+
 @final
 class CogLoadError(DisException):
     """Raised when loading a cog fails.
@@ -28,3 +32,23 @@ class CogLoadError(DisException):
     def __init__(self, message: str, cog: CogEnum, **kwargs: Any) -> None:
         super().__init__(message, **kwargs)
         self.cog = cog
+
+
+@final
+class PaginatorInvalidPages(PaginatorError):
+    """Raised when an invalid amount of pages are supplied to the paginator."""
+
+
+@final
+class PaginatorInvalidCurrentPage(PaginatorError):
+    """Raised when the current page is invalid of a paginator."""
+
+
+@final
+class PaginatorNoHomePage(PaginatorError):
+    """Raised when no page is supplied."""
+
+
+@final
+class PaginatorNoHomeView(PaginatorError):
+    """Raised when no view is supplied."""
