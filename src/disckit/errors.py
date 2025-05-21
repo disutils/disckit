@@ -47,8 +47,3 @@ class PaginatorInvalidCurrentPage(PaginatorError):
 @final
 class PaginatorNoHomePage(PaginatorError):
     """Raised when no page is supplied."""
-
-
-@final
-class PaginatorNoHomeView(PaginatorError):
-    """Raised when no view is supplied."""
