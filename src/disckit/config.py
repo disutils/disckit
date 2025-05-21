@@ -102,15 +102,17 @@ class UtilConfig:
 
     OWNER_LIST_URL: ClassVar[None | str] = None
 
-    PAGINATOR_HOME_PAGE: ClassVar[str] = "🏠"
+    PAGINATOR_HOME_PAGE_LABEL: ClassVar[str] = "\u200b"
 
-    PAGINATOR_FIRST_PAGE: ClassVar[str] = "⏪"
+    PAGINATOR_HOME_PAGE_EMOJI: ClassVar[str] = "🏠"
 
-    PAGINATOR_NEXT_PAGE: ClassVar[str] = "➡️"
+    PAGINATOR_FIRST_PAGE_EMOJI: ClassVar[str] = "⏪"
 
-    PAGINATOR_PREVIOUS_PAGE: ClassVar[str] = "⬅️"
+    PAGINATOR_NEXT_PAGE_EMOJI: ClassVar[str] = "➡️"
 
-    PAGINATOR_LAST_PAGE: ClassVar[str] = "⏩"
+    PAGINATOR_PREVIOUS_PAGE_EMOJI: ClassVar[str] = "⬅️"
+
+    PAGINATOR_LAST_PAGE_EMOJI: ClassVar[str] = "⏩"
 
 
 class CogEnum(StrEnum):
