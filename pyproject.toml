@@ -6,12 +6,12 @@ authors = [
 ]
 description = "An open source utilities library for the disutils bots."
 readme = "README.md"
-license = { file = "LICENSE" }
+license = "MIT"
+license-files = ["LICENSE"]
 requires-python = ">=3.9"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Natural Language :: English",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: MacOS",
     "Operating System :: Microsoft :: Windows",
     "Operating System :: POSIX",
