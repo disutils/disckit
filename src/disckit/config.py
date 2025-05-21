@@ -102,6 +102,8 @@ class UtilConfig:
 
     OWNER_LIST_URL: ClassVar[None | str] = None
 
+    PAGINATOR_HOME_PAGE: ClassVar[str] = "🏠"
+
     PAGINATOR_FIRST_PAGE: ClassVar[str] = "⏪"
 
     PAGINATOR_NEXT_PAGE: ClassVar[str] = "➡️"
