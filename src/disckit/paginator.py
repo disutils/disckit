@@ -13,6 +13,7 @@ from disckit.errors import (
     PaginatorInvalidPages,
     PaginatorNoHomePage,
 )
+from disckit.utils import ErrorEmbed
 
 if TYPE_CHECKING:
     from typing import Any, Literal, Sequence
@@ -89,12 +90,14 @@ class Paginator(View):
     ) -> None:
         super().__init__(timeout=timeout)
 
-        if len(pages) == 0:
+        self.total_pages = len(pages)
+
+        if self.total_pages == 0:
             raise PaginatorInvalidPages(
                 "Expected a seqence of 1 or more items (Embed | str). Instead got 0 items."
             )
 
-        if current_page > len(pages) - 1:
+        if current_page > self.total_pages - 1:
             raise PaginatorInvalidCurrentPage(
                 f"Expected an integer of range [0, {len(pages - 1)}]. Instead got {current_page}."
             )
@@ -118,7 +121,9 @@ class Paginator(View):
         return payload
 
     async def start(self) -> None:
-        self.children[2].label = f"{self.current_page + 1} / {len(self.pages)}"
+        self.children[
+            2
+        ].label = f"{self.current_page + 1} / {self.total_pages}"
 
         if self.home_button:
             if self.home_page is None:
@@ -165,19 +170,61 @@ class Paginator(View):
         else:
             await self.interaction.response.send_message(**payload_kwargs)
 
+    async def update_paginator(self, interaction: Interaction) -> None:
+        self.children[
+            2
+        ].label = f"{self.current_page + 1} / {self.total_pages}"
+
+        print(f"\n{self.current_page} / {self.total_pages}\n")
+
+        if interaction.response.is_done():
+            if not interaction.message.id:
+                print("ERROR")
+                await interaction.followup.send(
+                    embed=ErrorEmbed("Message not found to edit.", "Error!")
+                )
+                return
+            print("EDITING 1")
+            await interaction.followup.edit_message(
+                interaction.message.id,
+                embed=self.pages[self.current_page],
+                view=self,
+            )
+
+        else:
+            print("EDITING 2")
+            await interaction.response.edit_message(
+                embed=self.pages[self.current_page], view=self
+            )
+
     @discord.ui.button(
-        emoji=UtilConfig.PAGINATOR_FIRST_PAGE, style=ButtonStyle.blurple
+        emoji=UtilConfig.PAGINATOR_FIRST_PAGE_EMOJI, style=ButtonStyle.blurple
     )
     async def first_page_callback(
         self, interaction: Interaction, button: Button
-    ) -> None: ...
+    ) -> None:
+        await interaction.response.defer()
+
+        self.current_page = 0
+
+        await self.update_paginator(interaction)
 
     @discord.ui.button(
-        emoji=UtilConfig.PAGINATOR_PREVIOUS_PAGE, style=ButtonStyle.blurple
+        emoji=UtilConfig.PAGINATOR_PREVIOUS_PAGE_EMOJI,
+        style=ButtonStyle.blurple,
     )
     async def previous_page_callback(
         self, interaction: Interaction, button: Button
-    ) -> None: ...
+    ) -> None:
+        await interaction.response.defer()
+
+        self.current_page -= 1
+        print("BACK")
+        if self.current_page < 0:
+            print("LAST")
+            self.current_page = self.total_pages - 1
+
+        await self.update_paginator(interaction)
 
     @discord.ui.button(label="0/0", disabled=True, style=ButtonStyle.gray)
     async def number_page_callback(
@@ -185,15 +232,29 @@ class Paginator(View):
     ) -> None: ...
 
     @discord.ui.button(
-        emoji=UtilConfig.PAGINATOR_NEXT_PAGE, style=ButtonStyle.blurple
+        emoji=UtilConfig.PAGINATOR_NEXT_PAGE_EMOJI, style=ButtonStyle.blurple
     )
     async def next_page_callback(
         self, interaction: Interaction, button: Button
-    ) -> None: ...
+    ) -> None:
+        await interaction.response.defer()
+
+        self.current_page += 1
+        print("NEXT")
+        if self.current_page > self.pages - 1:
+            print("FIRST")
+            self.current_page = 0
+
+        await self.update_paginator(interaction)
 
     @discord.ui.button(
-        emoji=UtilConfig.PAGINATOR_LAST_PAGE, style=ButtonStyle.blurple
+        emoji=UtilConfig.PAGINATOR_LAST_PAGE_EMOJI, style=ButtonStyle.blurple
     )
     async def last_page_callback(
         self, interaction: Interaction, button: Button
-    ) -> None: ...
+    ) -> None:
+        await interaction.response.defer()
+
+        self.current_page = self.total_pages - 1
+
+        await self.update_paginator(interaction)
