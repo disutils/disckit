@@ -102,7 +102,7 @@ class UtilConfig:
 
     OWNER_LIST_URL: ClassVar[None | str] = None
 
-    PAGINATOR_HOME_PAGE_LABEL: ClassVar[str] = "\u200b"
+    PAGINATOR_HOME_PAGE_LABEL: ClassVar[str] = None
 
     PAGINATOR_HOME_PAGE_EMOJI: ClassVar[str] = "🏠"
 
