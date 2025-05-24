@@ -4,16 +4,18 @@ from typing import TYPE_CHECKING
 
 import discord
 from discord import ButtonStyle, Embed
-from discord.ui import Button, Modal, View
+from discord.ui import Button
 
 from disckit.config import UtilConfig
 from disckit.errors import PaginatorInvalidCurrentPage, PaginatorInvalidPages
 from disckit.utils import ErrorEmbed
+from disckit.utils.ui import BaseModal, BaseView
 
 if TYPE_CHECKING:
     from typing import Any, Optional, Sequence, Union
 
-    from discord import Interaction
+    from discord import Interaction, Message
+    from discord.ui import View
 
 
 def create_empty_button() -> Button:
@@ -42,7 +44,7 @@ class HomeButton(Button):
         await interaction.response.edit_message(**payload)
 
 
-class PageJumpModal(Modal, title="Jump to Page"):
+class PageJumpModal(BaseModal, title="Jump to Page"):
     page_number = discord.ui.TextInput(
         label="Enter the page number you want to jump to",
         placeholder="...",
@@ -56,7 +58,7 @@ class PageJumpModal(Modal, title="Jump to Page"):
         paginator_view: Union[View, Paginator],
         author: Optional[int] = None,
     ) -> None:
-        super().__init__()
+        super().__init__(author=author)
 
         self.paginator_view = paginator_view
         self.author = author
@@ -94,7 +96,7 @@ class PageJumpModal(Modal, title="Jump to Page"):
         await self.paginator_view.update_paginator(interaction=interaction)
 
 
-class Paginator(View):
+class Paginator(BaseView):
     def __init__(
         self,
         interaction: Interaction,
@@ -103,12 +105,19 @@ class Paginator(View):
         current_page: int = 0,
         author: Optional[int] = None,
         timeout: Optional[float] = 180.0,
+        disable_on_timeout: bool = True,
+        stop_on_timeout: bool = True,
         home_page: Optional[Union[Embed, str]] = None,
         home_view: Optional[View] = None,
         extra_buttons: Optional[Sequence[Button]] = None,
         ephemeral: bool = False,
     ) -> None:
-        super().__init__(timeout=timeout)
+        super().__init__(
+            author=author,
+            timeout=timeout,
+            disable_on_timeout=disable_on_timeout,
+            stop_on_timeout=stop_on_timeout,
+        )
 
         self.total_pages = len(pages)
 
@@ -126,7 +135,6 @@ class Paginator(View):
         self.pages = pages
         self.current_page = current_page
         self.author = author
-        self.timeout = timeout
         self.home_page = home_page
         self.home_view = home_view
         self.extra_buttons = list(extra_buttons) if extra_buttons else []
@@ -140,7 +148,9 @@ class Paginator(View):
             payload["embed"] = page_element
         return payload
 
-    async def start(self) -> None:
+    async def start(self, message: Optional[Message] = None) -> None:
+        self.message = message
+
         self.children[
             2
         ].label = f"{self.current_page + 1} / {self.total_pages}"
@@ -184,6 +194,9 @@ class Paginator(View):
             await self.interaction.followup.send(**payload_kwargs)
         else:
             await self.interaction.response.send_message(**payload_kwargs)
+
+        if self._disable_on_timeout and not self.message:
+            self.message = await self.interaction.original_response()
 
     async def update_paginator(self, interaction: Interaction) -> None:
         self.children[
