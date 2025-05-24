@@ -141,16 +141,12 @@ class Paginator(View):
             2
         ].label = f"{self.current_page + 1} / {self.total_pages}"
 
-        print(f"\n{self.current_page} / {self.total_pages}\n")
-
         if interaction.response.is_done():
             if not interaction.message.id:
-                print("ERROR")
                 await interaction.followup.send(
                     embed=ErrorEmbed("Message not found to edit.", "Error!")
                 )
                 return
-            print("EDITING 1")
             await interaction.followup.edit_message(
                 interaction.message.id,
                 embed=self.pages[self.current_page],
@@ -158,7 +154,6 @@ class Paginator(View):
             )
 
         else:
-            print("EDITING 2")
             await interaction.response.edit_message(
                 embed=self.pages[self.current_page], view=self
             )
@@ -186,13 +181,9 @@ class Paginator(View):
         await interaction.response.defer()
 
         self.current_page -= 1
-        print("BACK")
         if self.current_page < 0:
-            print("LAST")
             self.current_page = self.total_pages - 1
-        print("EDIT START")
         await self.update_paginator(interaction)
-        print("END END")
 
     @discord.ui.button(label="0/0", disabled=True, style=ButtonStyle.gray)
     async def number_page_callback(
@@ -209,13 +200,9 @@ class Paginator(View):
         await interaction.response.defer()
 
         self.current_page += 1
-        print("NEXT")
         if self.current_page > self.total_pages - 1:
-            print("FIRST")
             self.current_page = 0
-        print("EDIT START")
         await self.update_paginator(interaction)
-        print("END END")
 
     @discord.ui.button(
         emoji=UtilConfig.PAGINATOR_LAST_PAGE_EMOJI,
