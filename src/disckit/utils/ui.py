@@ -15,7 +15,7 @@ from disckit.utils import ErrorEmbed
 if TYPE_CHECKING:
     from typing import Any, Optional, Union
 
-    from discord import Interaction, Member, Message, User
+    from discord import Interaction, InteractionMessage, Member, Message, User
     from discord.ui import Item
 
 
@@ -46,7 +46,7 @@ class BaseView(View):
 
         super().__init__(timeout=timeout)
 
-        self.message: Optional[Message] = None
+        self.message: Optional[Union[Message, InteractionMessage]] = None
 
         self._author = author
         if isinstance(self._author, (discord.User, discord.Member)):
