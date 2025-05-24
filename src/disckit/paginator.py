@@ -11,7 +11,7 @@ from disckit.errors import PaginatorInvalidCurrentPage, PaginatorInvalidPages
 from disckit.utils import ErrorEmbed
 
 if TYPE_CHECKING:
-    from typing import Any, Sequence
+    from typing import Any, Optional, Sequence, Union
 
     from discord import Interaction
 
@@ -22,7 +22,7 @@ def create_empty_button() -> Button:
 
 class HomeButton(Button):
     def __init__(
-        self, home_page: str | Embed, new_view: None | View = None
+        self, home_page: Union[str, Embed], new_view: Optional[View] = None
     ) -> None:
         super().__init__(
             emoji=UtilConfig.PAGINATOR_HOME_PAGE_EMOJI,
@@ -42,7 +42,8 @@ class HomeButton(Button):
         await interaction.response.edit_message(**payload)
 
 
-class PageJumpModal(Modal): ...
+class PageJumpModal(Modal):
+    def __init__(self, author: Union[None, int]) -> None: ...
 
 
 class Paginator(View):
@@ -50,13 +51,13 @@ class Paginator(View):
         self,
         interaction: Interaction,
         *,
-        pages: Sequence[Embed | str],
+        pages: Sequence[Union[Embed, str]],
         current_page: int = 0,
-        author: None | int = None,
-        timeout: None | float = 180.0,
-        home_page: None | Embed | str = None,
-        home_view: None | View = None,
-        extra_buttons: None | Sequence[Button] = None,
+        author: Optional[int] = None,
+        timeout: Optional[float] = 180.0,
+        home_page: Optional[Union[Embed, str]] = None,
+        home_view: Optional[View] = None,
+        extra_buttons: Optional[Sequence[Button]] = None,
         ephemeral: bool = False,
     ) -> None:
         super().__init__(timeout=timeout)
@@ -83,7 +84,7 @@ class Paginator(View):
         self.extra_buttons = list(extra_buttons) if extra_buttons else []
         self.ephemeral = ephemeral
 
-    def send_kwargs(self, page_element: Embed | str) -> dict[str, Any]:
+    def send_kwargs(self, page_element: Union[Embed, str]) -> dict[str, Any]:
         payload = {"view": self}
         if isinstance(page_element, str):
             payload["content"] = page_element
@@ -128,7 +129,7 @@ class Paginator(View):
             for button in self.extra_buttons:
                 self.add_item(button)
 
-        element: Embed | str = self.pages[self.current_page]
+        element: Union[Embed, str] = self.pages[self.current_page]
         payload_kwargs = self.send_kwargs(element)
 
         if self.interaction.response.is_done():
