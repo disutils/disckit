@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
-from discord import ActivityType, Colour
+from discord import ActivityType, ButtonStyle, Colour
 
 from disckit.utils import default_status_handler
 
@@ -101,6 +101,10 @@ class UtilConfig:
     BUG_REPORT_CHANNEL: ClassVar[None | int] = None
 
     OWNER_LIST_URL: ClassVar[None | str] = None
+
+    PAGINATOR_BUTTON_STYLE: ClassVar[ButtonStyle] = ButtonStyle.blurple
+
+    PAGINATOR_HOME_BUTTON_STYLE: ClassVar[ButtonStyle] = ButtonStyle.red
 
     PAGINATOR_HOME_PAGE_LABEL: ClassVar[str] = None
 
