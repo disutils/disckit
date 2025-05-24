@@ -1,22 +1,17 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, overload
+from typing import TYPE_CHECKING
 
 import discord
 from discord import ButtonStyle, Embed
-from discord.ui.button import Button
-from discord.ui.view import View
+from discord.ui import Button, Modal, View
 
 from disckit.config import UtilConfig
-from disckit.errors import (
-    PaginatorInvalidCurrentPage,
-    PaginatorInvalidPages,
-    PaginatorNoHomePage,
-)
+from disckit.errors import PaginatorInvalidCurrentPage, PaginatorInvalidPages
 from disckit.utils import ErrorEmbed
 
 if TYPE_CHECKING:
-    from typing import Any, Literal, Sequence
+    from typing import Any, Sequence
 
     from discord import Interaction
 
@@ -32,7 +27,7 @@ class HomeButton(Button):
         super().__init__(
             emoji=UtilConfig.PAGINATOR_HOME_PAGE_EMOJI,
             label=UtilConfig.PAGINATOR_HOME_PAGE_LABEL,
-            style=ButtonStyle.red,
+            style=UtilConfig.PAGINATOR_HOME_BUTTON_STYLE,
         )
         self.home_page = home_page
         self.new_view = new_view
@@ -47,42 +42,18 @@ class HomeButton(Button):
         await interaction.response.edit_message(**payload)
 
 
+class PageJumpModal(Modal): ...
+
+
 class Paginator(View):
-    @overload
     def __init__(
         self,
         interaction: Interaction,
+        *,
         pages: Sequence[Embed | str],
         current_page: int = 0,
+        author: None | int = None,
         timeout: None | float = 180.0,
-        home_button: Literal[False] = ...,
-        home_page: None = ...,
-        home_view: None = None,
-        extra_buttons: None | Sequence[Button] = None,
-        ephemeral: bool = False,
-    ) -> None: ...
-
-    @overload
-    def __init__(
-        self,
-        interaction: Interaction,
-        pages: Sequence[Embed | str],
-        current_page: int = 0,
-        timeout: None | float = 180.0,
-        home_button: Literal[True] = ...,
-        home_page: Embed | str = ...,
-        home_view: None | View = None,
-        extra_buttons: None | Sequence[Button] = None,
-        ephemeral: bool = False,
-    ) -> None: ...
-
-    def __init__(
-        self,
-        interaction: Interaction,
-        pages: Sequence[Embed | str],
-        current_page: int = 0,
-        timeout: None | float = 180.0,
-        home_button: bool = False,
         home_page: None | Embed | str = None,
         home_view: None | View = None,
         extra_buttons: None | Sequence[Button] = None,
@@ -99,16 +70,16 @@ class Paginator(View):
 
         if current_page > self.total_pages - 1:
             raise PaginatorInvalidCurrentPage(
-                f"Expected an integer of range [0, {len(pages - 1)}]. Instead got {current_page}."
+                f"Expected an integer of range [0, {len(pages) - 1}]. Instead got {current_page}."
             )
 
         self.interaction = interaction
         self.pages = pages
         self.current_page = current_page
-        self.home_view = home_view
+        self.author = author
         self.timeout = timeout
-        self.home_button = home_button
         self.home_page = home_page
+        self.home_view = home_view
         self.extra_buttons = list(extra_buttons) if extra_buttons else []
         self.ephemeral = ephemeral
 
@@ -125,12 +96,7 @@ class Paginator(View):
             2
         ].label = f"{self.current_page + 1} / {self.total_pages}"
 
-        if self.home_button:
-            if self.home_page is None:
-                raise PaginatorNoHomePage(
-                    f"Expected {type(str)} or {type(Embed)} or {type(None)}, instead got type {type(self.home_page)} "
-                )
-
+        if self.home_page:
             self.extra_buttons.append(
                 HomeButton(self.home_page, self.home_view)
             )
@@ -198,7 +164,8 @@ class Paginator(View):
             )
 
     @discord.ui.button(
-        emoji=UtilConfig.PAGINATOR_FIRST_PAGE_EMOJI, style=ButtonStyle.blurple
+        emoji=UtilConfig.PAGINATOR_FIRST_PAGE_EMOJI,
+        style=UtilConfig.PAGINATOR_BUTTON_STYLE,
     )
     async def first_page_callback(
         self, interaction: Interaction, button: Button
@@ -211,7 +178,7 @@ class Paginator(View):
 
     @discord.ui.button(
         emoji=UtilConfig.PAGINATOR_PREVIOUS_PAGE_EMOJI,
-        style=ButtonStyle.blurple,
+        style=UtilConfig.PAGINATOR_BUTTON_STYLE,
     )
     async def previous_page_callback(
         self, interaction: Interaction, button: Button
@@ -223,8 +190,9 @@ class Paginator(View):
         if self.current_page < 0:
             print("LAST")
             self.current_page = self.total_pages - 1
-
+        print("EDIT START")
         await self.update_paginator(interaction)
+        print("END END")
 
     @discord.ui.button(label="0/0", disabled=True, style=ButtonStyle.gray)
     async def number_page_callback(
@@ -232,7 +200,8 @@ class Paginator(View):
     ) -> None: ...
 
     @discord.ui.button(
-        emoji=UtilConfig.PAGINATOR_NEXT_PAGE_EMOJI, style=ButtonStyle.blurple
+        emoji=UtilConfig.PAGINATOR_NEXT_PAGE_EMOJI,
+        style=UtilConfig.PAGINATOR_BUTTON_STYLE,
     )
     async def next_page_callback(
         self, interaction: Interaction, button: Button
@@ -241,14 +210,16 @@ class Paginator(View):
 
         self.current_page += 1
         print("NEXT")
-        if self.current_page > self.pages - 1:
+        if self.current_page > self.total_pages - 1:
             print("FIRST")
             self.current_page = 0
-
+        print("EDIT START")
         await self.update_paginator(interaction)
+        print("END END")
 
     @discord.ui.button(
-        emoji=UtilConfig.PAGINATOR_LAST_PAGE_EMOJI, style=ButtonStyle.blurple
+        emoji=UtilConfig.PAGINATOR_LAST_PAGE_EMOJI,
+        style=UtilConfig.PAGINATOR_BUTTON_STYLE,
     )
     async def last_page_callback(
         self, interaction: Interaction, button: Button
