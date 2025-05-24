@@ -42,8 +42,3 @@ class PaginatorInvalidPages(PaginatorError):
 @final
 class PaginatorInvalidCurrentPage(PaginatorError):
     """Raised when the current page is invalid of a paginator."""
-
-
-@final
-class PaginatorNoHomePage(PaginatorError):
-    """Raised when no page is supplied."""
