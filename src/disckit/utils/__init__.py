@@ -7,7 +7,6 @@ import discord
 from discord.app_commands import Choice
 
 from disckit.utils.embeds import ErrorEmbed, MainEmbed, SuccessEmbed
-from disckit.utils.ui import BaseModal, BaseView
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable, Coroutine
@@ -25,8 +24,6 @@ __all__ = (
     "MainEmbed",
     "SuccessEmbed",
     "ErrorEmbed",
-    "BaseModal",
-    "BaseView",
     "default_status_handler",
     "make_autocomplete",
     "sku_check",
