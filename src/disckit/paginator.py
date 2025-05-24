@@ -42,8 +42,56 @@ class HomeButton(Button):
         await interaction.response.edit_message(**payload)
 
 
-class PageJumpModal(Modal):
-    def __init__(self, author: Union[None, int]) -> None: ...
+class PageJumpModal(Modal, title="Jump to Page"):
+    page_number = discord.ui.TextInput(
+        label="Enter the page number you want to jump to",
+        placeholder="...",
+        min_length=1,
+        max_length=100,
+        style=discord.TextStyle.short,
+    )
+
+    def __init__(
+        self,
+        paginator_view: Union[View, Paginator],
+        author: Optional[int] = None,
+    ) -> None:
+        super().__init__()
+
+        self.paginator_view = paginator_view
+        self.author = author
+
+        self.page_number.placeholder = f"1 - {self.paginator_view.total_pages}"
+
+    async def on_submit(self, interaction: Interaction) -> None:
+        await interaction.response.defer()
+
+        if self.author and interaction.user.id != self.author:
+            await interaction.followup.send(
+                embed=ErrorEmbed("This interaction is not for you!"),
+                ephemeral=True,
+            )
+            return
+
+        if not self.page_number.value.isdigit():
+            await interaction.followup.send(
+                embed=ErrorEmbed("Please enter an integer."), ephemeral=True
+            )
+            return
+
+        page_num = int(self.page_number.value)
+
+        if page_num < 1 or page_num > self.paginator_view.total_pages:
+            await interaction.followup.send(
+                embed=ErrorEmbed(
+                    f"Invalid page number! Please enter a number from 1 - {self.paginator_view.total_pages}"
+                ),
+                ephemeral=True,
+            )
+            return
+
+        self.paginator_view.current_page = page_num - 1
+        await self.paginator_view.update_paginator(interaction=interaction)
 
 
 class Paginator(View):
@@ -186,10 +234,11 @@ class Paginator(View):
             self.current_page = self.total_pages - 1
         await self.update_paginator(interaction)
 
-    @discord.ui.button(label="0/0", disabled=True, style=ButtonStyle.gray)
+    @discord.ui.button(label="0/0", style=ButtonStyle.gray)
     async def number_page_callback(
         self, interaction: Interaction, button: Button
-    ) -> None: ...
+    ) -> None:
+        await interaction.response.send_modal(PageJumpModal(self, self.author))
 
     @discord.ui.button(
         emoji=UtilConfig.PAGINATOR_NEXT_PAGE_EMOJI,
