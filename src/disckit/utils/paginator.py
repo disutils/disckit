@@ -15,14 +15,14 @@ if TYPE_CHECKING:
     from typing import Any, Optional, Sequence, Union
 
     from discord import Interaction, Message
-    from discord.ui import View
+    from discord.ui import TextInput, View
 
 
-def create_empty_button() -> Button:
+def create_empty_button() -> Button[Any]:
     return Button(label="\u200b", style=ButtonStyle.gray, disabled=True)
 
 
-class HomeButton(Button):
+class HomeButton(Button[Any | "Paginator"]):
     def __init__(
         self, home_page: Union[str, Embed], new_view: Optional[View] = None
     ) -> None:
@@ -31,8 +31,8 @@ class HomeButton(Button):
             label=UtilConfig.PAGINATOR_HOME_PAGE_LABEL,
             style=UtilConfig.PAGINATOR_HOME_BUTTON_STYLE,
         )
-        self.home_page = home_page
-        self.new_view = new_view
+        self.home_page: Union[str, Embed] = home_page
+        self.new_view: Optional[View] = new_view
 
     async def callback(self, interaction: Interaction) -> None:
         payload: dict[str, Any] = {"view": self.new_view}
@@ -45,7 +45,7 @@ class HomeButton(Button):
 
 
 class PageJumpModal(BaseModal, title="Jump to Page"):
-    page_number = discord.ui.TextInput(
+    page_number: TextInput[PageJumpModal] = discord.ui.TextInput(
         label="Enter the page number you want to jump to",
         placeholder="...",
         min_length=1,
@@ -60,8 +60,8 @@ class PageJumpModal(BaseModal, title="Jump to Page"):
     ) -> None:
         super().__init__(author=author)
 
-        self.paginator_view = paginator_view
-        self.author = author
+        self.paginator_view: Paginator = paginator_view
+        self.author: Optional[int] = author
 
         self.page_number.placeholder = f"1 - {self.paginator_view.total_pages}"
 
@@ -109,7 +109,7 @@ class Paginator(BaseView):
         stop_on_timeout: bool = True,
         home_page: Optional[Union[Embed, str]] = None,
         home_view: Optional[View] = None,
-        extra_buttons: Optional[Sequence[Button]] = None,
+        extra_buttons: Optional[Sequence[Button[Any]]] = None,
         ephemeral: bool = False,
     ) -> None:
         super().__init__(
@@ -119,7 +119,7 @@ class Paginator(BaseView):
             stop_on_timeout=stop_on_timeout,
         )
 
-        self.total_pages = len(pages)
+        self.total_pages: int = len(pages)
 
         if self.total_pages == 0:
             raise PaginatorInvalidPages(
@@ -131,14 +131,16 @@ class Paginator(BaseView):
                 f"Expected an integer of range [0, {len(pages) - 1}]. Instead got {current_page}."
             )
 
-        self.interaction = interaction
-        self.pages = pages
-        self.current_page = current_page
-        self.author = author
-        self.home_page = home_page
-        self.home_view = home_view
-        self.extra_buttons = list(extra_buttons) if extra_buttons else []
-        self.ephemeral = ephemeral
+        self.interaction: Interaction = interaction
+        self.pages: Sequence[Union[Embed, str]] = pages
+        self.current_page: int = current_page
+        self.author: Optional[int] = author
+        self.home_page: Optional[Union[Embed, str]] = home_page
+        self.home_view: Optional[View] = home_view
+        self.extra_buttons: list[Button[Any]] = (
+            list(extra_buttons) if extra_buttons else []
+        )
+        self.ephemeral: bool = ephemeral
 
     def send_kwargs(self, page_element: Union[Embed, str]) -> dict[str, Any]:
         payload: dict[str, Any] = {"view": self}
@@ -149,7 +151,7 @@ class Paginator(BaseView):
         return payload
 
     async def start(self, message: Optional[Message] = None) -> None:
-        self.message = message
+        self.message: Optional[Message] = message
 
         self.children[
             2
@@ -223,7 +225,7 @@ class Paginator(BaseView):
         style=UtilConfig.PAGINATOR_BUTTON_STYLE,
     )
     async def first_page_callback(
-        self, interaction: Interaction, button: Button
+        self, interaction: Interaction, button: Button[Any]
     ) -> None:
         await interaction.response.defer()
 
@@ -236,7 +238,7 @@ class Paginator(BaseView):
         style=UtilConfig.PAGINATOR_BUTTON_STYLE,
     )
     async def previous_page_callback(
-        self, interaction: Interaction, button: Button
+        self, interaction: Interaction, button: Button[Any]
     ) -> None:
         await interaction.response.defer()
 
@@ -247,7 +249,7 @@ class Paginator(BaseView):
 
     @discord.ui.button(label="0/0", style=ButtonStyle.gray)
     async def number_page_callback(
-        self, interaction: Interaction, button: Button
+        self, interaction: Interaction, button: Button[Any]
     ) -> None:
         await interaction.response.send_modal(PageJumpModal(self, self.author))
 
@@ -256,7 +258,7 @@ class Paginator(BaseView):
         style=UtilConfig.PAGINATOR_BUTTON_STYLE,
     )
     async def next_page_callback(
-        self, interaction: Interaction, button: Button
+        self, interaction: Interaction, button: Button[Any]
     ) -> None:
         await interaction.response.defer()
 
@@ -270,7 +272,7 @@ class Paginator(BaseView):
         style=UtilConfig.PAGINATOR_BUTTON_STYLE,
     )
     async def last_page_callback(
-        self, interaction: Interaction, button: Button
+        self, interaction: Interaction, button: Button[Any]
     ) -> None:
         await interaction.response.defer()
 

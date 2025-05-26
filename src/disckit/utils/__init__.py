@@ -32,7 +32,7 @@ __all__ = (
 )
 
 
-async def default_status_handler(bot: Bot, *args: Any) -> tuple[str, ...]:  # pyright:ignore[reportUnusedParameter]
+async def default_status_handler(bot: Bot, *args: Any) -> tuple[str, ...]:
     """The default status handler. The first parameter will always be the
     bot instance which will automatically be passed as argument in the
     status handler.

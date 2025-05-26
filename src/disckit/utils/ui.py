@@ -48,11 +48,11 @@ class BaseView(View):
 
         self.message: Optional[Union[Message, InteractionMessage]] = None
 
-        self._author = author
+        self._author: Optional[Union[int, User, Member]] = author
         if isinstance(self._author, (discord.User, discord.Member)):
             self._author = self._author.id
-        self._disable_on_timeout = disable_on_timeout
-        self._stop_on_timeout = stop_on_timeout
+        self._disable_on_timeout: bool = disable_on_timeout
+        self._stop_on_timeout: bool = stop_on_timeout
 
     def disable_all_items(self) -> None:
         """Disables all items in the View when called."""
@@ -151,7 +151,7 @@ class BaseView(View):
             "```"
         )
 
-        await channel.send(  # pyright:ignore[reportAttributeAccessIssue]
+        await channel.send(  # pyright:ignore[reportAttributeAccessIssue, reportUnknownMemberType]
             embed=ErrorEmbed(
                 title="Error caused in a view",
                 description=description,
@@ -170,7 +170,7 @@ class BaseModal(Modal):
     ) -> None:
         super().__init__(title=title, timeout=timeout, custom_id=custom_id)
 
-        self._author = author
+        self._author: Optional[Union[int, User, Member]] = author
         if isinstance(self._author, (discord.User, discord.Member)):
             self._author = self._author.id
 
@@ -236,7 +236,7 @@ class BaseModal(Modal):
             "```"
         )
 
-        await channel.send(  # pyright:ignore[reportAttributeAccessIssue]
+        await channel.send(  # pyright:ignore[reportAttributeAccessIssue, reportUnknownMemberType]
             embed=ErrorEmbed(
                 title="Error caused in a modal",
                 description=description,
