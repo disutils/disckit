@@ -10,7 +10,7 @@ from disckit.utils import default_status_handler
 if TYPE_CHECKING:
     from collections.abc import Callable, Sequence
     from types import CoroutineType
-    from typing import Any, ClassVar
+    from typing import Any, ClassVar, List, Optional, Tuple, Union
 
     from discord.ext.commands import Bot
 
@@ -68,24 +68,24 @@ class UtilConfig:
     def __init__(self) -> None:
         raise RuntimeError("Cannot instantiate UtilConfig.")
 
-    MAIN_COLOR: ClassVar[None | int | Colour] = 0x5865F2
+    MAIN_COLOR: ClassVar[Optional[Union[int, Colour]]] = 0x5865F2
 
-    SUCCESS_COLOR: ClassVar[None | int | Colour] = 0x00FF00
+    SUCCESS_COLOR: ClassVar[Optional[Union[int, Colour]]] = 0x00FF00
 
-    ERROR_COLOR: ClassVar[None | int | Colour] = 0xFF0000
+    ERROR_COLOR: ClassVar[Optional[Union[int, Colour]]] = 0xFF0000
 
     SUCCESS_EMOJI: ClassVar[str] = "✅"
 
     ERROR_EMOJI: ClassVar[str] = "❌"
 
-    FOOTER_IMAGE: ClassVar[None | str] = None
+    FOOTER_IMAGE: ClassVar[Optional[str]] = None
 
-    FOOTER_TEXT: ClassVar[None | str] = None
+    FOOTER_TEXT: ClassVar[Optional[str]] = None
 
     STATUS_FUNC: ClassVar[
         tuple[
             Callable[
-                [Bot, *tuple[Any, ...]], CoroutineType[Any, Any, Sequence[str]]
+                [Bot, *Tuple[Any, ...]], CoroutineType[Any, Any, Sequence[str]]
             ],
             tuple[Any, ...],
         ]
@@ -96,17 +96,17 @@ class UtilConfig:
 
     STATUS_TYPE: ClassVar[ActivityType] = ActivityType.listening
 
-    STATUS_COOLDOWN: ClassVar[None | float] = None
+    STATUS_COOLDOWN: ClassVar[Optional[float]] = None
 
-    BUG_REPORT_CHANNEL: ClassVar[None | int] = None
+    BUG_REPORT_CHANNEL: ClassVar[Optional[int]] = None
 
-    OWNER_LIST_URL: ClassVar[None | str] = None
+    OWNER_LIST_URL: ClassVar[Optional[str]] = None
 
     PAGINATOR_BUTTON_STYLE: ClassVar[ButtonStyle] = ButtonStyle.blurple
 
     PAGINATOR_HOME_BUTTON_STYLE: ClassVar[ButtonStyle] = ButtonStyle.red
 
-    PAGINATOR_HOME_PAGE_LABEL: ClassVar[str] = None
+    PAGINATOR_HOME_PAGE_LABEL: ClassVar[Optional[str]] = None
 
     PAGINATOR_HOME_PAGE_EMOJI: ClassVar[str] = "🏠"
 
@@ -117,6 +117,13 @@ class UtilConfig:
     PAGINATOR_PREVIOUS_PAGE_EMOJI: ClassVar[str] = "⬅️"
 
     PAGINATOR_LAST_PAGE_EMOJI: ClassVar[str] = "⏩"
+
+    COOLDOWN_TEXTS: Union[List[str], Tuple[str, ...]] = (
+        "Chill, the command will be available {}",
+        "What's the hurry? The command will be available {}.",
+        "I appreciate your enthusiasm but the command can be used {}.",
+        "Take a deep breath in, a deep breath out. The command will be available {}.",
+    )
 
 
 class CogEnum(StrEnum):
