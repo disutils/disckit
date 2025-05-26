@@ -35,7 +35,7 @@ class HomeButton(Button):
         self.new_view = new_view
 
     async def callback(self, interaction: Interaction) -> None:
-        payload = {"view": self.new_view}
+        payload: dict[str, Any] = {"view": self.new_view}
         if isinstance(self.home_page, str):
             payload["content"] = self.home_page
         else:
@@ -55,7 +55,7 @@ class PageJumpModal(BaseModal, title="Jump to Page"):
 
     def __init__(
         self,
-        paginator_view: Union[View, Paginator],
+        paginator_view: Paginator,
         author: Optional[int] = None,
     ) -> None:
         super().__init__(author=author)
@@ -141,7 +141,7 @@ class Paginator(BaseView):
         self.ephemeral = ephemeral
 
     def send_kwargs(self, page_element: Union[Embed, str]) -> dict[str, Any]:
-        payload = {"view": self}
+        payload: dict[str, Any] = {"view": self}
         if isinstance(page_element, str):
             payload["content"] = page_element
         else:
@@ -153,7 +153,7 @@ class Paginator(BaseView):
 
         self.children[
             2
-        ].label = f"{self.current_page + 1} / {self.total_pages}"
+        ].label = f"{self.current_page + 1} / {self.total_pages}"  # pyright:ignore[reportAttributeAccessIssue]
 
         if self.home_page:
             self.extra_buttons.append(
@@ -201,24 +201,22 @@ class Paginator(BaseView):
     async def update_paginator(self, interaction: Interaction) -> None:
         self.children[
             2
-        ].label = f"{self.current_page + 1} / {self.total_pages}"
+        ].label = f"{self.current_page + 1} / {self.total_pages}"  # pyright:ignore[reportAttributeAccessIssue]
+        kwargs = self.send_kwargs(self.pages[self.current_page])
 
         if interaction.response.is_done():
-            if not interaction.message.id:
+            if not interaction.message:
                 await interaction.followup.send(
                     embed=ErrorEmbed("Message not found to edit.", "Error!")
                 )
                 return
+
             await interaction.followup.edit_message(
-                interaction.message.id,
-                embed=self.pages[self.current_page],
-                view=self,
+                interaction.message.id, **kwargs
             )
 
         else:
-            await interaction.response.edit_message(
-                embed=self.pages[self.current_page], view=self
-            )
+            await interaction.response.edit_message(**kwargs)
 
     @discord.ui.button(
         emoji=UtilConfig.PAGINATOR_FIRST_PAGE_EMOJI,

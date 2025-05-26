@@ -31,7 +31,7 @@ class BaseView(View):
         author: Optional[Union[int, User, Member]] = None,
         disable_on_timeout: bool = True,
         stop_on_timeout: bool = True,
-        timeout: float = 180.0,
+        timeout: Optional[float] = 180.0,
     ) -> None:
         """
         Parameters
@@ -50,7 +50,7 @@ class BaseView(View):
 
         self._author = author
         if isinstance(self._author, (discord.User, discord.Member)):
-            self._author = author.id
+            self._author = self._author.id
         self._disable_on_timeout = disable_on_timeout
         self._stop_on_timeout = stop_on_timeout
 
@@ -58,7 +58,7 @@ class BaseView(View):
         """Disables all items in the View when called."""
 
         for item in self.children:
-            item.disabled = True
+            item.disabled = True  # pyright:ignore[reportAttributeAccessIssue]
 
     async def on_timeout(self) -> None:
         if self._disable_on_timeout:
@@ -103,6 +103,10 @@ class BaseView(View):
     async def on_error(
         self, interaction: Interaction, error: Exception, item: Item[Any]
     ) -> None:
+        if not UtilConfig.BUG_REPORT_CHANNEL:
+            await super().on_error(interaction, error, item)
+            return
+
         if interaction.response.is_done():
             await interaction.followup.send(
                 embed=ErrorEmbed(
@@ -168,7 +172,7 @@ class BaseModal(Modal):
 
         self._author = author
         if isinstance(self._author, (discord.User, discord.Member)):
-            self._author = author.id
+            self._author = self._author.id
 
     async def interaction_check(self, interaction: Interaction) -> bool:
         if self._author is None:
@@ -185,6 +189,10 @@ class BaseModal(Modal):
     async def on_error(
         self, interaction: Interaction, error: Exception
     ) -> None:
+        if not UtilConfig.BUG_REPORT_CHANNEL:
+            await super().on_error(interaction, error)
+            return
+
         if interaction.response.is_done():
             await interaction.followup.send(
                 embed=ErrorEmbed(
