@@ -34,7 +34,7 @@ def _expand() -> _VersionInfo:
     level_types = {"a": "alpha", "b": "beta"}
     level: Literal["alpha", "beta", "final"] = level_types.get(
         v[-1][-1], "final"
-    )
+    )  # type: ignore
     minor_version = v[1] if level == "final" else v[1][0]
     return _VersionInfo(
         major=int(v[0]), minor=int(minor_version), release_level=level
