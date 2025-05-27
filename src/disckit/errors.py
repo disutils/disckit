@@ -19,6 +19,10 @@ class PaginatorError(DisException):
     """Base exception of all paginator errors."""
 
 
+class CooldownError(DisException):
+    """Base excpetion of all cooldown errors."""
+
+
 @final
 class CogLoadError(DisException):
     """Raised when loading a cog fails.
@@ -42,3 +46,18 @@ class PaginatorInvalidPages(PaginatorError):
 @final
 class PaginatorInvalidCurrentPage(PaginatorError):
     """Raised when the current page is invalid of a paginator."""
+
+
+@final
+class UnkownCooldownInteraction(CooldownError):
+    """Raises when the cooldown cannot find the interaction object of a command."""
+
+
+@final
+class UnkownCooldownCommand(CooldownError):
+    """Raises when the cooldown cannot find the command to act upon."""
+
+
+@final
+class UnkownCooldownContext(CooldownError):
+    """Raised when the cooldown doesn't have the required bucket object in the interaction."""
