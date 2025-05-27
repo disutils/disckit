@@ -1,18 +1,34 @@
-from typing import TYPE_CHECKING
+from __future__ import annotations
+
+from typing import TYPE_CHECKING, overload
 
 from discord import Embed, utils
 
 import disckit
 
 if TYPE_CHECKING:
+    from typing import Any, Optional
+
     import disckit.config
 
 
 class MainEmbed(Embed):
     """Represents a main embed for general use."""
 
+    @overload
+    def __init__(self, description: str, **kwargs: Any) -> None: ...
+
+    @overload
     def __init__(
-        self, description: None | str = None, title: None | str = None
+        self, title: str, description: str, **kwargs: Any
+    ) -> None: ...
+
+    def __init__(  # pyright:ignore[reportInconsistentOverload]
+        self,
+        title: Optional[str],
+        description: Optional[str] = None,
+        /,
+        **kwargs: Any,
     ) -> None:
         """
         Parameters
@@ -24,41 +40,16 @@ class MainEmbed(Embed):
             The title of the main embed.
         """
 
+        if description is None:
+            description = title
+            title = None
+
         super().__init__(
             title=title,
             description=description,
             color=disckit.config.UtilConfig.MAIN_COLOR,
             timestamp=utils.utcnow(),
-        )
-        self.set_footer(
-            text=disckit.config.UtilConfig.FOOTER_TEXT,
-            icon_url=disckit.config.UtilConfig.FOOTER_IMAGE,
-        )
-
-
-class SuccessEmbed(Embed):
-    """Represents a success embed."""
-
-    def __init__(
-        self, description: None | str = None, title: None | str = None
-    ) -> None:
-        """
-        Parameters
-        ----------
-        description: :class:`str`
-            The description of the success embed.
-
-        title: :class:`str`, default `None`
-            The title of the success embed.
-        """
-
-        if title:
-            title = f"{disckit.config.UtilConfig.SUCCESS_EMOJI} {title}"
-        super().__init__(
-            title=title,
-            description=description,
-            color=disckit.config.UtilConfig.SUCCESS_COLOR,
-            timestamp=utils.utcnow(),
+            **kwargs,
         )
         self.set_footer(
             text=disckit.config.UtilConfig.FOOTER_TEXT,
@@ -69,26 +60,92 @@ class SuccessEmbed(Embed):
 class ErrorEmbed(Embed):
     """Represents an error embed."""
 
+    @overload
+    def __init__(self, description: str, **kwargs: Any) -> None: ...
+
+    @overload
     def __init__(
-        self, description: None | str = None, title: None | str = None
+        self, title: str, description: str, **kwargs: Any
+    ) -> None: ...
+
+    def __init__(  # pyright:ignore[reportInconsistentOverload]
+        self,
+        title: Optional[str],
+        description: Optional[str] = None,
+        /,
+        **kwargs: Any,
     ) -> None:
         """
         Parameters
         ----------
         description: :class:`str`
-            The description of the error embed.
+            The description of the main embed.
 
         title: :class:`str`, default `None`
-            The title of the error embed.
+            The title of the main embed.
         """
 
+        if description is None:
+            description = title
+            title = None
+
         if title:
-            title = f"❌ {title}"
+            title = f"{disckit.config.UtilConfig.ERROR_EMOJI} {title}"
+
         super().__init__(
             title=title,
             description=description,
             color=disckit.config.UtilConfig.ERROR_COLOR,
             timestamp=utils.utcnow(),
+            **kwargs,
+        )
+        self.set_footer(
+            text=disckit.config.UtilConfig.FOOTER_TEXT,
+            icon_url=disckit.config.UtilConfig.FOOTER_IMAGE,
+        )
+
+
+class SuccessEmbed(Embed):
+    """Represents a success embed."""
+
+    @overload
+    def __init__(self, description: str, **kwargs: Any) -> None: ...
+
+    @overload
+    def __init__(
+        self, title: str, description: str, **kwargs: Any
+    ) -> None: ...
+
+    def __init__(  # pyright:ignore[reportInconsistentOverload]
+        self,
+        title: Optional[str],
+        description: Optional[str] = None,
+        /,
+        **kwargs: Any,
+    ) -> None:
+        """
+        Parameters
+        ----------
+        description: :class:`str`
+            The description of the main embed.
+
+        title: :class:`str`, default `None`
+            The title of the main embed.
+        """
+
+        if description is None:
+            description = title
+            title = None
+
+        if title:
+            title = f"{disckit.config.UtilConfig.SUCCESS_EMOJI} {title}"
+
+        super().__init__(
+            title=title,
+            description=description,
+            color=disckit.config.UtilConfig.SUCCESS_COLOR,
+            timestamp=utils.utcnow(),
+            **kwargs,
         )
         self.set_footer(
             text=disckit.config.UtilConfig.FOOTER_TEXT,
