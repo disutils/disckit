@@ -9,7 +9,7 @@ from disckit.errors import CogLoadError
 if TYPE_CHECKING:
     from discord.ext.commands import AutoShardedBot, Bot
 
-_logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 async def dis_load_extension(
@@ -79,6 +79,6 @@ async def dis_load_extension(
 
         await bot.load_extension(cog.value)
         if debug_message:
-            _logger.info(
+            logger.info(
                 f"Loading extension: {cog.name.title().replace(' ', '')}"
             )

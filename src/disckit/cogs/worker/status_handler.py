@@ -14,7 +14,7 @@ if TYPE_CHECKING:
 
     from discord.ext.commands import Bot
 
-_logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class StatusHandler(commands.Cog, name="Status Handler"):
@@ -27,12 +27,12 @@ class StatusHandler(commands.Cog, name="Status Handler"):
     @override
     async def cog_load(self) -> None:
         self.status_task.start()
-        _logger.info(f"{self.qualified_name} has been loaded.")
+        logger.info(f"{self.qualified_name} has been loaded.")
 
     @override
     async def cog_unload(self) -> None:
         self.status_task.cancel()
-        _logger.info(f"{self.qualified_name} has been unloaded.")
+        logger.info(f"{self.qualified_name} has been unloaded.")
 
     @tasks.loop(seconds=UtilConfig.STATUS_COOLDOWN)  # pyright:ignore[reportArgumentType]
     async def status_task(self) -> None:

@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from discord.ext.commands import Bot
 
 
-_logger = logging.getLogger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class OwnerIDsHandler(commands.Cog):
@@ -25,19 +25,19 @@ class OwnerIDsHandler(commands.Cog):
 
     @override
     async def cog_load(self) -> None:
-        _logger.info(f"{self.qualified_name} has been loaded.")
+        logger.info(f"{self.qualified_name} has been loaded.")
 
     @override
     async def cog_unload(self) -> None:
         self.fetch_owner_ids.cancel()
-        _logger.info(f"{self.qualified_name} has been unloaded.")
+        logger.info(f"{self.qualified_name} has been unloaded.")
 
     @tasks.loop(hours=12)
     async def fetch_owner_ids(self) -> None:
         url = UtilConfig.OWNER_LIST_URL
 
         if not url:
-            _logger.warning("OWNER_LIST_URL is not set in the configuration.")
+            logger.warning("OWNER_LIST_URL is not set in the configuration.")
             return
 
         async with aiohttp.ClientSession() as session:
@@ -48,9 +48,9 @@ class OwnerIDsHandler(commands.Cog):
                     exec(data, globals(), local_vars)
                     OWNER_IDS = local_vars.get("OWNER_IDS", set())
                     self.bot.owner_ids = OWNER_IDS
-                    _logger.info("Owner IDs successfully fetched.")
+                    logger.info("Owner IDs successfully fetched.")
                 else:
-                    _logger.error(
+                    logger.error(
                         f"Failed to fetch owner IDs. Response Status: {response.status}"
                     )
 
