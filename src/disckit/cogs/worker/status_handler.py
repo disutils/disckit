@@ -4,9 +4,10 @@ import logging
 from typing import TYPE_CHECKING
 
 import discord
-from discord.ext import commands, tasks
+from discord.ext import tasks
 from typing_extensions import override
 
+from disckit.cogs import BaseCog
 from disckit.config import UtilConfig
 
 if TYPE_CHECKING:
@@ -17,22 +18,23 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class StatusHandler(commands.Cog, name="Status Handler"):
+class StatusHandler(BaseCog, name="Status Handler"):
     """Cog for handling bot's dynamic status."""
 
     def __init__(self, bot: Bot) -> None:
+        super().__init__(logger)
         self.bot: Bot = bot
         self.status: None | Iterator[str] = None
 
     @override
     async def cog_load(self) -> None:
         self.status_task.start()
-        logger.info(f"{self.qualified_name} has been loaded.")
+        await super().cog_load()
 
     @override
     async def cog_unload(self) -> None:
         self.status_task.cancel()
-        logger.info(f"{self.qualified_name} has been unloaded.")
+        await super().cog_unload()
 
     @tasks.loop(seconds=UtilConfig.STATUS_COOLDOWN)  # pyright:ignore[reportArgumentType]
     async def status_task(self) -> None:

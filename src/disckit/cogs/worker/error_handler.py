@@ -10,6 +10,7 @@ from discord import Interaction, app_commands
 from discord.ext import commands
 from typing_extensions import override
 
+from disckit.cogs import BaseCog
 from disckit.config import UtilConfig
 from disckit.utils import ErrorEmbed
 
@@ -23,22 +24,23 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class ErrorHandler(commands.Cog, name="Error Handler"):
+class ErrorHandler(BaseCog, name="Error Handler"):
     """Error handler for global application commands."""
 
     def __init__(self, bot: Bot) -> None:
+        super().__init__(logger)
         self.bot: Bot = bot
         self.default_error_handler = app_commands.CommandTree.on_error  # pyright:ignore[reportUnannotatedClassAttribute]
 
     @override
     async def cog_load(self) -> None:
         app_commands.CommandTree.on_error = self.on_error  # pyright:ignore[reportAttributeAccessIssue]
-        logger.info(f"{self.qualified_name} has been loaded.")
+        await super().cog_load()
 
     @override
     async def cog_unload(self) -> None:
         app_commands.CommandTree.on_error = self.default_error_handler
-        logger.info(f"{self.qualified_name} has been unloaded.")
+        await super().cog_unload()
 
     @staticmethod
     def _get_group_names(

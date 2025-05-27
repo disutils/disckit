@@ -4,9 +4,10 @@ import logging
 from typing import TYPE_CHECKING
 
 import aiohttp
-from discord.ext import commands, tasks
+from discord.ext import tasks
 from typing_extensions import override
 
+from disckit.cogs import BaseCog
 from disckit.config import UtilConfig
 
 if TYPE_CHECKING:
@@ -18,19 +19,20 @@ if TYPE_CHECKING:
 logger = logging.getLogger(__name__)
 
 
-class OwnerIDsHandler(commands.Cog):
+class OwnerIDsHandler(BaseCog):
     def __init__(self, bot: Bot) -> None:
+        super().__init__(logger)
         self.bot: Bot = bot
         self.fetch_owner_ids.start()
 
     @override
     async def cog_load(self) -> None:
-        logger.info(f"{self.qualified_name} has been loaded.")
+        await super().cog_load()
 
     @override
     async def cog_unload(self) -> None:
         self.fetch_owner_ids.cancel()
-        logger.info(f"{self.qualified_name} has been unloaded.")
+        await super().cog_unload()
 
     @tasks.loop(hours=12)
     async def fetch_owner_ids(self) -> None:

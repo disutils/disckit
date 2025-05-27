@@ -20,7 +20,7 @@ class BaseCog(commands.Cog):
 
     def __init__(self, logger: Optional[Logger] = None) -> None:
         super().__init__()
-        self.logger = logger
+        self.logger: Optional[Logger] = logger
 
     @override
     async def cog_load(self) -> None:
