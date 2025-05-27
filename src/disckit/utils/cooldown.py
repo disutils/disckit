@@ -101,7 +101,7 @@ class CoolDown:
 
                 interaction: Optional[Interaction] = None
                 cooldown_check: tuple[bool, Optional[str]] = (True, None)
-                sku: bool
+                sku: bool = False
 
                 for arg in args + tuple(kwargs.values()):
                     if isinstance(arg, discord.Interaction):
@@ -129,8 +129,6 @@ class CoolDown:
                         sku_id=sku_id,
                         user_id=interaction.user.id,
                     )
-                else:
-                    sku = True
 
                 if cooldown_check[0] or sku:
                     CoolDown.add(
@@ -186,9 +184,20 @@ class CoolDown:
         bucket_type: CoolDownBucket,
         command_name: Optional[str] = None,
     ) -> None:
+        """Adds the cool down to the respective bucket type.
+
+        Parameters
+        ----------
+        time
+            | How long for the cool down to last in seconds.
+        interaction
+            | The interaction object associated with the command.
+        bucket_type
+            | The bucket type on which the cooldown should act upon.
+        command_name
+            | An optional command name to give. This will be choosen over `interaction.command.name` if given.
         """
-        Adds the cool down to the respective bucket type.
-        """
+
         if interaction.command is None and command_name is None:
             raise UnkownCooldownCommand("Couldn't determine command name.")
 
@@ -228,9 +237,18 @@ class CoolDown:
         command_name: Optional[str] = None,
         cooldown_return: Literal["datetime", "string"] = "string",
     ) -> tuple[bool, Optional[Union[str, datetime.datetime]]]:
+        """Checks the cooldown for the respective bucket type.
+
+        Parameters
+        ----------
+        interaction
+            | The interaction object associated with the command.
+        bucket_type
+            | The bucket type on which the cooldown should act upon.
+        command_name
+            | An optional command name to give. This will be choosen over `interaction.command.name` if given.
         """
-        Checks the cooldown for the respective bucket type.
-        """
+
         if interaction.command is None and command_name is None:
             raise UnkownCooldownCommand("Couldn't determine command name.")
 
@@ -274,10 +292,16 @@ class CoolDown:
         bucket_type: CoolDownBucket,
         command_name: Optional[str] = None,
     ) -> bool:
-        """
-        Removes the cool down from the user
-        @command_: The command's name
-        @interaction : The Interaction of the user
+        """Removes the cool down from the bucket type.
+
+        Parameters
+        ----------
+        interaction
+            | The interaction object associated with the command.
+        bucket_type
+            | The bucket type on which the cooldown should act upon.
+        command_name
+            | An optional command name to give. This will be choosen over `interaction.command.name` if given.
         """
 
         if interaction.command is None and command_name is None:
