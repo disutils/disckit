@@ -6,7 +6,6 @@ A utility package made for the disutils bots.
 
 :copyright: (c) 2024-present Disutils Team
 :license: MIT, see LICENSE for more details.
-
 """
 
 __version__ = "0.9b"
@@ -18,9 +17,8 @@ __copyright__ = "Copyright 2024-present Disutils Team"
 from typing import Literal, NamedTuple
 
 from disckit.config import CogEnum, UtilConfig
-from disckit.errors import CogLoadError, DisException
 
-__all__ = ("UtilConfig", "CogEnum", "DisException", "CogLoadError")
+__all__ = ("UtilConfig", "CogEnum")
 
 
 class _VersionInfo(NamedTuple):
