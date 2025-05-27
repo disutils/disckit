@@ -1,173 +1,295 @@
+from __future__ import annotations
+
 import datetime
 import functools
+import logging
 import random
-from typing import TYPE_CHECKING
+from enum import Enum, auto
+from typing import TYPE_CHECKING, overload
 
 import discord
 from discord import Interaction
 
+from disckit import UtilConfig
+from disckit.errors import (
+    UnkownCooldownCommand,
+    UnkownCooldownContext,
+    UnkownCooldownInteraction,
+)
 from disckit.utils import ErrorEmbed, sku_check
 
 if TYPE_CHECKING:
-    from typing import Any, Callable, Coroutine, TypeAlias
+    from typing import (
+        Any,
+        Awaitable,
+        Callable,
+        Literal,
+        Optional,
+        Sequence,
+        TypeVar,
+        Union,
+    )
 
-OptionalUser: TypeAlias = None | discord.Member | discord.User | int
-OptionalCommand: TypeAlias = None | str
+    from typing_extensions import ParamSpec
 
-cooldown_data = {"users": {}}
+    P = ParamSpec("P")
+    T = TypeVar("T")
+
+
+logger = logging.getLogger(__name__)
+
+
+class CoolDownBucket(Enum):
+    USER = auto()
+    GUILD = auto()
+    CHANNEL = auto()
 
 
 class CoolDown:
+    owner_ids: Optional[Sequence[int]] = None
+    owner_bypass: bool = False
+
+    cooldown_data: dict[
+        CoolDownBucket, dict[str, dict[int, datetime.datetime]]
+    ] = {
+        CoolDownBucket.USER: {},
+        CoolDownBucket.GUILD: {},
+        CoolDownBucket.CHANNEL: {},
+    }
+
+    @overload
     @staticmethod
-    def cool_down(
-        time: int, owner_bypass: bool = False, sku_id: int = None
-    ) -> Callable:
+    def cooldown(
+        time: Union[float, int],
+        bucket_type: Literal[CoolDownBucket.USER] = ...,
+        sku_id: int = ...,
+    ) -> Callable[..., Any]: ...
+
+    @overload
+    @staticmethod
+    def cooldown(
+        time: Union[float, int],
+        bucket_type: CoolDownBucket = ...,
+        sku_id: None = ...,
+    ) -> Callable[..., Any]: ...
+
+    @staticmethod
+    def cooldown(
+        time: Union[float, int],
+        bucket_type: CoolDownBucket = CoolDownBucket.USER,
+        sku_id: Optional[int] = None,
+    ) -> Callable[..., Any]:
         """A command decorator to handle cool downs and cool down replies automatically.
 
         Parameters
         ----------
-        time: :class:`int`
-            How long for the cool down to last in seconds.
-        owner_bypass: :class:`bool`, default `False`
-            Whether to allow bypassing the cooldown for owners. Optional and defaults to False.
-        sku_id: :class:`int`, default `None`
-            The SKU ID to check for bypassing the cooldown. Optional and defaults to None.
-
-        Returns
-        --------
-        Optional[:class:`DatabaseClass`]
-            A :class:`DatabaseClass` of containing the required attributes.
-            Returns `None` when the record doesn't exist and `auto_create` is set to `False`.
+        time
+            | How long for the cool down to last in seconds.
+        sku_id
+            | The SKU ID to check for bypassing the cooldown. Optional and defaults to None.
+            | The bucket type needs to be of `CoolDownBucket.USER` if sku_id is supplied.
         """
 
-        def decorator(func: Callable) -> Coroutine:
+        def decorator(
+            func: Callable[P, Awaitable[T]],
+        ) -> Callable[P, Awaitable[T]]:
             @functools.wraps(func)
-            async def wrapper(*args: Any, **kwargs: Any) -> Callable:
+            async def wrapper(
+                *args: P.args, **kwargs: P.kwargs
+            ) -> Optional[T]:
                 nonlocal time
 
-                interaction: Interaction = locals()["args"][1]
-                cooldown_check = CoolDown.check(interaction)
+                interaction: Optional[Interaction] = None
+                cooldown_check: tuple[bool, Optional[str]] = (True, None)
+                sku: bool
 
-                sku = await sku_check(
-                    bot=interaction.client,
-                    sku_id=sku_id,
-                    user_id=interaction.user.id,
+                for arg in args + tuple(kwargs.values()):
+                    if isinstance(arg, discord.Interaction):
+                        interaction = arg
+
+                if not isinstance(interaction, discord.Interaction):
+                    raise UnkownCooldownInteraction(
+                        f"Cannot find the interaction object of the command: {func.__name__}"
+                    )
+
+                if CoolDown.owner_bypass:
+                    if not CoolDown.owner_ids:
+                        logger.error(
+                            "`CoolDown.owner_ids` contains falsey data while `CoolDown.owner_bypass` is enabled."
+                            "\nHence couldn't determine owner ids to bypass."
+                        )
+                else:
+                    cooldown_check = CoolDown.check(
+                        interaction=interaction, bucket_type=bucket_type
+                    )
+
+                if sku_id:
+                    sku = await sku_check(
+                        bot=interaction.client,
+                        sku_id=sku_id,
+                        user_id=interaction.user.id,
+                    )
+                else:
+                    sku = True
+
+                if cooldown_check[0] or sku:
+                    CoolDown.add(
+                        time=time,
+                        interaction=interaction,
+                        bucket_type=bucket_type,
+                    )
+                    return await func(*args, **kwargs)
+
+                cooldown_text = random.choice(
+                    UtilConfig.COOLDOWN_TEXTS
+                ).format(cooldown_check[1])
+
+                await interaction.response.send_message(
+                    embed=ErrorEmbed(cooldown_text), ephemeral=True
                 )
 
-                if (
-                    cooldown_check[0]
-                    or (owner_bypass and interaction.user.id in OWNER_IDS)
-                    or sku
-                ):
-                    CoolDown.add(time, interaction)
-                    await func(*args, **kwargs)
-                else:
-                    cooldown_text = random.choice(COOLDOWN_TEXTS).format(
-                        cooldown_check[1]
-                    )
-                    await interaction.response.send_message(
-                        embed=ErrorEmbed(cooldown_text), ephemeral=True
-                    )
-
-            return wrapper
+            return wrapper  # pyright:ignore[reportReturnType]
 
         return decorator
 
     @staticmethod
+    def _get_context(
+        bucket_type: CoolDownBucket, interaction: Interaction
+    ) -> int:
+        primary_context: int
+
+        if bucket_type == CoolDownBucket.USER:
+            primary_context = interaction.user.id
+
+        elif bucket_type == CoolDownBucket.GUILD:
+            if interaction.guild is None:
+                raise UnkownCooldownContext(
+                    "Couldn't obtain guild object for bucket type `CoolDownBucket.GUILD`"
+                    "\nMake sure the command is being ran in a server."
+                )
+            primary_context = interaction.guild.id
+
+        elif bucket_type == CoolDownBucket.CHANNEL:
+            if interaction.channel is None:
+                raise UnkownCooldownContext(
+                    "Couldn't obtain channel object for bucket type `CoolDownBucket.CHANNEL`"
+                    "\nMake sure the command is being ran in a server."
+                )
+            primary_context = interaction.channel.id
+
+        return primary_context
+
+    @staticmethod
     def add(
-        time_: int,
+        time: Union[float, int],
         interaction: Interaction,
-        user: OptionalUser = None,
-        command: OptionalCommand = None,
+        bucket_type: CoolDownBucket,
+        command_name: Optional[str] = None,
     ) -> None:
         """
-        Adds the cool down to the user
-        @command_: The command's name
-        @interaction : The Interaction of the user
+        Adds the cool down to the respective bucket type.
         """
+        if interaction.command is None and command_name is None:
+            raise UnkownCooldownCommand("Couldn't determine command name.")
 
-        if user is not None:
-            assert isinstance(user, (discord.Member, discord.User, int)), (
-                f"Expected [discord.Member, discord.User, int] instead got {type(user)}"
-            )
-
-            if isinstance(user, (discord.Member, discord.User)):
-                user = user.id
-        else:
-            user = interaction.user.id
-        command = interaction.command.name if command is None else command
+        command = command_name or interaction.command.name  # pyright:ignore[reportOptionalMemberAccess]
+        primary_context = CoolDown._get_context(
+            bucket_type=bucket_type, interaction=interaction
+        )
         current = datetime.datetime.now()
 
-        cooldown_data["users"].setdefault(command, {})
-        cooldown_data["users"][command][user] = current + datetime.timedelta(
-            seconds=time_
+        CoolDown.cooldown_data[bucket_type].setdefault(command, {})
+        CoolDown.cooldown_data[bucket_type][command][primary_context] = (
+            current + datetime.timedelta(seconds=time)
         )
+
+    @overload
+    @staticmethod
+    def check(  # pyright:ignore[reportOverlappingOverload]
+        interaction: Interaction,
+        bucket_type: CoolDownBucket,
+        command_name: Optional[str] = None,
+        cooldown_return: Literal["string"] = ...,
+    ) -> tuple[bool, Optional[str]]: ...
+
+    @overload
+    @staticmethod
+    def check(
+        interaction: Interaction,
+        bucket_type: CoolDownBucket,
+        command_name: Optional[str] = None,
+        cooldown_return: Literal["datetime"] = ...,
+    ) -> tuple[bool, Optional[datetime.datetime]]: ...
 
     @staticmethod
     def check(
         interaction: Interaction,
-        user: OptionalUser = None,
-        command: OptionalCommand = None,
-    ) -> tuple[bool, None | str]:
+        bucket_type: CoolDownBucket,
+        command_name: Optional[str] = None,
+        cooldown_return: Literal["datetime", "string"] = "string",
+    ) -> tuple[bool, Optional[Union[str, datetime.datetime]]]:
         """
-        Checks whether the user is under a cool down or not
-        @command_: The command's name
-        @interaction : The Interaction of the user
+        Checks the cooldown for the respective bucket type.
         """
+        if interaction.command is None and command_name is None:
+            raise UnkownCooldownCommand("Couldn't determine command name.")
 
-        if user is not None:
-            assert isinstance(user, (discord.Member, discord.User, int)), (
-                f"Expected [discord.Member, discord.User, int] instead got {type(user)}"
-            )
-
-            if isinstance(user, (discord.Member, discord.User)):
-                user = user.id
-        else:
-            user = interaction.user.id
-        command = interaction.command.name if command is None else command
+        command = command_name or interaction.command.name  # pyright:ignore[reportOptionalMemberAccess]
+        primary_context = CoolDown._get_context(
+            bucket_type=bucket_type, interaction=interaction
+        )
         current = datetime.datetime.now()
 
         try:
-            cooldown = cooldown_data["users"][command][user]
+            cooldown = CoolDown.cooldown_data[bucket_type][command][
+                primary_context
+            ]
         except KeyError:
             return (True, None)
 
         if current > cooldown:
             try:
-                del cooldown_data["users"][command][user]
+                del CoolDown.cooldown_data[bucket_type][command][
+                    primary_context
+                ]
             except KeyError:
                 pass
             finally:
                 return (True, None)
 
         else:
-            cooldown = f"<t:{round(cooldown_data['users'][command][user].timestamp())}:R>"
-            return (False, cooldown)
+            cooldown = CoolDown.cooldown_data[bucket_type][command][
+                primary_context
+            ]
+
+            if cooldown_return == "datetime":
+                return (False, cooldown)
+
+            cooldown_text = f"<t:{round(cooldown.timestamp())}:R>"
+            return (False, cooldown_text)
 
     @staticmethod
     def reset(
         interaction: Interaction,
-        user: OptionalUser = None,
-        command: OptionalCommand = None,
-    ) -> None:
+        bucket_type: CoolDownBucket,
+        command_name: Optional[str] = None,
+    ) -> bool:
         """
         Removes the cool down from the user
         @command_: The command's name
         @interaction : The Interaction of the user
         """
 
-        if user is not None:
-            assert isinstance(user, (discord.Member, discord.User, int)), (
-                f"Expected [discord.Member, discord.User, int] instead got {type(user)}"
-            )
+        if interaction.command is None and command_name is None:
+            raise UnkownCooldownCommand("Couldn't determine command name.")
 
-            if isinstance(user, (discord.Member, discord.User)):
-                user = user.id
-        else:
-            user = interaction.user.id
-        command = interaction.command.name if command is None else command
+        command = command_name or interaction.command.name  # pyright:ignore[reportOptionalMemberAccess]
+        primary_context = CoolDown._get_context(
+            bucket_type=bucket_type, interaction=interaction
+        )
 
         try:
-            del cooldown_data["users"][command][user]
+            del CoolDown.cooldown_data[bucket_type][command][primary_context]
+            return True
         except KeyError:
-            pass
+            return False
