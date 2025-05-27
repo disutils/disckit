@@ -97,6 +97,33 @@ class PageJumpModal(BaseModal, title="Jump to Page"):
 
 
 class Paginator(BaseView):
+    """A custom, easy-to-use paginator for your bot.
+    It can paginate through a list / tuple of strings or embeds.
+
+    Attributes
+    ----------
+    interaction
+        The interaction for the paginator to respond to.
+    pages
+        The pages to paginate over.
+    total_pages
+        The total number of pages.
+    current_page
+        The starting page to begin with.
+    timeout
+        The amount of seconds in which the paginator view will time out in.
+    author
+        The author of the paginator, disallowing anyone else to use it.
+    home_page
+        Adds a home button if this is supplied
+    home_view
+        An optional home view which is activated when the home button is used.
+    extra_buttons
+        Extra buttons to be added to the paginator.
+    ephemeral
+        A bool for if the paginator needs to be ephemeral or not.
+    """
+
     def __init__(
         self,
         interaction: Interaction,
@@ -104,20 +131,13 @@ class Paginator(BaseView):
         pages: Union[List[Union[str, Embed]], Tuple[Union[Embed, str], ...]],
         current_page: int = 0,
         author: Optional[int] = None,
-        timeout: Optional[float] = 180.0,
-        disable_on_timeout: bool = True,
-        stop_on_timeout: bool = True,
         home_page: Optional[Union[Embed, str]] = None,
         home_view: Optional[View] = None,
         extra_buttons: Optional[Sequence[Button[Any]]] = None,
         ephemeral: bool = False,
+        **kwargs: Any,
     ) -> None:
-        super().__init__(
-            author=author,
-            timeout=timeout,
-            disable_on_timeout=disable_on_timeout,
-            stop_on_timeout=stop_on_timeout,
-        )
+        super().__init__(author=author, **kwargs)
 
         self.total_pages: int = len(pages)
 

@@ -23,28 +23,28 @@ class UtilConfig:
 
     Attributes
     ----------
-    MAIN_COLOR : None | int | Colour
+    MAIN_COLOR
         | The color of the MainEmbed.
 
-    SUCCESS_COLOR : Optional[int, discord.color.Color, tuple[int, int, int]]
+    SUCCESS_COLOR
         | The color of the SuccessEmbed.
 
-    ERROR_COLOR : Optional[int, discord.color.Color, tuple[int, int, int]]
+    ERROR_COLOR
         | The color of the ErrorEmbed.
 
-    SUCCESS_EMOJI : None | str
+    SUCCESS_EMOJI
         | An emoji used in the title of the SuccessEmbed.
 
-    ERROR_EMOJI : None | str
+    ERROR_EMOJI
         | An emoji used in the title of the ErrorEmbed.
 
-    FOOTER_IMAGE : None | str
+    FOOTER_IMAGE
         | A URL to an image for the footer of `MainEmbed`, `SuccessEmbed` and `ErrorEmbed`.
 
-    FOOTER_TEXT : None | str
+    FOOTER_TEXT
         | The footer text of `MainEmbed`, `SuccessEmbed` and `ErrorEmbed`.
 
-    STATUS_FUNC : tuple[Awaitable[Union[tuple, list, set]], tuple]
+    STATUS_FUNC
         | A tuple having its first element as a coroutine object which will be awaited when-
         | - When the cog first loads.
         | - When the handler is done iterating through all statuses returned from the function.
@@ -52,17 +52,46 @@ class UtilConfig:
         | custom status handler function. If no arguments have to be passed an empty tuple
         | should suffice.
 
-    STATUS_TYPE : ActivityType
+    STATUS_TYPE
         | The discord acitvity type used by the StatusHandler.
 
-    STATUS_COOLDOWN: None | int
+    STATUS_COOLDOWN
         | A cooldown in seconds for how long a status will play before changing in the `StatusHandler` cog.
 
-    BUG_REPORT_CHANNEL: None | int
+    BUG_REPORT_CHANNEL
         | The channel ID to where the bug reports will be sent to by the `ErrorHandler` cog.
 
-    OWNER_LIST_URL : None | str
+    OWNER_LIST_URL
         | The URL from which to fetch the list of owner IDs for the bot. If not set, no fetching will occur.
+
+    PAGINATOR_BUTTON_STYLE
+        | The button style of the paginator buttons.
+
+    PAGINATOR_HOME_BUTTON_STYLE
+        | The style for the Home Button in the paginator.
+
+    PAGINATOR_HOME_PAGE_LABEL
+        | The label for the home button in the paginator.
+
+    PAGINATOR_HOME_PAGE_EMOJI
+        | The emoji for the home button in the paginator.
+
+    PAGINATOR_FIRST_PAGE_EMOJI
+        | The emoji for the button controlling the first page in the paginator.
+
+    PAGINATOR_NEXT_PAGE_EMOJI
+        | The emoji for the button controlling the next page in the paginator.
+
+    PAGINATOR_PREVIOUS_PAGE_EMOJI
+        | The emoji for the button controlling the previous page in the paginator.
+
+    PAGINATOR_LAST_PAGE_EMOJI
+        | The emoji for the button controlling the last page in the paginator.
+
+    COOLDOWN_TEXTS: list[str] | tuple[str, ...]
+        | The cooldown text used by the cooldown controller.
+        | This config needs to have a single placeholder: {}
+        | In each of its string elements.
     """
 
     def __init__(self) -> None:
@@ -83,11 +112,11 @@ class UtilConfig:
     FOOTER_TEXT: ClassVar[Optional[str]] = None
 
     STATUS_FUNC: ClassVar[
-        tuple[
+        Tuple[
             Callable[
                 [Bot, *Tuple[Any, ...]], CoroutineType[Any, Any, Sequence[str]]
             ],
-            tuple[Any, ...],
+            Tuple[Any, ...],
         ]
     ] = (
         default_status_handler,
@@ -108,7 +137,7 @@ class UtilConfig:
 
     PAGINATOR_HOME_PAGE_LABEL: ClassVar[Optional[str]] = None
 
-    PAGINATOR_HOME_PAGE_EMOJI: ClassVar[str] = "🏠"
+    PAGINATOR_HOME_PAGE_EMOJI: ClassVar[Optional[str]] = "🏠"
 
     PAGINATOR_FIRST_PAGE_EMOJI: ClassVar[str] = "⏪"
 

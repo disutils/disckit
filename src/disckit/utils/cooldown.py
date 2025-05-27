@@ -26,6 +26,7 @@ if TYPE_CHECKING:
         Literal,
         Optional,
         Sequence,
+        Tuple,
         TypeVar,
         Union,
     )
@@ -85,6 +86,8 @@ class CoolDown:
         ----------
         time
             | How long for the cool down to last in seconds.
+        bucket_type
+            | The bucket type for which the cooldown needs to be in.
         sku_id
             | The SKU ID to check for bypassing the cooldown. Optional and defaults to None.
             | The bucket type needs to be of `CoolDownBucket.USER` if sku_id is supplied.
@@ -100,7 +103,7 @@ class CoolDown:
                 nonlocal time
 
                 interaction: Optional[Interaction] = None
-                cooldown_check: tuple[bool, Optional[str]] = (True, None)
+                cooldown_check: Tuple[bool, Optional[str]] = (True, None)
                 sku: bool = False
 
                 for arg in args + tuple(kwargs.values()):
@@ -219,7 +222,7 @@ class CoolDown:
         bucket_type: CoolDownBucket,
         command_name: Optional[str] = None,
         cooldown_return: Literal["string"] = ...,
-    ) -> tuple[bool, Optional[str]]: ...
+    ) -> Tuple[bool, Optional[str]]: ...
 
     @overload
     @staticmethod
@@ -228,7 +231,7 @@ class CoolDown:
         bucket_type: CoolDownBucket,
         command_name: Optional[str] = None,
         cooldown_return: Literal["datetime"] = ...,
-    ) -> tuple[bool, Optional[datetime.datetime]]: ...
+    ) -> Tuple[bool, Optional[datetime.datetime]]: ...
 
     @staticmethod
     def check(
@@ -236,7 +239,7 @@ class CoolDown:
         bucket_type: CoolDownBucket,
         command_name: Optional[str] = None,
         cooldown_return: Literal["datetime", "string"] = "string",
-    ) -> tuple[bool, Optional[Union[str, datetime.datetime]]]:
+    ) -> Tuple[bool, Optional[Union[str, datetime.datetime]]]:
         """Checks the cooldown for the respective bucket type.
 
         Parameters
@@ -247,6 +250,11 @@ class CoolDown:
             | The bucket type on which the cooldown should act upon.
         command_name
             | An optional command name to give. This will be choosen over `interaction.command.name` if given.
+
+        Returns
+        -------
+        Tuple[bool, Optional[Union[str, datetime.datetime]]]
+
         """
 
         if interaction.command is None and command_name is None:

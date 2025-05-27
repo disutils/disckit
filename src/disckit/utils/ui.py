@@ -23,27 +23,28 @@ logger = logging.getLogger(__name__)
 
 
 class BaseView(View):
-    """A custom base view which extends`discord.ui.View`
-    to provide more inbuilt features."""
+    """A custom base view which extends `discord.ui.View`
+    to provide more inbuilt features.
+
+    Parameters
+    ----------
+    author: Optional[:class:`int`], default `None`
+        | The author of the `View`. If set to `None` anyone can interact with the `View`.
+    timeout
+        | In how many seconds the view will timeout.
+    disable_on_timeout: :class:`bool`, default `True`
+        | If set to `True` it will disable all items in the view when it times out.
+    stop_on_timeout: :class:`bool`, default `True`
+        | Stops the view from listening to any further events on timeout.
+    """
 
     def __init__(
         self,
         author: Optional[Union[int, User, Member]] = None,
+        timeout: Optional[float] = 180.0,
         disable_on_timeout: bool = True,
         stop_on_timeout: bool = True,
-        timeout: Optional[float] = 180.0,
     ) -> None:
-        """
-        Parameters
-        ----------
-        author: Optional[:class:`int`], default `None`
-            | The author of the `View`. If set to `None` anyone can interact with the `View`.
-        disable_on_timeout: :class:`bool`, default `True`
-            | If set to `True` it will disable all items in the view when it times out.
-        unload_on_timeout: :class:`bool`, default `True`
-            | Stops the view from listening to any further events.
-        """
-
         super().__init__(timeout=timeout)
 
         self.message: Optional[Union[Message, InteractionMessage]] = None
@@ -104,20 +105,19 @@ class BaseView(View):
         self, interaction: Interaction, error: Exception, item: Item[Any]
     ) -> None:
         if not UtilConfig.BUG_REPORT_CHANNEL:
-            await super().on_error(interaction, error, item)
-            return
+            return await super().on_error(interaction, error, item)
 
         if interaction.response.is_done():
             await interaction.followup.send(
                 embed=ErrorEmbed(
-                    "An unexpected error has occurred. The developers have been notified of this.",
                     "Sorry :(",
+                    "An unexpected error has occurred. The developers have been notified of this.",
                 )
             )
         await interaction.response.send_message(
             embed=ErrorEmbed(
-                "An unexpected error has occurred. The developers have been notified of this.",
                 "Sorry :(",
+                "An unexpected error has occurred. The developers have been notified of this.",
             )
         )
 
@@ -160,6 +160,25 @@ class BaseView(View):
 
 
 class BaseModal(Modal):
+    """A custom base modal which extends `discord.ui.Modal`
+    to provide more inbuilt features.
+
+    Parameters
+    -----------
+    title
+        | The title of the modal.
+        | Can only be up to 45 characters.
+    timeout
+        | Timeout in seconds from last interaction with the UI before no longer accepting input.
+        | If ``None`` then there is no timeout.
+    custom_id
+        | The ID of the modal that gets received during an interaction.
+        | If not given then one is generated for you.
+        | Can only be up to 100 characters.
+    author
+        | The author of the modal. Disallows anyone else to use the modal.
+    """
+
     def __init__(
         self,
         *,
@@ -196,14 +215,14 @@ class BaseModal(Modal):
         if interaction.response.is_done():
             await interaction.followup.send(
                 embed=ErrorEmbed(
-                    "An unexpected error has occurred. The developers have been notified of this.",
                     "Sorry :(",
+                    "An unexpected error has occurred. The developers have been notified of this.",
                 )
             )
         await interaction.response.send_message(
             embed=ErrorEmbed(
-                "An unexpected error has occurred. The developers have been notified of this.",
                 "Sorry :(",
+                "An unexpected error has occurred. The developers have been notified of this.",
             )
         )
 
@@ -238,7 +257,7 @@ class BaseModal(Modal):
 
         await channel.send(  # pyright:ignore[reportAttributeAccessIssue, reportUnknownMemberType]
             embed=ErrorEmbed(
-                title="Error caused in a modal",
-                description=description,
+                "Error caused in a modal",
+                description,
             )
         )
