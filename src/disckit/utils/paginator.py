@@ -12,7 +12,7 @@ from disckit.utils import ErrorEmbed
 from disckit.utils.ui import BaseModal, BaseView
 
 if TYPE_CHECKING:
-    from typing import Any, Optional, Sequence, Union
+    from typing import Any, List, Optional, Sequence, Tuple, Union
 
     from discord import Interaction, Message
     from discord.ui import TextInput, View
@@ -101,7 +101,7 @@ class Paginator(BaseView):
         self,
         interaction: Interaction,
         *,
-        pages: Sequence[Union[Embed, str]],
+        pages: Union[List[Union[str, Embed]], Tuple[Union[Embed, str], ...]],
         current_page: int = 0,
         author: Optional[int] = None,
         timeout: Optional[float] = 180.0,
@@ -132,7 +132,9 @@ class Paginator(BaseView):
             )
 
         self.interaction: Interaction = interaction
-        self.pages: Sequence[Union[Embed, str]] = pages
+        self.pages: Union[
+            List[Union[str, Embed]], Tuple[Union[Embed, str], ...]
+        ] = pages
         self.current_page: int = current_page
         self.author: Optional[int] = author
         self.home_page: Optional[Union[Embed, str]] = home_page
@@ -146,8 +148,10 @@ class Paginator(BaseView):
         payload: dict[str, Any] = {"view": self}
         if isinstance(page_element, str):
             payload["content"] = page_element
+            payload["embed"] = None
         else:
             payload["embed"] = page_element
+            payload["content"] = None
         return payload
 
     async def start(self, message: Optional[Message] = None) -> None:
