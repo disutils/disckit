@@ -14,7 +14,7 @@ if TYPE_CHECKING:
     from types import CoroutineType
     from typing import Any, TypeVar
 
-    from discord import Interaction
+    from discord import Client, Interaction
     from discord.ext.commands import Bot
 
     _T = TypeVar("_T", str, int, float)
@@ -101,7 +101,7 @@ def make_autocomplete(
     return autocomplete
 
 
-async def sku_check(bot: Bot, sku_id: int, user_id: int) -> bool:
+async def sku_check(bot: Client, sku_id: int, user_id: int) -> bool:
     """|coro|
 
     Checks if a user has purchased a specific SKU package.
