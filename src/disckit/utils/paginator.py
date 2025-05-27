@@ -22,7 +22,7 @@ def create_empty_button() -> Button[Any]:
     return Button(label="\u200b", style=ButtonStyle.gray, disabled=True)
 
 
-class HomeButton(Button[Any | "Paginator"]):
+class HomeButton(Button["Any"]):
     def __init__(
         self, home_page: Union[str, Embed], new_view: Optional[View] = None
     ) -> None:
