@@ -41,7 +41,7 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
         logger.info(f"{self.qualified_name} has been unloaded.")
 
     @staticmethod
-    def __get_group_names(
+    def _get_group_names(
         group: Group,
         all_groups: None | list[str] = None,
     ) -> list[str]:
@@ -49,7 +49,7 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
         all_groups.append(group.name)
         if group.parent is None:
             return all_groups
-        return ErrorHandler.__get_group_names(group.parent, all_groups)
+        return ErrorHandler._get_group_names(group.parent, all_groups)
 
     @staticmethod
     async def send_response(
@@ -100,7 +100,7 @@ class ErrorHandler(commands.Cog, name="Error Handler"):
                 not isinstance(interaction.command, app_commands.ContextMenu)
                 and interaction.command.parent
             ):
-                final_name = ErrorHandler.__get_group_names(
+                final_name = ErrorHandler._get_group_names(
                     interaction.command.parent
                 )
             final_name.append(interaction.command.name)
