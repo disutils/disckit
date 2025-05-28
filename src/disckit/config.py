@@ -8,11 +8,27 @@ from discord import ActivityType, ButtonStyle, Colour
 from disckit.utils import default_status_handler
 
 if TYPE_CHECKING:
-    from collections.abc import Callable, Sequence
-    from types import CoroutineType
-    from typing import Any, ClassVar, List, Optional, Tuple, Union
+    from typing import (
+        Any,
+        ClassVar,
+        Coroutine,
+        List,
+        Optional,
+        Protocol,
+        Tuple,
+        TypeVar,
+        Union,
+    )
 
+    from discord import Client
     from discord.ext.commands import Bot
+
+    T_contra = TypeVar("T_contra", bound=Client, contravariant=True)
+
+    class StatusHandlerProtocol(Protocol[T_contra]):
+        def __call__(
+            self, bot: T_contra, *args: Any
+        ) -> Coroutine[Any, Any, Union[Tuple[str, ...], List[str]]]: ...
 
 
 _BASE_WORKER_COG_PATH: str = "disckit.cogs.worker."
@@ -112,12 +128,7 @@ class UtilConfig:
     FOOTER_TEXT: ClassVar[Optional[str]] = None
 
     STATUS_FUNC: ClassVar[
-        Tuple[
-            Callable[
-                [Bot, *Tuple[Any, ...]], CoroutineType[Any, Any, Sequence[str]]
-            ],
-            Tuple[Any, ...],
-        ]
+        Tuple[StatusHandlerProtocol[Bot], Tuple[Any, ...]]
     ] = (
         default_status_handler,
         (),
