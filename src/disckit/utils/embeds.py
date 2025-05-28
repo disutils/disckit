@@ -12,6 +12,9 @@ if TYPE_CHECKING:
     import disckit.config
 
 
+__all__ = ("MainEmbed", "ErrorEmbed", "SuccessEmbed")
+
+
 class MainEmbed(Embed):
     """Represents a main embed for general use."""
 

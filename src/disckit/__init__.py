@@ -18,7 +18,7 @@ from typing import Literal, NamedTuple
 
 from disckit.config import CogEnum, UtilConfig
 
-__all__ = ("UtilConfig", "CogEnum")
+__all__ = ("UtilConfig", "CogEnum", "version_info")
 
 
 class _VersionInfo(NamedTuple):

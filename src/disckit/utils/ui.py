@@ -19,6 +19,9 @@ if TYPE_CHECKING:
     from discord.ui import Item
 
 
+__all__ = ("BaseView", "BaseModal")
+
+
 logger = logging.getLogger(__name__)
 
 

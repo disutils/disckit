@@ -30,6 +30,9 @@ if TYPE_CHECKING:
         ) -> Coroutine[Any, Any, Union[Tuple[str, ...], List[str]]]: ...
 
 
+__all__ = ("UtilConfig", "CogEnum")
+
+
 _BASE_WORKER_COG_PATH: str = "disckit.cogs.worker."
 
 

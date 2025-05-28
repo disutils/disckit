@@ -18,8 +18,17 @@ if TYPE_CHECKING:
     from discord.ui import TextInput, View
 
 
-def create_empty_button() -> Button[Any]:
-    return Button(label="\u200b", style=ButtonStyle.gray, disabled=True)
+__all__ = ("create_empty_button", "HomeButton", "PageJumpModal", "Paginator")
+
+
+def create_empty_button(
+    label: str = "\u200b",
+    style: ButtonStyle = ButtonStyle.gray,
+    disabled: bool = True,
+) -> Button[Any]:
+    """Creates a placeholder button with no callback."""
+
+    return Button(label=label, style=style, disabled=disabled)
 
 
 class HomeButton(Button["Any"]):

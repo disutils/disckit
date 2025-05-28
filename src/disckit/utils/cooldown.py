@@ -37,6 +37,9 @@ if TYPE_CHECKING:
     T = TypeVar("T")
 
 
+__all__ = ("CoolDownBucket", "CoolDown")
+
+
 logger = logging.getLogger(__name__)
 
 

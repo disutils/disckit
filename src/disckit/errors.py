@@ -8,6 +8,19 @@ if TYPE_CHECKING:
     from disckit.config import CogEnum
 
 
+__all__ = (
+    "DisException",
+    "PaginatorError",
+    "CooldownError",
+    "CogLoadError",
+    "PaginatorInvalidPages",
+    "PaginatorInvalidCurrentPage",
+    "UnkownCooldownInteraction",
+    "UnkownCooldownCommand",
+    "UnkownCooldownContext",
+)
+
+
 class DisException(Exception):
     """Base class of disckit's exceptions."""
 
