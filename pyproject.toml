@@ -5,10 +5,14 @@ authors = [
   { name="Jiggly Balls", email="jigglyballs9000@gmail.com" },
 ]
 description = "An open source utilities library for the disutils bots."
+dependencies = [
+  "discord.py >= 2.4.0",
+  "typing_extensions >= 4.13.2"
+]
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Natural Language :: English",
@@ -25,9 +29,6 @@ classifiers = [
     "Topic :: Software Development :: Libraries",
     "Topic :: Utilities"
 ]
-
-[tool.setuptools.dynamic]
-dependencies = { file = "requirements.txt" }
 
 [project.urls]
 Homepage = "https://github.com/disutils/disckit"
