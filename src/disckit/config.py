@@ -21,7 +21,6 @@ if TYPE_CHECKING:
     )
 
     from discord import Client
-    from discord.ext.commands import Bot
 
     T_contra = TypeVar("T_contra", bound=Client, contravariant=True)
 
@@ -128,7 +127,7 @@ class UtilConfig:
     FOOTER_TEXT: ClassVar[Optional[str]] = None
 
     STATUS_FUNC: ClassVar[
-        Tuple[StatusHandlerProtocol[Bot], Tuple[Any, ...]]
+        Tuple[StatusHandlerProtocol[Any], Tuple[Any, ...]]
     ] = (
         default_status_handler,
         (),
