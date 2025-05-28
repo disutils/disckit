@@ -110,17 +110,17 @@ class ErrorHandler(BaseCog, name="Error Handler"):
 
         await channel.send(  # pyright:ignore[reportAttributeAccessIssue, reportUnknownMemberType]
             embed=ErrorEmbed(
+                name,
                 f"```\nError caused by-\nAuthor Name: {interaction.user}"
                 f"\nAuthor ID: {interaction.user.id}\n"
                 f"\nError Type-\n{type(error)}\n"
                 f"\nError Type Description-\n{error.__traceback__.tb_frame if error.__traceback__ else None}\n"
                 f"\nCause-\n{error.with_traceback(error.__traceback__)}```",
-                title=name,
             )
         )
         embed = ErrorEmbed(
-            title="Sorry...",
-            description="An unexpected error has occurred.\nThe developers have been notified of it.",
+            "Sorry...",
+            "An unexpected error has occurred.\nThe developers have been notified of it.",
         )
         await ErrorHandler.send_response(interaction=interaction, embed=embed)
 
@@ -129,7 +129,7 @@ class ErrorHandler(BaseCog, name="Error Handler"):
         interaction: discord.Interaction,
         error: app_commands.AppCommandError,
     ) -> None:
-        error_embed = ErrorEmbed("Error")
+        error_embed = ErrorEmbed(title="Error")
 
         if isinstance(interaction.channel, discord.DMChannel):
             return

@@ -153,8 +153,8 @@ class BaseView(View):
 
         await channel.send(  # pyright:ignore[reportAttributeAccessIssue, reportUnknownMemberType]
             embed=ErrorEmbed(
-                title="Error caused in a view",
-                description=description,
+                "Error caused in a view",
+                description,
             )
         )
 
