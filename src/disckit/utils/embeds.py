@@ -16,18 +16,23 @@ class MainEmbed(Embed):
     """Represents a main embed for general use."""
 
     @overload
-    def __init__(self, description: str, **kwargs: Any) -> None: ...
+    def __init__(self, description: str, /, **kwargs: Any) -> None: ...
 
     @overload
     def __init__(
-        self, title: str, description: str, **kwargs: Any
+        self, title: str, description: str, /, **kwargs: Any
     ) -> None: ...
 
-    def __init__(  # pyright:ignore[reportInconsistentOverload]
+    @overload
+    def __init__(self, *, title: str = ...) -> None: ...
+
+    @overload
+    def __init__(self, *, description: str = ...) -> None: ...
+
+    def __init__(
         self,
-        title: Optional[str],
+        title: Optional[str] = None,
         description: Optional[str] = None,
-        /,
         **kwargs: Any,
     ) -> None:
         """
@@ -61,18 +66,23 @@ class ErrorEmbed(Embed):
     """Represents an error embed."""
 
     @overload
-    def __init__(self, description: str, **kwargs: Any) -> None: ...
+    def __init__(self, description: str, /, **kwargs: Any) -> None: ...
 
     @overload
     def __init__(
-        self, title: str, description: str, **kwargs: Any
+        self, title: str, description: str, /, **kwargs: Any
     ) -> None: ...
 
-    def __init__(  # pyright:ignore[reportInconsistentOverload]
+    @overload
+    def __init__(self, *, title: str = ...) -> None: ...
+
+    @overload
+    def __init__(self, *, description: str = ...) -> None: ...
+
+    def __init__(
         self,
-        title: Optional[str],
+        title: Optional[str] = None,
         description: Optional[str] = None,
-        /,
         **kwargs: Any,
     ) -> None:
         """
@@ -109,18 +119,23 @@ class SuccessEmbed(Embed):
     """Represents a success embed."""
 
     @overload
-    def __init__(self, description: str, **kwargs: Any) -> None: ...
+    def __init__(self, description: str, /, **kwargs: Any) -> None: ...
 
     @overload
     def __init__(
-        self, title: str, description: str, **kwargs: Any
+        self, title: str, description: str, /, **kwargs: Any
     ) -> None: ...
 
-    def __init__(  # pyright:ignore[reportInconsistentOverload]
+    @overload
+    def __init__(self, *, title: str = ...) -> None: ...
+
+    @overload
+    def __init__(self, *, description: str = ...) -> None: ...
+
+    def __init__(
         self,
-        title: Optional[str],
+        title: Optional[str] = None,
         description: Optional[str] = None,
-        /,
         **kwargs: Any,
     ) -> None:
         """
