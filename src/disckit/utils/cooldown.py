@@ -94,8 +94,8 @@ class CoolDown:
         """
 
         def decorator(
-            func: Callable[P, Awaitable[T]],
-        ) -> Callable[P, Awaitable[T]]:
+            func: Callable[P, Awaitable[Optional[T]]],
+        ) -> Callable[P, Awaitable[Optional[T]]]:
             @functools.wraps(func)
             async def wrapper(
                 *args: P.args, **kwargs: P.kwargs
@@ -149,7 +149,7 @@ class CoolDown:
                     embed=ErrorEmbed(cooldown_text), ephemeral=True
                 )
 
-            return wrapper  # pyright:ignore[reportReturnType]
+            return wrapper
 
         return decorator
 
