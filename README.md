@@ -1,4 +1,5 @@
 # disckit
+![Python](https://img.shields.io/badge/Python-3.11%20%7C%203.12-blue)
 An open source utilities library for the disutils bots
 
 > [!WARNING]  
