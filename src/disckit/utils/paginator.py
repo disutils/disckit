@@ -12,7 +12,7 @@ from disckit.utils import ErrorEmbed
 from disckit.utils.ui import BaseModal, BaseView
 
 if TYPE_CHECKING:
-    from typing import Any, List, Optional, Sequence, Tuple, Union
+    from typing import Any, List, Optional, Tuple, Union
 
     from discord import Interaction, Message
     from discord.ui import TextInput, View
@@ -47,8 +47,10 @@ class HomeButton(Button["Any"]):
         payload: dict[str, Any] = {"view": self.new_view}
         if isinstance(self.home_page, str):
             payload["content"] = self.home_page
+            payload["embed"] = None
         else:
             payload["embed"] = self.home_page
+            payload["content"] = None
 
         await interaction.response.edit_message(**payload)
 
@@ -118,7 +120,7 @@ class Paginator(BaseView):
     total_pages
         The total number of pages.
     current_page
-        The starting page to begin with.
+        The current page it is on.
     timeout
         The amount of seconds in which the paginator view will time out in.
     author
@@ -138,14 +140,38 @@ class Paginator(BaseView):
         interaction: Interaction,
         *,
         pages: Union[List[Union[str, Embed]], Tuple[Union[Embed, str], ...]],
-        current_page: int = 0,
+        start_page: int = 0,
         author: Optional[int] = None,
         home_page: Optional[Union[Embed, str]] = None,
         home_view: Optional[View] = None,
-        extra_buttons: Optional[Sequence[Button[Any]]] = None,
+        extra_buttons: Optional[
+            Union[Tuple[Button[Any], ...], List[Button[Any]]]
+        ] = None,
+        extra_buttons_format: bool = True,
         ephemeral: bool = False,
         **kwargs: Any,
     ) -> None:
+        """
+        Parameters
+        ----------
+        interaction
+            The interaction for the paginator to respond to.
+        pages
+            The pages to paginate over.
+        start_page
+            The starting page for the paginator to begin.
+        author
+            The author of the paginator, disallowing anyone else to use it.
+        home_page
+            Adds a home button if this is supplied
+        home_view
+            An optional home view which is activated when the home button is used.
+        extra_buttons
+            Extra buttons to be added to the paginator.
+        ephemeral
+            A bool for if the paginator needs to be ephemeral or not.
+        """
+
         super().__init__(author=author, **kwargs)
 
         self.total_pages: int = len(pages)
@@ -155,22 +181,23 @@ class Paginator(BaseView):
                 "Expected a seqence of 1 or more items (Embed | str). Instead got 0 items."
             )
 
-        if current_page > self.total_pages - 1:
+        if start_page > self.total_pages - 1:
             raise PaginatorInvalidCurrentPage(
-                f"Expected an integer of range [0, {len(pages) - 1}]. Instead got {current_page}."
+                f"Expected an integer of range [0, {len(pages) - 1}]. Instead got {start_page}."
             )
 
         self.interaction: Interaction = interaction
         self.pages: Union[
             List[Union[str, Embed]], Tuple[Union[Embed, str], ...]
         ] = pages
-        self.current_page: int = current_page
+        self.current_page: int = start_page
         self.author: Optional[int] = author
         self.home_page: Optional[Union[Embed, str]] = home_page
         self.home_view: Optional[View] = home_view
         self.extra_buttons: list[Button[Any]] = (
             list(extra_buttons) if extra_buttons else []
         )
+        self.extra_buttons_format = extra_buttons_format
         self.ephemeral: bool = ephemeral
 
     def send_kwargs(self, page_element: Union[Embed, str]) -> dict[str, Any]:
@@ -191,34 +218,43 @@ class Paginator(BaseView):
         ].label = f"{self.current_page + 1} / {self.total_pages}"  # pyright:ignore[reportAttributeAccessIssue]
 
         if self.home_page:
-            self.extra_buttons.append(
-                HomeButton(self.home_page, self.home_view)
-            )
+            self.add_item(create_empty_button())
+            self.add_item(create_empty_button())
+            self.add_item(HomeButton(self.home_page, self.home_view))
+            self.add_item(create_empty_button())
+            self.add_item(create_empty_button())
 
         total_extra_buttons = len(self.extra_buttons)
 
-        if total_extra_buttons == 1:
-            self.add_item(create_empty_button())
-            self.add_item(create_empty_button())
-            self.add_item(self.extra_buttons[0])
-            self.add_item(create_empty_button())
-            self.add_item(create_empty_button())
+        if total_extra_buttons > 0 and self.extra_buttons_format:
+            if total_extra_buttons == 1:
+                self.add_item(create_empty_button())
+                self.add_item(create_empty_button())
+                self.add_item(self.extra_buttons[0])
+                self.add_item(create_empty_button())
+                self.add_item(create_empty_button())
 
-        elif total_extra_buttons == 2:
-            self.add_item(create_empty_button())
-            self.add_item(self.extra_buttons[0])
-            self.add_item(create_empty_button())
-            self.add_item(self.extra_buttons[1])
-            self.add_item(create_empty_button())
+            elif total_extra_buttons % 2 == 0 and total_extra_buttons // 2 < 4:
+                for button_index in range(0, len(self.extra_buttons) - 1, 2):
+                    self.add_item(create_empty_button())
+                    self.add_item(self.extra_buttons[button_index])
+                    self.add_item(create_empty_button())
+                    self.add_item(self.extra_buttons[button_index + 1])
+                    self.add_item(create_empty_button())
 
-        elif total_extra_buttons == 3:
-            self.add_item(create_empty_button())
-            self.add_item(self.extra_buttons[0])
-            self.add_item(self.extra_buttons[1])
-            self.add_item(self.extra_buttons[2])
-            self.add_item(create_empty_button())
+            elif total_extra_buttons % 3 == 0 and total_extra_buttons // 2 < 4:
+                for button_index in range(0, len(self.extra_buttons) - 1, 3):
+                    self.add_item(create_empty_button())
+                    self.add_item(self.extra_buttons[button_index])
+                    self.add_item(self.extra_buttons[button_index + 1])
+                    self.add_item(self.extra_buttons[button_index + 2])
+                    self.add_item(create_empty_button())
 
-        elif total_extra_buttons > 3:
+            else:
+                for button in self.extra_buttons:
+                    self.add_item(button)
+
+        else:
             for button in self.extra_buttons:
                 self.add_item(button)
 
