@@ -9,15 +9,16 @@ from discord.app_commands import Choice
 from disckit.utils.embeds import ErrorEmbed, MainEmbed, SuccessEmbed
 
 if TYPE_CHECKING:
-    from collections.abc import Awaitable, Callable, Coroutine
-    from functools import _Wrapped  # pyright:ignore[reportPrivateUsage]
-    from types import CoroutineType
-    from typing import Any, TypeVar
+    from collections.abc import Awaitable, Callable
+    from typing import Any, Optional, ParamSpec, TypeVar
 
     from discord import Client, Interaction
     from discord.ext.commands import Bot
 
-    _T = TypeVar("_T", str, int, float)
+    T_autocomplete = TypeVar("T_autocomplete", str, int, float)
+
+    P = ParamSpec("P")
+    T = TypeVar("T")
 
 
 __all__ = (
@@ -70,8 +71,8 @@ async def default_status_handler(bot: Bot, *args: Any) -> tuple[str, ...]:
 
 
 def make_autocomplete(
-    *args: _T,
-) -> Callable[[Interaction, str], Awaitable[list[Choice[_T]]]]:
+    *args: T_autocomplete,
+) -> Callable[[Interaction, str], Awaitable[list[Choice[T_autocomplete]]]]:
     """
     Creates an autocomplete function for the given arguments.
 
@@ -95,7 +96,7 @@ def make_autocomplete(
     """
     choices = [Choice(name=str(arg), value=arg) for arg in args]
 
-    async def autocomplete(_p1: Any, _p2: Any) -> list[Choice[_T]]:
+    async def autocomplete(_p1: Any, _p2: Any) -> list[Choice[T_autocomplete]]:
         return choices
 
     return autocomplete
@@ -108,11 +109,11 @@ async def sku_check(bot: Client, sku_id: int, user_id: int) -> bool:
 
     Parameters
     ----------
-    bot: :class:`int`
+    bot
         The bot class.
-    sku_id: :class:`int`
+    sku_id
         The SKU ID of the package.
-    user_id: :class:`int`
+    user_id
         The Discord user ID to check.
     """
 
@@ -127,66 +128,78 @@ async def sku_check(bot: Client, sku_id: int, user_id: int) -> bool:
     return bool(user_entitlements)
 
 
-def disallow_bots(
-    func: Callable[..., Coroutine[Any, Any, None]],
-) -> None | _Wrapped[..., Any, ..., CoroutineType[Any, Any, None]]:
+def disallow_bots() -> Callable[..., Any]:
     """A decorator used for not allowing members to pass in a bot user into command params"""
 
-    @functools.wraps(func)
-    async def wrapper(*args: Any, **kwargs: Any) -> None:
-        interaction: None | Interaction[Bot] = None
-        bot_user: bool = False
+    def decorator(
+        func: Callable[P, Awaitable[Optional[T]]],
+    ) -> Callable[P, Awaitable[Optional[T]]]:
+        @functools.wraps(func)
+        async def wrapper(*args: P.args, **kwargs: P.kwargs) -> Optional[T]:
+            interaction: None | Interaction[Bot] = None
+            bot_user: bool = False
 
-        for arg in args + tuple(kwargs.values()):
-            if isinstance(arg, discord.Interaction):
-                interaction = arg
+            for arg in args + tuple(kwargs.values()):
+                if isinstance(arg, discord.Interaction):
+                    interaction = arg
 
-            elif isinstance(arg, (discord.Member, discord.User)):
-                bot_user = bot_user or arg.bot
+                elif isinstance(arg, (discord.Member, discord.User)):
+                    bot_user = bot_user or arg.bot
 
-        if bot_user and interaction:
-            embed = ErrorEmbed("You cannot interact with bots!")
-            try:
-                await interaction.response.send_message(
-                    embed=embed, ephemeral=True
-                )
-            except discord.InteractionResponded:
-                await interaction.followup.send(embed=embed, ephemeral=True)
-            return
-        await func(*args, **kwargs)
+            if bot_user and interaction:
+                embed = ErrorEmbed("You cannot interact with bots!")
 
-    return wrapper
-
-
-def is_owner(
-    func: Callable[..., Coroutine[Any, Any, None]],
-) -> None | _Wrapped[..., Any, ..., CoroutineType[Any, Any, None]]:
-    """A decorator for owner-only slash commands"""
-
-    @functools.wraps(func)
-    async def wrapper(*args: Any, **kwargs: Any) -> None:
-        interaction: None | Interaction[Bot] = None
-
-        for arg in args + tuple(kwargs.values()):
-            if isinstance(arg, discord.Interaction):
-                interaction = arg
-                break
-
-        if interaction and interaction.client.owner_ids:
-            if interaction.user.id in interaction.client.owner_ids:
-                await func(*args, **kwargs)
-
-            else:
-                embed = ErrorEmbed("This command is owner only!")
-                try:
+                if not interaction.response.is_done():
                     await interaction.response.send_message(
                         embed=embed, ephemeral=True
                     )
-                except discord.InteractionResponded:
+                else:
                     await interaction.followup.send(
                         embed=embed, ephemeral=True
                     )
-        else:
-            await func(*args, **kwargs)
+                return
 
-    return wrapper
+            return await func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
+
+
+def is_owner() -> Callable[..., Any]:
+    """A decorator for owner-only slash commands"""
+
+    def decorator(
+        func: Callable[P, Awaitable[Optional[T]]],
+    ) -> Callable[P, Awaitable[Optional[T]]]:
+        """A decorator for owner-only slash commands"""
+
+        @functools.wraps(func)
+        async def wrapper(*args: P.args, **kwargs: P.kwargs) -> Optional[T]:
+            interaction: None | Interaction[Bot] = None
+
+            for arg in args + tuple(kwargs.values()):
+                if isinstance(arg, discord.Interaction):
+                    interaction = arg
+                    break
+
+            if interaction and interaction.client.owner_ids:
+                if interaction.user.id in interaction.client.owner_ids:
+                    await func(*args, **kwargs)
+
+                else:
+                    embed = ErrorEmbed("This command is owner only!")
+                    try:
+                        await interaction.response.send_message(
+                            embed=embed, ephemeral=True
+                        )
+                    except discord.InteractionResponded:
+                        await interaction.followup.send(
+                            embed=embed, ephemeral=True
+                        )
+            else:
+                await func(*args, **kwargs)
+
+        return wrapper
+
+    return decorator
