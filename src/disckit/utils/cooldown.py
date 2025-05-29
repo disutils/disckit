@@ -25,13 +25,12 @@ if TYPE_CHECKING:
         Callable,
         Literal,
         Optional,
+        ParamSpec,
         Sequence,
         Tuple,
         TypeVar,
         Union,
     )
-
-    from typing_extensions import ParamSpec
 
     P = ParamSpec("P")
     T = TypeVar("T")
