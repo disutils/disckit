@@ -200,7 +200,7 @@ class Paginator(BaseView):
         self.extra_buttons_format = extra_buttons_format
         self.ephemeral: bool = ephemeral
 
-    def send_kwargs(self, page_element: Union[Embed, str]) -> dict[str, Any]:
+    def _send_kwargs(self, page_element: Union[Embed, str]) -> dict[str, Any]:
         payload: dict[str, Any] = {"view": self}
         if isinstance(page_element, str):
             payload["content"] = page_element
@@ -210,12 +210,20 @@ class Paginator(BaseView):
             payload["content"] = None
         return payload
 
+    def _add_all_items(self) -> None:
+        for button in self.extra_buttons:
+            self.add_item(button)
+
     async def start(self, message: Optional[Message] = None) -> None:
         self.message: Optional[Message] = message
 
         self.children[
             2
         ].label = f"{self.current_page + 1} / {self.total_pages}"  # pyright:ignore[reportAttributeAccessIssue]
+
+        if self.total_pages == 1:
+            for button_index in range(5):
+                self.children[button_index].disabled = True  # pyright:ignore[reportAttributeAccessIssue]
 
         if self.home_page:
             self.add_item(create_empty_button())
@@ -225,8 +233,19 @@ class Paginator(BaseView):
             self.add_item(create_empty_button())
 
         total_extra_buttons = len(self.extra_buttons)
+        full_rows = 0
 
         if total_extra_buttons > 0 and self.extra_buttons_format:
+            if total_extra_buttons > 5:
+                full_rows = total_extra_buttons // 5
+                buttons_slice = self.extra_buttons[: full_rows * 5]
+                self.extra_buttons = self.extra_buttons[full_rows * 5 :]
+
+                for button in buttons_slice:
+                    self.add_item(button)
+
+                total_extra_buttons = len(self.extra_buttons)
+
             if total_extra_buttons == 1:
                 self.add_item(create_empty_button())
                 self.add_item(create_empty_button())
@@ -234,15 +253,19 @@ class Paginator(BaseView):
                 self.add_item(create_empty_button())
                 self.add_item(create_empty_button())
 
-            elif total_extra_buttons % 2 == 0 and total_extra_buttons // 2 < 4:
-                for button_index in range(0, len(self.extra_buttons) - 1, 2):
-                    self.add_item(create_empty_button())
+            elif total_extra_buttons % 4 == 0 and total_extra_buttons // 4 < (
+                4 - full_rows
+            ):
+                for button_index in range(0, len(self.extra_buttons) - 1, 4):
                     self.add_item(self.extra_buttons[button_index])
-                    self.add_item(create_empty_button())
                     self.add_item(self.extra_buttons[button_index + 1])
                     self.add_item(create_empty_button())
+                    self.add_item(self.extra_buttons[button_index + 2])
+                    self.add_item(self.extra_buttons[button_index + 3])
 
-            elif total_extra_buttons % 3 == 0 and total_extra_buttons // 2 < 4:
+            elif total_extra_buttons % 3 == 0 and total_extra_buttons // 3 < (
+                4 - full_rows
+            ):
                 for button_index in range(0, len(self.extra_buttons) - 1, 3):
                     self.add_item(create_empty_button())
                     self.add_item(self.extra_buttons[button_index])
@@ -250,16 +273,24 @@ class Paginator(BaseView):
                     self.add_item(self.extra_buttons[button_index + 2])
                     self.add_item(create_empty_button())
 
+            elif total_extra_buttons % 2 == 0 and total_extra_buttons // 2 < (
+                4 - full_rows
+            ):
+                for button_index in range(0, len(self.extra_buttons) - 1, 2):
+                    self.add_item(create_empty_button())
+                    self.add_item(self.extra_buttons[button_index])
+                    self.add_item(create_empty_button())
+                    self.add_item(self.extra_buttons[button_index + 1])
+                    self.add_item(create_empty_button())
+
             else:
-                for button in self.extra_buttons:
-                    self.add_item(button)
+                self._add_all_items()
 
         else:
-            for button in self.extra_buttons:
-                self.add_item(button)
+            self._add_all_items()
 
         element: Union[Embed, str] = self.pages[self.current_page]
-        payload_kwargs = self.send_kwargs(element)
+        payload_kwargs = self._send_kwargs(element)
 
         if self.interaction.response.is_done():
             await self.interaction.followup.send(**payload_kwargs)
@@ -273,7 +304,7 @@ class Paginator(BaseView):
         self.children[
             2
         ].label = f"{self.current_page + 1} / {self.total_pages}"  # pyright:ignore[reportAttributeAccessIssue]
-        kwargs = self.send_kwargs(self.pages[self.current_page])
+        kwargs = self._send_kwargs(self.pages[self.current_page])
 
         if interaction.response.is_done():
             if not interaction.message:
