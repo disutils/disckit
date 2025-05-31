@@ -72,7 +72,7 @@ async def default_status_handler(bot: Bot, *args: Any) -> tuple[str, ...]:
 
 def make_autocomplete(
     *args: T_autocomplete,
-) -> Callable[[Interaction, str], Awaitable[list[Choice[T_autocomplete]]]]:
+) -> Any:
     """
     Creates an autocomplete function for the given arguments.
 
