@@ -15,10 +15,10 @@ from disckit.config import UtilConfig
 from disckit.utils import ErrorEmbed
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import Any, Optional
 
-    from discord import Embed
-    from discord.app_commands import Group
+    from discord import DiscordException, Embed
+    from discord.app_commands import AppCommandError, Group
     from discord.ext.commands import Bot
 
 logger = logging.getLogger(__name__)
@@ -57,8 +57,8 @@ class ErrorHandler(BaseCog, name="Error Handler"):
     async def send_response(
         *,
         interaction: Interaction,
-        embed: None | Embed = None,
-        content: None | str = None,
+        embed: Optional[Embed] = None,
+        content: Optional[str] = None,
         ephemeral: bool = False,
     ) -> None:
         """Handles the error response to user."""
@@ -79,7 +79,7 @@ class ErrorHandler(BaseCog, name="Error Handler"):
 
     @staticmethod
     async def throw_err(
-        interaction: Interaction, error: discord.DiscordException
+        interaction: Interaction, error: DiscordException
     ) -> None:
         print(
             f"Ignoring exception in command {interaction.command}:",
@@ -126,8 +126,8 @@ class ErrorHandler(BaseCog, name="Error Handler"):
 
     async def on_error(
         self,
-        interaction: discord.Interaction,
-        error: app_commands.AppCommandError,
+        interaction: Interaction,
+        error: AppCommandError,
     ) -> None:
         error_embed = ErrorEmbed(title="Error")
 

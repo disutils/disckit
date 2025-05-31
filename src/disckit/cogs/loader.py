@@ -22,21 +22,21 @@ async def dis_load_extension(
 
     Parameters
     ----------
-    bot: :class:`commands.Bot`
-        The bot instance.
+    bot
+        | The bot instance.
 
-    *cogs: :class:`CogEnum`
-        The cogs to be loaded from disckit package.
+    *cogs
+        | The cogs to be loaded from disckit package.
 
-    debug_message: :class:`Optional[str]`
-        The debug message to be printed out when the cog is loaded.
-        Needs to contain one `{}` which is formatted to the cog name
-        being loaded.
+    debug_message
+        | The debug message to be printed out when the cog is loaded.
+        | Needs to contain one `{}` which is formatted to the cog name
+        | being loaded.
 
     Raises
     ------
     :exc:`CogLoadError`
-        Raised when an error occurrs in loading the cog.
+        | Raised when an error occurrs in loading the cog.
     """
 
     message = None

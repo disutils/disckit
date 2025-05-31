@@ -14,7 +14,7 @@ from disckit.utils import ErrorEmbed
 from disckit.utils.ui import BaseModal, BaseView
 
 if TYPE_CHECKING:
-    from typing import Any, List, Optional, Tuple, Union
+    from typing import Any, Optional, Sequence, Union
 
     from discord import Interaction, Message
     from discord.ui import TextInput, View
@@ -144,14 +144,12 @@ class Paginator(BaseView):
         self,
         interaction: Interaction,
         *,
-        pages: Union[List[Union[str, Embed]], Tuple[Union[Embed, str], ...]],
+        pages: Sequence[Union[str, Embed]],
         start_page: int = 0,
         author: Optional[int] = None,
         home_page: Optional[Union[Embed, str]] = None,
         home_view: Optional[View] = None,
-        extra_buttons: Optional[
-            Union[Tuple[Button[Any], ...], List[Button[Any]]]
-        ] = None,
+        extra_buttons: Optional[Sequence[Button[Any]]] = None,
         extra_buttons_format: bool = True,
         ephemeral: bool = False,
         **kwargs: Any,
@@ -194,9 +192,7 @@ class Paginator(BaseView):
             )
 
         self.interaction: Interaction = interaction
-        self.pages: Union[
-            List[Union[str, Embed]], Tuple[Union[Embed, str], ...]
-        ] = pages
+        self.pages: Sequence[Union[str, Embed]] = pages
         self.current_page: int = start_page
         self.author: Optional[int] = author
         self.home_page: Optional[Union[Embed, str]] = home_page
