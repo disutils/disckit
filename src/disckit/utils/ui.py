@@ -31,13 +31,13 @@ class BaseView(View):
 
     Parameters
     ----------
-    author: Optional[:class:`int`], default `None`
+    author
         | The author of the `View`. If set to `None` anyone can interact with the `View`.
     timeout
         | In how many seconds the view will timeout.
-    disable_on_timeout: :class:`bool`, default `True`
+    disable_on_timeout
         | If set to `True` it will disable all items in the view when it times out.
-    stop_on_timeout: :class:`bool`, default `True`
+    stop_on_timeout
         | Stops the view from listening to any further events on timeout.
     """
 

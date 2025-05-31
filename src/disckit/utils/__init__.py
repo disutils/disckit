@@ -44,17 +44,15 @@ async def default_status_handler(bot: Bot, *args: Any) -> tuple[str, ...]:
 
     Parameters
     ----------
-    bot: :class:`commands.Bot`
-        The global bot instance that gets passed to the function automatically.
-
-    *args: :class:`Any`
-        The extra arguments passed in `UtilUtilConfig.STATUS_FUNC[1]`
-        (The second element is the extra arguments that will be passed on).
+    bot
+        | The global bot instance that gets passed to the function automatically.
+    *args
+        | The extra arguments passed in `UtilUtilConfig.STATUS_FUNC[1]`
+        | (The second element is the extra arguments that will be passed on).
 
     Returns
     --------
-    :class:`Tuple` [:class:`str`, ...]
-        Heehee hawhaw
+    | Heehee hawhaw
     """
 
     users = len(bot.users)
@@ -73,26 +71,26 @@ async def default_status_handler(bot: Bot, *args: Any) -> tuple[str, ...]:
 def make_autocomplete(
     *args: T_autocomplete,
 ) -> Any:
-    """
-    Creates an autocomplete function for the given arguments.
+    """Creates an autocomplete function for the given arguments.
 
     Parameters
     ----------
-        *args: :class:`str`: Options for the autocomplete
+    *args
+        | Options for the autocomplete
 
     Returns
     --------
-        A function that can be put in @discord.app_commands.autocomplete
+    | A function that can be put in @discord.app_commands.autocomplete
 
     Usage
     ------
-        ```
-        @app_commands.autocomplete(choice=make_autocomplete("Heads", "Tails"))
-        @app_commands.command(name="coin-flip")
-        async def coin_flip(
-            self, interaction: discord.Interaction, choice: str
-        ): ...
-        ```
+    ```
+    @app_commands.autocomplete(choice=make_autocomplete("Heads", "Tails"))
+    @app_commands.command(name="coin-flip")
+    async def coin_flip(
+        self, interaction: discord.Interaction, choice: str
+    ): ...
+    ```
     """
     choices = [Choice(name=str(arg), value=arg) for arg in args]
 
@@ -110,11 +108,15 @@ async def sku_check(bot: Client, sku_id: int, user_id: int) -> bool:
     Parameters
     ----------
     bot
-        The bot class.
+        | The bot class.
     sku_id
-        The SKU ID of the package.
+        | The SKU ID of the package.
     user_id
-        The Discord user ID to check.
+        | The Discord user ID to check.
+
+    Returns
+    -------
+    | A bool indicating if the user has subscribed to the package or not.
     """
 
     sku = discord.Object(id=sku_id)

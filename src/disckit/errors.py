@@ -42,7 +42,7 @@ class CogLoadError(DisException):
 
     Attributes
     ------------
-    cog: :class:`CogEnum`
+    cog
         The cog that failed loading.
     """
 

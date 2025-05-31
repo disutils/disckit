@@ -155,21 +155,21 @@ class Paginator(BaseView):
         Parameters
         ----------
         interaction
-            The interaction for the paginator to respond to.
+            | The interaction for the paginator to respond to.
         pages
-            The pages to paginate over.
+            | The pages to paginate over.
         start_page
-            The starting page for the paginator to begin.
+            | The starting page for the paginator to begin.
         author
-            The author of the paginator, disallowing anyone else to use it.
+            | The author of the paginator, disallowing anyone else to use it.
         home_page
-            Adds a home button if this is supplied
+            | Adds a home button if this is supplied
         home_view
-            An optional home view which is activated when the home button is used.
+            | An optional home view which is activated when the home button is used.
         extra_buttons
-            Extra buttons to be added to the paginator.
+            | Extra buttons to be added to the paginator.
         ephemeral
-            A bool for if the paginator needs to be ephemeral or not.
+            | A bool for if the paginator needs to be ephemeral or not.
         """
 
         super().__init__(author=author, **kwargs)

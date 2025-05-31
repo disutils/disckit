@@ -46,11 +46,10 @@ class MainEmbed(Embed):
         """
         Parameters
         ----------
-        description: :class:`str`
-            The description of the main embed.
-
-        title: :class:`str`, default `None`
-            The title of the main embed.
+        description
+            | The description of the main embed.
+        title
+            | The title of the main embed.
         """
 
         if description is None:
@@ -101,11 +100,10 @@ class ErrorEmbed(Embed):
         """
         Parameters
         ----------
-        description: :class:`str`
-            The description of the main embed.
-
-        title: :class:`str`, default `None`
-            The title of the main embed.
+        description
+            | The description of the main embed.
+        title
+            | The title of the main embed.
         """
 
         if description is None:
@@ -159,11 +157,10 @@ class SuccessEmbed(Embed):
         """
         Parameters
         ----------
-        description: :class:`str`
-            The description of the main embed.
-
-        title: :class:`str`, default `None`
-            The title of the main embed.
+        description
+            | The description of the main embed.
+        title
+            | The title of the main embed.
         """
 
         if description is None:

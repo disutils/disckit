@@ -255,7 +255,10 @@ class CoolDown:
 
         Returns
         -------
-        Tuple[bool, Optional[Union[str, datetime.datetime]]]
+        | Returns a tuple where the first element is a bool. If the bool is `False` the user is under cooldown.
+        | The second element is either a relative timestamp string or a datetime object of when the cooldown gets
+        | over. If the first element `True` meaning no cooldown is imposed, the second element of the tuple will
+        | be `None`.
 
         """
 
