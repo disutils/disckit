@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import logging
+import traceback
 from typing import TYPE_CHECKING
 
 import discord
@@ -19,6 +21,9 @@ if TYPE_CHECKING:
 
 
 __all__ = ("create_empty_button", "HomeButton", "PageJumpModal", "Paginator")
+
+
+logger = logging.getLogger(__name__)
 
 
 def create_empty_button(
@@ -168,6 +173,8 @@ class Paginator(BaseView):
             | An optional home view which is activated when the home button is used.
         extra_buttons
             | Extra buttons to be added to the paginator.
+        extra_buttons_format
+            | If `True` is passed, it formats the buttons in a symmetrical format.
         ephemeral
             | A bool for if the paginator needs to be ephemeral or not.
         """
@@ -197,7 +204,7 @@ class Paginator(BaseView):
         self.extra_buttons: list[Button[Any]] = (
             list(extra_buttons) if extra_buttons else []
         )
-        self.extra_buttons_format = extra_buttons_format
+        self.extra_buttons_format: bool = extra_buttons_format
         self.ephemeral: bool = ephemeral
 
     def _send_kwargs(self, page_element: Union[Embed, str]) -> dict[str, Any]:
@@ -311,6 +318,8 @@ class Paginator(BaseView):
                 await interaction.followup.send(
                     embed=ErrorEmbed("Message not found to edit.", "Error!")
                 )
+                logger.error("Could not find interaction message to edit.")
+                traceback.print_stack()
                 return
 
             await interaction.followup.edit_message(
