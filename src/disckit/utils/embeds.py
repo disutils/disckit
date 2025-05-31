@@ -27,15 +27,15 @@ class MainEmbed(Embed):
     ) -> None: ...
 
     @overload
+    def __init__(
+        self, *, title: str | None, description: str | None, **kwargs: Any
+    ) -> None: ...
+
+    @overload
     def __init__(self, *, title: str = ..., **kwargs: Any) -> None: ...
 
     @overload
     def __init__(self, *, description: str = ..., **kwargs: Any) -> None: ...
-
-    @overload
-    def __init__(
-        self, *, title: str, description: str, **kwargs: Any
-    ) -> None: ...
 
     def __init__(
         self,
@@ -81,15 +81,15 @@ class ErrorEmbed(Embed):
     ) -> None: ...
 
     @overload
+    def __init__(
+        self, *, title: str | None, description: str | None, **kwargs: Any
+    ) -> None: ...
+
+    @overload
     def __init__(self, *, title: str = ..., **kwargs: Any) -> None: ...
 
     @overload
     def __init__(self, *, description: str = ..., **kwargs: Any) -> None: ...
-
-    @overload
-    def __init__(
-        self, *, title: str, description: str, **kwargs: Any
-    ) -> None: ...
 
     def __init__(
         self,
@@ -138,15 +138,15 @@ class SuccessEmbed(Embed):
     ) -> None: ...
 
     @overload
+    def __init__(
+        self, *, title: str | None, description: str | None, **kwargs: Any
+    ) -> None: ...
+
+    @overload
     def __init__(self, *, title: str = ..., **kwargs: Any) -> None: ...
 
     @overload
     def __init__(self, *, description: str = ..., **kwargs: Any) -> None: ...
-
-    @overload
-    def __init__(
-        self, *, title: str, description: str, **kwargs: Any
-    ) -> None: ...
 
     def __init__(
         self,
