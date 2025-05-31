@@ -93,16 +93,14 @@ class BaseView(View):
             self.stop()
 
     async def interaction_check(self, interaction: Interaction) -> bool:
-        if self._author is None:
+        if interaction.user.id == self._author:
             return True
 
-        if interaction.user.id != self._author:
-            await interaction.response.send_message(
-                embed=ErrorEmbed("This interaction is not for you!"),
-                ephemeral=True,
-            )
-            return False
-        return True
+        await interaction.response.send_message(
+            embed=ErrorEmbed("This interaction is not for you!"),
+            ephemeral=True,
+        )
+        return False
 
     async def on_error(
         self, interaction: Interaction, error: Exception, item: Item[Any]
@@ -197,16 +195,14 @@ class BaseModal(Modal):
             self._author = self._author.id
 
     async def interaction_check(self, interaction: Interaction) -> bool:
-        if self._author is None:
+        if interaction.user.id == self._author:
             return True
 
-        if interaction.user.id != self._author:
-            await interaction.response.send_message(
-                embed=ErrorEmbed("This interaction is not for you!"),
-                ephemeral=True,
-            )
-            return False
-        return True
+        await interaction.response.send_message(
+            embed=ErrorEmbed("This interaction is not for you!"),
+            ephemeral=True,
+        )
+        return False
 
     async def on_error(
         self, interaction: Interaction, error: Exception
