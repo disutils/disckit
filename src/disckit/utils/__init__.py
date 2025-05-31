@@ -10,9 +10,10 @@ from disckit.utils.embeds import ErrorEmbed, MainEmbed, SuccessEmbed
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
-    from typing import Any, Optional, ParamSpec, TypeVar
+    from typing import Any, Optional, ParamSpec, Tuple, TypeVar, Union
 
-    from discord import Client, Interaction
+    from discord import Client, Guild, Interaction, Thread, User
+    from discord.abc import GuildChannel, PrivateChannel
     from discord.ext.commands import Bot
 
     T_autocomplete = TypeVar("T_autocomplete", str, int, float)
@@ -33,7 +34,7 @@ __all__ = (
 )
 
 
-async def default_status_handler(bot: Bot, *args: Any) -> tuple[str, ...]:
+async def default_status_handler(bot: Bot, *args: Any) -> Tuple[str, ...]:
     """The default status handler. The first parameter will always be the
     bot instance which will automatically be passed as argument in the
     status handler.
@@ -205,3 +206,73 @@ def is_owner() -> Callable[..., Any]:
         return wrapper
 
     return decorator
+
+
+async def get_or_fetch_guild(bot: Client, id: int) -> Guild:
+    """|coro|
+
+    Tries to fetch the guild object from cache. If it fails, it makes
+    an API request to the discord API and return it.
+
+    Parameters
+    ----------
+    bot
+        The bot instance.
+    id
+        The ID of the guild object you want to obtain.
+    """
+    return bot.get_guild(id) or await bot.fetch_guild(id)
+
+
+async def get_or_fetch_user(bot: Client, id: int) -> User:
+    """|coro|
+
+    Tries to fetch the user object from cache. If it fails, it makes
+    an API request to the discord API and return it.
+
+    Parameters
+    ----------
+    bot
+        The bot instance.
+    id
+        The ID of the guild object you want to obtain.
+
+    Raises
+    ------
+    NotFound
+        A user with this ID does not exist.
+    HTTPException
+        Fetching the user failed.
+    """
+
+    return bot.get_user(id) or await bot.fetch_user(id)
+
+
+async def get_or_fetch_channel(
+    bot: Client, id: int
+) -> Union[PrivateChannel, GuildChannel, Thread]:
+    """|coro|
+
+    Tries to fetch the channel object from cache. If it fails, it makes
+    an API request to the discord API and return it.
+
+    Parameters
+    ----------
+    bot
+        The bot instance.
+    id
+        The ID of the channel object you want to obtain.
+
+    Raises
+    ------
+    InvalidData
+        An unknown channel type was received from Discord.
+    HTTPException
+        Retrieving the channel failed.
+    NotFound
+        Invalid Channel ID.
+    Forbidden
+        You do not have permission to fetch this channel.
+    """
+
+    return bot.get_channel(id) or await bot.fetch_channel(id)
