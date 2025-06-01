@@ -39,6 +39,9 @@ __all__ = (
     "sku_check",
     "disallow_bots",
     "is_owner",
+    "get_or_fetch_guild",
+    "get_or_fetch_user",
+    "get_or_fetch_channel",
 )
 
 
