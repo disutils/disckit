@@ -10,7 +10,15 @@ from disckit.utils.embeds import ErrorEmbed, MainEmbed, SuccessEmbed
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
-    from typing import Any, Optional, ParamSpec, Tuple, TypeVar, Union
+    from typing import (
+        Any,
+        Optional,
+        ParamSpec,
+        Tuple,
+        TypeGuard,
+        TypeVar,
+        Union,
+    )
 
     from discord import Client, Guild, Interaction, Thread, User
     from discord.abc import GuildChannel, PrivateChannel
@@ -67,6 +75,21 @@ async def default_status_handler(bot: Bot, *args: Any) -> Tuple[str, ...]:
     )
 
     return status
+
+
+def type_guarantee(var: Any, *var_types: type[T]) -> TypeGuard[T]:
+    """Ensures the type of a variable for type checking purposes only;
+    it has no effect at runtime.
+
+    Parameters
+    ----------
+    var
+        The variable to guarentee the type for.
+    *var_types
+        The types to verify against.
+    """
+
+    return True
 
 
 def make_autocomplete(
