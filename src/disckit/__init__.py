@@ -22,20 +22,21 @@ __all__ = ("UtilConfig", "CogEnum", "version_info")
 
 
 class _VersionInfo(NamedTuple):
-    major: int
-    minor: int
+    major: str
+    minor: str
+    patch: str
     release_level: Literal["alpha", "beta", "final"]
 
 
 def _expand() -> _VersionInfo:
     v = __version__.split(".")
     level_types = {"a": "alpha", "b": "beta"}
-    level: Literal["alpha", "beta", "final"] = level_types.get(
-        v[-1][-1], "final"
-    )  # type: ignore
-    minor_version = v[1] if level == "final" else v[1][0]
+    level = level_types.get(v[-1], "final")
     return _VersionInfo(
-        major=int(v[0]), minor=int(minor_version), release_level=level
+        major=v[0],
+        minor=v[1],
+        patch=v[2],
+        release_level=level,  # pyright:ignore[reportArgumentType]
     )
 
 
