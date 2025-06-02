@@ -1,18 +1,14 @@
 [project]
 name = "disckit"
 version = "1.0.0"
+description = "An open source utilities library for the disutils bots."
 authors = [
   { name="Jiggly Balls", email="jigglyballs9000@gmail.com" },
 ]
-description = "An open source utilities library for the disutils bots."
-dependencies = [
-  "discord.py >= 2.4.0",
-  "typing_extensions >= 4.13.2"
-]
 readme = "README.md"
+requires-python = ">=3.11"
 license = "MIT"
 license-files = ["LICENSE"]
-requires-python = ">=3.11"
 classifiers = [
     "Development Status :: 5 - Production/Stable",
     "Natural Language :: English",
@@ -29,6 +25,10 @@ classifiers = [
     "Topic :: Utilities",
     "Typing :: Typed"
 ]
+dependencies = [
+    "discord-py>=2.5.0",
+    "typing-extensions>=4.13.2",
+]
 
 [project.urls]
 Homepage = "https://github.com/disutils/disckit"
@@ -37,6 +37,16 @@ Issues = "https://github.com/disutils/disckit/issues"
 [build-system]
 requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
+
+[dependency-groups]
+dev = [
+    "basedpyright>=1.29.2",
+    "isort>=6.0.1",
+    "ruff>=0.11.12",
+    "setuptools>=61.0",
+    "twine>=6.1.0",
+    "wheel>=0.45.1",
+]
 
 [tool.isort]
 multi_line_output = 3
