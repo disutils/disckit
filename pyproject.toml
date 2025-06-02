@@ -1,6 +1,6 @@
 [project]
 name = "disckit"
-version = "1.0.0b"
+version = "1.0.0"
 authors = [
   { name="Jiggly Balls", email="jigglyballs9000@gmail.com" },
 ]
