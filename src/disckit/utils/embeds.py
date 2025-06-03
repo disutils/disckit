@@ -19,6 +19,19 @@ class MainEmbed(Embed):
     """Represents a main embed for general use."""
 
     @overload
+    def __init__(self, /, **kwargs: Any) -> None: ...
+
+    @overload
+    def __init__(
+        self, title: str, /, *, description: str, **kwargs: Any
+    ) -> None: ...
+
+    @overload
+    def __init__(
+        self, description: str, /, *, title: str, **kwargs: Any
+    ) -> None: ...
+
+    @overload
     def __init__(self, description: str, /, **kwargs: Any) -> None: ...
 
     @overload
@@ -26,21 +39,11 @@ class MainEmbed(Embed):
         self, title: str, description: str, /, **kwargs: Any
     ) -> None: ...
 
-    @overload
-    def __init__(
-        self, *, title: str | None, description: str | None, **kwargs: Any
-    ) -> None: ...
-
-    @overload
-    def __init__(self, *, title: str = ..., **kwargs: Any) -> None: ...
-
-    @overload
-    def __init__(self, *, description: str = ..., **kwargs: Any) -> None: ...
-
     def __init__(
         self,
         title: Optional[str] = None,
         description: Optional[str] = None,
+        /,
         **kwargs: Any,
     ) -> None:
         """
@@ -52,13 +55,18 @@ class MainEmbed(Embed):
             | The title of the main embed.
         """
 
-        if description is None:
+        if "title" in kwargs and title and not description:
+            description = title
+        elif not kwargs and not description and title:
             description = title
             title = None
+        else:
+            description = kwargs.get("description") or description
+        title = kwargs.get("title") or title
+
+        kwargs.update({"title": title, "description": description})
 
         super().__init__(
-            title=title,
-            description=description,
             color=disckit.config.UtilConfig.MAIN_COLOR,
             timestamp=utils.utcnow(),
             **kwargs,
@@ -73,6 +81,19 @@ class ErrorEmbed(Embed):
     """Represents an error embed."""
 
     @overload
+    def __init__(self, /, **kwargs: Any) -> None: ...
+
+    @overload
+    def __init__(
+        self, title: str, /, *, description: str, **kwargs: Any
+    ) -> None: ...
+
+    @overload
+    def __init__(
+        self, description: str, /, *, title: str, **kwargs: Any
+    ) -> None: ...
+
+    @overload
     def __init__(self, description: str, /, **kwargs: Any) -> None: ...
 
     @overload
@@ -80,21 +101,11 @@ class ErrorEmbed(Embed):
         self, title: str, description: str, /, **kwargs: Any
     ) -> None: ...
 
-    @overload
-    def __init__(
-        self, *, title: str | None, description: str | None, **kwargs: Any
-    ) -> None: ...
-
-    @overload
-    def __init__(self, *, title: str = ..., **kwargs: Any) -> None: ...
-
-    @overload
-    def __init__(self, *, description: str = ..., **kwargs: Any) -> None: ...
-
     def __init__(
         self,
         title: Optional[str] = None,
         description: Optional[str] = None,
+        /,
         **kwargs: Any,
     ) -> None:
         """
@@ -106,16 +117,23 @@ class ErrorEmbed(Embed):
             | The title of the main embed.
         """
 
-        if description is None:
+        if "title" in kwargs and title and not description:
+            description = title
+        elif not kwargs and not description and title:
             description = title
             title = None
+        else:
+            description = kwargs.get("description") or description
+        title = kwargs.get("title") or title
 
-        if title:
-            title = f"{disckit.config.UtilConfig.ERROR_EMOJI} {title}"
+        kwargs.update({"title": title, "description": description})
+
+        if kwargs["title"]:
+            kwargs["title"] = (
+                f"{disckit.config.UtilConfig.ERROR_EMOJI} {kwargs['title']}"
+            )
 
         super().__init__(
-            title=title,
-            description=description,
             color=disckit.config.UtilConfig.ERROR_COLOR,
             timestamp=utils.utcnow(),
             **kwargs,
@@ -130,6 +148,19 @@ class SuccessEmbed(Embed):
     """Represents a success embed."""
 
     @overload
+    def __init__(self, /, **kwargs: Any) -> None: ...
+
+    @overload
+    def __init__(
+        self, title: str, /, *, description: str, **kwargs: Any
+    ) -> None: ...
+
+    @overload
+    def __init__(
+        self, description: str, /, *, title: str, **kwargs: Any
+    ) -> None: ...
+
+    @overload
     def __init__(self, description: str, /, **kwargs: Any) -> None: ...
 
     @overload
@@ -137,21 +168,11 @@ class SuccessEmbed(Embed):
         self, title: str, description: str, /, **kwargs: Any
     ) -> None: ...
 
-    @overload
-    def __init__(
-        self, *, title: str | None, description: str | None, **kwargs: Any
-    ) -> None: ...
-
-    @overload
-    def __init__(self, *, title: str = ..., **kwargs: Any) -> None: ...
-
-    @overload
-    def __init__(self, *, description: str = ..., **kwargs: Any) -> None: ...
-
     def __init__(
         self,
         title: Optional[str] = None,
         description: Optional[str] = None,
+        /,
         **kwargs: Any,
     ) -> None:
         """
@@ -163,16 +184,23 @@ class SuccessEmbed(Embed):
             | The title of the main embed.
         """
 
-        if description is None:
+        if "title" in kwargs and title and not description:
+            description = title
+        elif not kwargs and not description and title:
             description = title
             title = None
+        else:
+            description = kwargs.get("description") or description
+        title = kwargs.get("title") or title
 
-        if title:
-            title = f"{disckit.config.UtilConfig.SUCCESS_EMOJI} {title}"
+        kwargs.update({"title": title, "description": description})
+
+        if kwargs["title"]:
+            kwargs["title"] = (
+                f"{disckit.config.UtilConfig.SUCCESS_EMOJI} {kwargs['title']}"
+            )
 
         super().__init__(
-            title=title,
-            description=description,
             color=disckit.config.UtilConfig.SUCCESS_COLOR,
             timestamp=utils.utcnow(),
             **kwargs,
