@@ -93,7 +93,7 @@ class BaseView(View):
             self.stop()
 
     async def interaction_check(self, interaction: Interaction) -> bool:
-        if interaction.user.id == self._author:
+        if self._author is None or interaction.user.id == self._author:
             return True
 
         await interaction.response.send_message(
@@ -195,7 +195,7 @@ class BaseModal(Modal):
             self._author = self._author.id
 
     async def interaction_check(self, interaction: Interaction) -> bool:
-        if interaction.user.id == self._author:
+        if self._author is None or interaction.user.id == self._author:
             return True
 
         await interaction.response.send_message(
