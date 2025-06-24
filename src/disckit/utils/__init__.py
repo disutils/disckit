@@ -99,6 +99,7 @@ def make_autocomplete(
     *args: T_autocomplete,
 ) -> Any:
     """Creates an autocomplete function for the given arguments.
+    Returns up to 25 filtered choices based on user input.
 
     Parameters
     ----------
@@ -121,40 +122,79 @@ def make_autocomplete(
     """
     choices = [Choice(name=str(arg), value=arg) for arg in args]
 
-    async def autocomplete(_p1: Any, _p2: Any) -> list[Choice[T_autocomplete]]:
-        return choices
+    async def autocomplete(
+        _: Any, current: str
+    ) -> list[Choice[T_autocomplete]]:
+        if not current:
+            return choices[:25]
+
+        return [
+            choice
+            for choice in choices
+            if current.lower() in str(choice.name).lower()
+        ][:25]
 
     return autocomplete
 
 
-async def sku_check(bot: Client, sku_id: int, user_id: int) -> bool:
+async def sku_check(
+    bot: Client,
+    sku_id: int,
+    *,
+    user_id: int | None = None,
+    guild_id: int | None = None,
+) -> bool:
     """|coro|
 
-    Checks if a user has purchased a specific SKU package.
+    Checks if a user or guild has purchased a specific SKU package.
+    Only one of user_id or guild_id should be provided.
 
     Parameters
     ----------
-    bot
-        | The bot class.
-    sku_id
-        | The SKU ID of the package.
-    user_id
-        | The Discord user ID to check.
+    bot : Client
+        The bot class.
+    sku_id : int
+        The SKU ID of the package.
+    user_id : int | None
+        The Discord user ID to check
+    guild_id : int | None
+        The Discord guild ID to check
 
     Returns
     -------
-    | A bool indicating if the user has subscribed to the package or not.
+    bool
+        True if the user/guild has the entitlement
+
+    Raises
+    ------
+    ValueError
+        If both user_id and guild_id are provided or neither is provided
     """
+    if (user_id is None and guild_id is None) or (
+        user_id is not None and guild_id is not None
+    ):
+        raise ValueError(
+            "Must provide either user_id or guild_id, not both or neither"
+        )
 
     sku = discord.Object(id=sku_id)
-    user = discord.Object(id=user_id)
 
-    user_entitlements = [
+    if user_id is not None:
+        user = discord.Object(id=user_id)
+        user_entitlements = [
+            entitlement
+            async for entitlement in bot.entitlements(skus=[sku], user=user)
+        ]
+        return bool(user_entitlements)
+
+    # At this point, guild_id must be an int since we validated the inputs
+    assert guild_id is not None
+    guild = discord.Object(id=guild_id)
+    guild_entitlements = [
         entitlement
-        async for entitlement in bot.entitlements(skus=[sku], user=user)
+        async for entitlement in bot.entitlements(skus=[sku], guild=guild)
     ]
-
-    return bool(user_entitlements)
+    return bool(guild_entitlements)
 
 
 def disallow_bots() -> Callable[..., Any]:
