@@ -16,7 +16,7 @@ from disckit.errors import (
     UnkownCooldownContext,
     UnkownCooldownInteraction,
 )
-from disckit.utils import ErrorEmbed, sku_check_user
+from disckit.utils import ErrorEmbed, sku_check_guild, sku_check_user
 
 if TYPE_CHECKING:
     from typing import (
@@ -60,12 +60,11 @@ class CoolDown:
         CoolDownBucket.CHANNEL: {},
     }
 
-    # TODO: Integrate sku_check_guild for cooldown 
     @overload
     @staticmethod
     def cooldown(
         time: Union[float, int],
-        bucket_type: Literal[CoolDownBucket.USER] = ...,
+        bucket_type: Literal[CoolDownBucket.USER, CoolDownBucket.GUILD] = ...,
         sku_id: int = ...,
     ) -> Callable[..., Any]: ...
 
@@ -130,11 +129,19 @@ class CoolDown:
                     )
 
                 if sku_id:
-                    sku = await sku_check_user(
-                        bot=interaction.client,
-                        sku_id=sku_id,
-                        user_id=interaction.user.id,
-                    )
+                    if bucket_type == CoolDownBucket.USER:
+                        sku = await sku_check_user(
+                            bot=interaction.client,
+                            sku_id=sku_id,
+                            user_id=interaction.user.id,
+                        )
+
+                    elif bucket_type == CoolDownBucket.GUILD:
+                        sku = await sku_check_guild(
+                            bot=interaction.client,
+                            sku_id=sku_id,
+                            guild_id=interaction.user.id,
+                        )
 
                 if cooldown_check[0] or sku:
                     CoolDown.add(
