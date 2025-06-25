@@ -36,7 +36,8 @@ __all__ = (
     "ErrorEmbed",
     "default_status_handler",
     "make_autocomplete",
-    "sku_check",
+    "sku_check_guild",
+    "sku_check_user",
     "disallow_bots",
     "is_owner",
     "get_or_fetch_guild",
@@ -99,6 +100,7 @@ def make_autocomplete(
     *args: T_autocomplete,
 ) -> Any:
     """Creates an autocomplete function for the given arguments.
+    Returns up to 25 filtered choices based on user input.
 
     Parameters
     ----------
@@ -121,39 +123,88 @@ def make_autocomplete(
     """
     choices = [Choice(name=str(arg), value=arg) for arg in args]
 
-    async def autocomplete(_p1: Any, _p2: Any) -> list[Choice[T_autocomplete]]:
-        return choices
+    async def autocomplete(
+        _: Any, current: str
+    ) -> list[Choice[T_autocomplete]]:
+        if not current:
+            return choices[:25]
+
+        return [
+            choice
+            for choice in choices
+            if current.lower() in str(choice.name).lower()
+        ][:25]
 
     return autocomplete
 
 
-async def sku_check(bot: Client, sku_id: int, user_id: int) -> bool:
+async def sku_check_guild(
+    bot: Client,
+    sku_id: int,
+    *,
+    guild_id: int,
+) -> bool:
     """|coro|
 
-    Checks if a user has purchased a specific SKU package.
+    Checks if a user or guild has purchased a specific SKU package.
+    Only one of user_id or guild_id should be provided.
 
     Parameters
     ----------
-    bot
-        | The bot class.
-    sku_id
-        | The SKU ID of the package.
-    user_id
-        | The Discord user ID to check.
+    bot : Client
+        The bot class.
+    sku_id : int
+        The SKU ID of the package.
+    guild_id : int
+        The Discord guild ID to check
 
     Returns
     -------
-    | A bool indicating if the user has subscribed to the package or not.
+    bool
+        True if the user/guild has the entitlement
     """
-
     sku = discord.Object(id=sku_id)
-    user = discord.Object(id=user_id)
 
+    guild = discord.Object(id=guild_id)
+    guild_entitlements = [
+        entitlement
+        async for entitlement in bot.entitlements(skus=[sku], guild=guild)
+    ]
+    return bool(guild_entitlements)
+
+
+async def sku_check_user(
+    bot: Client,
+    sku_id: int,
+    *,
+    user_id: int,
+) -> bool:
+    """|coro|
+
+    Checks if a user or guild has purchased a specific SKU package.
+    Only one of user_id or guild_id should be provided.
+
+    Parameters
+    ----------
+    bot : Client
+        The bot class.
+    sku_id : int
+        The SKU ID of the package.
+    user_id : int
+        The Discord user ID to check
+
+    Returns
+    -------
+    bool
+        True if the user/guild has the entitlement
+    """
+    sku = discord.Object(id=sku_id)
+
+    user = discord.Object(id=user_id)
     user_entitlements = [
         entitlement
         async for entitlement in bot.entitlements(skus=[sku], user=user)
     ]
-
     return bool(user_entitlements)
 
 
