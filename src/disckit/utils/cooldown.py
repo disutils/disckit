@@ -16,7 +16,7 @@ from disckit.errors import (
     UnkownCooldownContext,
     UnkownCooldownInteraction,
 )
-from disckit.utils import ErrorEmbed, sku_check
+from disckit.utils import ErrorEmbed, sku_check_user
 
 if TYPE_CHECKING:
     from typing import (
@@ -129,7 +129,7 @@ class CoolDown:
                     )
 
                 if sku_id:
-                    sku = await sku_check(
+                    sku = await sku_check_user(
                         bot=interaction.client,
                         sku_id=sku_id,
                         user_id=interaction.user.id,
