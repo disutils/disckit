@@ -60,6 +60,7 @@ class CoolDown:
         CoolDownBucket.CHANNEL: {},
     }
 
+    # TODO: Integrate sku_check_guild for cooldown 
     @overload
     @staticmethod
     def cooldown(
