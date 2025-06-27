@@ -16,7 +16,7 @@ from disckit.utils.ui import BaseModal, BaseView
 if TYPE_CHECKING:
     from typing import Any, Optional, Sequence, Union
 
-    from discord import Interaction, Message
+    from discord import Emoji, Interaction, Message, PartialEmoji
     from discord.ui import TextInput, View
 
 
@@ -30,10 +30,20 @@ def create_empty_button(
     label: str = "\u200b",
     style: ButtonStyle = ButtonStyle.gray,
     disabled: bool = True,
+    custom_id: Optional[str] = None,
+    emoji: Optional[Union[str, Emoji, PartialEmoji]] = None,
+    row: int | None = None,
 ) -> Button[Any]:
     """Creates a placeholder button with no callback."""
 
-    return Button(label=label, style=style, disabled=disabled)
+    return Button(
+        label=label,
+        style=style,
+        disabled=disabled,
+        custom_id=custom_id,
+        emoji=emoji,
+        row=row,
+    )
 
 
 class HomeButton(Button["Any"]):
@@ -312,7 +322,7 @@ class Paginator(BaseView):
         if interaction.response.is_done():
             if not interaction.message:
                 await interaction.followup.send(
-                    embed=ErrorEmbed("Message not found to edit.", "Error!")
+                    embed=ErrorEmbed("Error!", "Message not found to edit.")
                 )
                 logger.error("Could not find interaction message to edit.")
                 traceback.print_stack()
