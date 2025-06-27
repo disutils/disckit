@@ -7,6 +7,7 @@ import discord
 from discord.app_commands import Choice
 
 from disckit.utils.embeds import ErrorEmbed, MainEmbed, SuccessEmbed
+from disckit.utils.mention_tree import MentionTree
 
 if TYPE_CHECKING:
     from collections.abc import Awaitable, Callable
@@ -34,6 +35,7 @@ __all__ = (
     "MainEmbed",
     "SuccessEmbed",
     "ErrorEmbed",
+    "MentionTree",
     "default_status_handler",
     "make_autocomplete",
     "sku_check_guild",
