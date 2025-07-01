@@ -228,6 +228,15 @@ class Paginator(BaseView):
             self.add_item(button)
 
     async def start(self, message: Optional[Message] = None) -> None:
+        """Starts the entire paginator
+
+        Parameters
+        ----------
+        message : Optional[Message]
+            If it is not None, the paginator starts by editing this
+            message instead of sending a new one
+        """
+
         self.message: Optional[Message] = message
 
         self.children[
@@ -306,9 +315,21 @@ class Paginator(BaseView):
         payload_kwargs = self._send_kwargs(element)
 
         if self.interaction.response.is_done():
-            await self.interaction.followup.send(**payload_kwargs)
+            if self.message:
+                await self.interaction.followup.edit_message(
+                    self.message.id, **payload_kwargs
+                )
+            else:
+                await self.interaction.followup.send(**payload_kwargs)
         else:
-            await self.interaction.response.send_message(**payload_kwargs)
+            if self.message:
+                await self.interaction.response.defer()
+                await self.interaction.followup.edit_message(
+                    self.message.id, **payload_kwargs
+                )
+
+            else:
+                await self.interaction.response.send_message(**payload_kwargs)
 
         if self._disable_on_timeout and not self.message:
             self.message = await self.interaction.original_response()
