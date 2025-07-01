@@ -1,6 +1,6 @@
 [project]
 name = "disckit"
-version = "1.0.2"
+version = "1.1.0b"
 description = "An open source utilities library for the disutils bots."
 authors = [
   { name="Jiggly Balls", email="jigglyballs9000@gmail.com" },

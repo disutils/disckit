@@ -8,7 +8,7 @@ A utility package made for the disutils bots.
 :license: MIT, see LICENSE for more details.
 """
 
-__version__ = "1.0.2"
+__version__ = "1.1.0b"
 __title__ = "disckit"
 __author__ = "Jiggly Balls"
 __license__ = "MIT"
