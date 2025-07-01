@@ -188,7 +188,7 @@ class UtilConfig:
         "help cog",
         "status handler",
         "error handler",
-        "owner id handler"
+        "owner id handler",
     )
 
     OVERVIEW_HELP_EMBED: Embed = Embed(
