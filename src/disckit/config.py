@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
-from discord import ActivityType, ButtonStyle, Colour
+from discord import ActivityType, ButtonStyle, Colour, Embed
 
 from disckit.utils import default_status_handler
 
@@ -21,7 +21,7 @@ if TYPE_CHECKING:
         Union,
     )
 
-    from discord import Client, Embed
+    from discord import Client
 
     T_contra = TypeVar("T_contra", bound=Client, contravariant=True)
 
@@ -35,6 +35,7 @@ __all__ = ("UtilConfig", "CogEnum")
 
 
 _BASE_WORKER_COG_PATH: str = "disckit.cogs.worker."
+_BASE_COMMAND_COG_PATH: str = "disckit.cogs.commands."
 
 
 class UtilConfig:
@@ -183,7 +184,12 @@ class UtilConfig:
 
     OWNER_ONLY_HELP_COGS: Sequence[str] = ()
 
-    IGNORE_HELP_COGS: Sequence[str] = ("Help Cog",)
+    IGNORE_HELP_COGS: Sequence[str] = (
+        "help cog",
+        "status handler",
+        "error handler",
+        "owner id handler"
+    )
 
     OVERVIEW_HELP_EMBED: Embed = Embed(
         title="Bot's Overview",
@@ -203,5 +209,8 @@ class CogEnum(StrEnum):
     STATUS_HANDLER = _BASE_WORKER_COG_PATH + "status_handler"
     """An extension for the bot's status handling."""
 
-    OWNER_IDS_HANDLER = _BASE_WORKER_COG_PATH + "owner_ids_handler"
+    OWNER_IDS_HANDLER = _BASE_WORKER_COG_PATH + "owner_id_handler"
     """An extension for fetching owner IDs in a URL."""
+
+    HELP_COG = _BASE_COMMAND_COG_PATH + "help"
+    """An extension for the help command."""
