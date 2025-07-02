@@ -89,14 +89,23 @@ class HelpCog(BaseCog, name="Help Cog"):
         cog_copy = [name.title() for name in cog_copy]
 
         for cog_name in UtilConfig.IGNORE_HELP_COGS:
-            cog_copy.remove(cog_name.title())
+            try:
+                cog_copy.remove(cog_name.title())
+            except ValueError:
+                logger.warning(
+                    "Couldn't find cog: %s under `UtilConfig.IGNORE_HELP_COGS`",
+                    cog_name.title(),
+                )
 
         def remove_commands() -> None:
             for cog_name in UtilConfig.OWNER_ONLY_HELP_COGS:
                 try:
                     cog_copy.remove(cog_name.title())
                 except ValueError:
-                    pass
+                    logger.warning(
+                        "Couldn't find cog: %s under `UtilConfig.OWNER_ONLY_HELP_COGS`",
+                        cog_name.title(),
+                    )
 
         if self.bot.owner_id and interaction.user.id != self.bot.owner_id:
             remove_commands()
