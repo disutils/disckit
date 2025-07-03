@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import logging
 import ast
+import logging
 from typing import TYPE_CHECKING
 
 import aiohttp
@@ -12,7 +12,6 @@ from disckit.cogs import BaseCog
 from disckit.config import UtilConfig
 
 if TYPE_CHECKING:
-
     from discord.ext.commands import Bot
 
 
