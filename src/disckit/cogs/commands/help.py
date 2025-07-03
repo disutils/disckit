@@ -48,8 +48,9 @@ class HelpSelect(Select[Any]):
         selected_cog: str = self.values[0]
         if selected_cog == "All Commands":
             all_embeds = []
-            for embeds in self.cog_embed_data.values():
-                all_embeds.extend(embeds)
+            for cog, embeds in self.cog_embed_data.items():
+                if cog.title() not in UtilConfig.OWNER_ONLY_HELP_COGS:
+                    all_embeds.extend(embeds)
 
         elif selected_cog == "Overview":
             all_embeds = [UtilConfig.OVERVIEW_HELP_EMBED]
@@ -93,7 +94,7 @@ class HelpCog(BaseCog, name="Help Cog"):
                 cog_copy.remove(cog_name.title())
             except ValueError:
                 logger.warning(
-                    "Couldn't find cog: %s under `UtilConfig.IGNORE_HELP_COGS`",
+                    "Couldn't find cog: `%s` under `UtilConfig.IGNORE_HELP_COGS`",
                     cog_name.title(),
                 )
 
@@ -103,7 +104,7 @@ class HelpCog(BaseCog, name="Help Cog"):
                     cog_copy.remove(cog_name.title())
                 except ValueError:
                     logger.warning(
-                        "Couldn't find cog: %s under `UtilConfig.OWNER_ONLY_HELP_COGS`",
+                        "Couldn't find cog: `%s` under `UtilConfig.OWNER_ONLY_HELP_COGS`",
                         cog_name.title(),
                     )
 
@@ -187,8 +188,9 @@ class HelpCog(BaseCog, name="Help Cog"):
 
         if required_cog == "All Commands":
             all_embeds = []
-            for embeds in requred_embeds.values():
-                all_embeds.extend(embeds)
+            for cog_name, embeds in requred_embeds.items():
+                if cog_name.title() not in UtilConfig.OWNER_ONLY_HELP_COGS:
+                    all_embeds.extend(embeds)
 
         elif required_cog == "Overview":
             all_embeds = [UtilConfig.OVERVIEW_HELP_EMBED]
