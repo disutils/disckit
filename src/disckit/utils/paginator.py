@@ -48,17 +48,27 @@ def create_empty_button(
 
 class HomeButton(Button["Any"]):
     def __init__(
-        self, home_page: Union[str, Embed], new_view: Optional[View] = None
+        self,
+        home_page: Union[str, Embed],
+        author: Optional[int],
+        new_view: Optional[View] = None,
     ) -> None:
         super().__init__(
             emoji=UtilConfig.PAGINATOR_HOME_PAGE_EMOJI,
             label=UtilConfig.PAGINATOR_HOME_PAGE_LABEL,
             style=UtilConfig.PAGINATOR_HOME_BUTTON_STYLE,
         )
+        self.author = author
         self.home_page: Union[str, Embed] = home_page
         self.new_view: Optional[View] = new_view
 
     async def callback(self, interaction: Interaction) -> None:
+        if self.author and interaction.user.id != self.author:
+            await interaction.response.send_message(
+                embed=ErrorEmbed("This interaction is not for you!")
+            )
+            return
+
         payload: dict[str, Any] = {"view": self.new_view}
         if isinstance(self.home_page, str):
             payload["content"] = self.home_page
@@ -250,7 +260,9 @@ class Paginator(BaseView):
         if self.home_page:
             self.add_item(create_empty_button())
             self.add_item(create_empty_button())
-            self.add_item(HomeButton(self.home_page, self.home_view))
+            self.add_item(
+                HomeButton(self.home_page, self.author, self.home_view)
+            )
             self.add_item(create_empty_button())
             self.add_item(create_empty_button())
 
