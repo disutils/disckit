@@ -8,7 +8,7 @@ from discord.ui import Select, View
 
 from disckit import UtilConfig
 from disckit.cogs import BaseCog
-from disckit.utils import MainEmbed, MentionTree
+from disckit.utils import ErrorEmbed, MainEmbed, MentionTree
 from disckit.utils.paginator import Paginator
 
 logger = logging.getLogger(__name__)
@@ -17,9 +17,11 @@ logger = logging.getLogger(__name__)
 class HelpSelect(Select[Any]):
     def __init__(
         self,
+        author: int,
         valid_help_options: list[str],
         cog_embed_data: dict[str, list[Embed]],
     ) -> None:
+        self.author = author
         self.cog_embed_data = cog_embed_data
 
         options: list[discord.SelectOption] = [
@@ -43,13 +45,21 @@ class HelpSelect(Select[Any]):
         )
 
     async def callback(self, interaction: Interaction) -> None:
+        if interaction.user.id != self.author:
+            await interaction.response.send_message(
+                embed=ErrorEmbed("This help command isn't for you!"),
+                ephemeral=True,
+            )
+            return
+
         await interaction.response.defer()
 
         selected_cog: str = self.values[0]
         if selected_cog == "All Commands":
             all_embeds = []
+            owner_cogs: list[str] = [name.title() for name in UtilConfig.OWNER_ONLY_HELP_COGS]
             for cog, embeds in self.cog_embed_data.items():
-                if cog.title() not in UtilConfig.OWNER_ONLY_HELP_COGS:
+                if cog.title() not in owner_cogs:
                     all_embeds.extend(embeds)
 
         elif selected_cog == "Overview":
@@ -62,6 +72,7 @@ class HelpSelect(Select[Any]):
         view.add_item(self)
         paginator = Paginator(
             interaction,
+            author=interaction.user.id,
             pages=all_embeds,
             home_page=UtilConfig.OVERVIEW_HELP_EMBED,
             home_view=view,
@@ -121,7 +132,16 @@ class HelpCog(BaseCog, name="Help Cog"):
             app_commands.Choice(name=option.title(), value=option.title())
             for option in cog_copy
         ]
-        return commands
+        narrowed_commands: list[app_commands.Choice[str]] = []
+
+        if current:
+            narrowed_commands = [
+                choice
+                for choice in commands
+                if current.lower() in str(choice.name).lower()
+            ][:25]
+
+        return narrowed_commands or commands[:25]
 
     async def get_all_cog_embeds(self) -> dict[str, list[Embed]]:
         tree: MentionTree = self.bot.tree  # pyright:ignore[reportAssignmentType]
@@ -188,8 +208,9 @@ class HelpCog(BaseCog, name="Help Cog"):
 
         if required_cog == "All Commands":
             all_embeds = []
+            owner_cogs: list[str] = [name.title() for name in UtilConfig.OWNER_ONLY_HELP_COGS]
             for cog_name, embeds in requred_embeds.items():
-                if cog_name.title() not in UtilConfig.OWNER_ONLY_HELP_COGS:
+                if cog_name.title() not in owner_cogs:
                     all_embeds.extend(embeds)
 
         elif required_cog == "Overview":
@@ -200,7 +221,9 @@ class HelpCog(BaseCog, name="Help Cog"):
 
         valid_cog_names.remove("Overview")
         view = View()
-        view.add_item(HelpSelect(valid_cog_names, requred_embeds))
+        view.add_item(
+            HelpSelect(interaction.user.id, valid_cog_names, requred_embeds)
+        )
 
         if required_cog == "Overview":
             await interaction.followup.send(
@@ -210,6 +233,7 @@ class HelpCog(BaseCog, name="Help Cog"):
         else:
             paginator = Paginator(
                 interaction,
+                author=interaction.user.id,
                 pages=all_embeds,
                 home_page=UtilConfig.OVERVIEW_HELP_EMBED,
                 home_view=view,
