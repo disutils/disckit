@@ -224,7 +224,7 @@ class Paginator(BaseView):
         self.ephemeral: bool = ephemeral
 
     def _send_kwargs(self, page_element: Union[Embed, str]) -> dict[str, Any]:
-        payload: dict[str, Any] = {"view": self}
+        payload: dict[str, Any] = {"view": self, "ephemeral": self.ephemeral}
         if isinstance(page_element, str):
             payload["content"] = page_element
             payload["embed"] = None
