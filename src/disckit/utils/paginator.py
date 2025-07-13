@@ -242,7 +242,7 @@ class Paginator(BaseView):
         for button in self.extra_buttons:
             self.add_item(button)
 
-    async def start(self, message: Optional[Message] = None, edit_orignal_resp:bool = False) -> None:
+    async def start(self, message: Optional[Message] = None, edit_original_resp:bool = False) -> None:
         """Starts the entire paginator.
 
         Parameters
