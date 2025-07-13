@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import traceback
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import discord
 from discord import ButtonStyle, Embed
@@ -223,8 +223,13 @@ class Paginator(BaseView):
         self.extra_buttons_format: bool = extra_buttons_format
         self.ephemeral: bool = ephemeral
 
-    def _send_kwargs(self, page_element: Union[Embed, str]) -> dict[str, Any]:
-        payload: dict[str, Any] = {"view": self, "ephemeral": self.ephemeral}
+    def _send_kwargs(self, page_element: Union[Embed, str], send_ephemeral:bool = False) -> dict[str, Any]:
+        
+        if send_ephemeral is True:
+            payload: dict[str, Any] = {"view": self, "ephemeral":self.ephemeral}
+        else:
+            payload: dict[str, Any] = {"view": self}
+            
         if isinstance(page_element, str):
             payload["content"] = page_element
             payload["embed"] = None
@@ -237,14 +242,18 @@ class Paginator(BaseView):
         for button in self.extra_buttons:
             self.add_item(button)
 
-    async def start(self, message: Optional[Message] = None) -> None:
-        """Starts the entire paginator
+    async def start(self, message: Optional[Message] = None, edit_orignal_resp:bool = False) -> None:
+        """Starts the entire paginator.
 
         Parameters
         ----------
         message : Optional[Message]
             If it is not None, the paginator starts by editing this
             message instead of sending a new one
+        
+        edit_orignal_resp: bool
+            If it's set to true it will edit the orignal response incase it was an ephemeral otherwise defaults to
+            false. Note: Only use this if the orignal response of your interaction was ephemeral.
         """
 
         self.message: Optional[Message] = message
@@ -324,24 +333,33 @@ class Paginator(BaseView):
             self._add_all_items()
 
         element: Union[Embed, str] = self.pages[self.current_page]
-        payload_kwargs = self._send_kwargs(element)
 
-        if self.interaction.response.is_done():
-            if self.message:
-                await self.interaction.followup.edit_message(
-                    self.message.id, **payload_kwargs
-                )
-            else:
-                await self.interaction.followup.send(**payload_kwargs)
-        else:
-            if self.message:
-                await self.interaction.response.defer()
-                await self.interaction.followup.edit_message(
-                    self.message.id, **payload_kwargs
-                )
+        if edit_orignal_resp is True:
+            payload_kwargs = self._send_kwargs(element)
+            await self.interaction.edit_original_response(**payload_kwargs)
+        
+        else:        
+            if self.interaction.response.is_done():
+                if self.message:
+                    payload_kwargs = self._send_kwargs(element)
+                    await self.interaction.followup.edit_message(
+                        self.message.id, **payload_kwargs
+                    )
 
+                else:
+                    payload_kwargs = self._send_kwargs(element, True)
+                    await self.interaction.followup.send(**payload_kwargs)
             else:
-                await self.interaction.response.send_message(**payload_kwargs)
+                if self.message:
+                    payload_kwargs = self._send_kwargs(element)
+                    await self.interaction.response.defer()
+                    await self.interaction.followup.edit_message(
+                        self.message.id, **payload_kwargs
+                    )
+
+                else:
+                    payload_kwargs = self._send_kwargs(element, True)
+                    await self.interaction.response.send_message(**payload_kwargs)
 
         if self._disable_on_timeout and not self.message:
             self.message = await self.interaction.original_response()
@@ -350,7 +368,7 @@ class Paginator(BaseView):
         self.children[
             2
         ].label = f"{self.current_page + 1} / {self.total_pages}"  # pyright:ignore[reportAttributeAccessIssue]
-        kwargs = self._send_kwargs(self.pages[self.current_page])
+        kwargs: dict[str, Any] = self._send_kwargs(self.pages[self.current_page])
 
         if interaction.response.is_done():
             if not interaction.message:
