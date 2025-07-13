@@ -223,7 +223,7 @@ class Paginator(BaseView):
         self.extra_buttons_format: bool = extra_buttons_format
         self.ephemeral: bool = ephemeral
 
-    def _send_kwargs(self, page_element: Union[Embed, str], send_ephemeral:bool = False) -> dict[str, Any]:
+    def _send_kwargs(self, page_element: Union[Embed, str], send_ephemeral: bool = False) -> dict[str, Any]:
         
         if send_ephemeral is True:
             payload: dict[str, Any] = {"view": self, "ephemeral":self.ephemeral}
