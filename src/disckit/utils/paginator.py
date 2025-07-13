@@ -334,7 +334,7 @@ class Paginator(BaseView):
 
         element: Union[Embed, str] = self.pages[self.current_page]
 
-        if edit_orignal_resp is True:
+        if edit_original_resp is True:
             payload_kwargs = self._send_kwargs(element)
             await self.interaction.edit_original_response(**payload_kwargs)
         
