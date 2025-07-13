@@ -251,9 +251,9 @@ class Paginator(BaseView):
             If it is not None, the paginator starts by editing this
             message instead of sending a new one
         
-        edit_orignal_resp: bool
-            If it's set to true it will edit the orignal response incase it was an ephemeral otherwise defaults to
-            false. Note: Only use this if the orignal response of your interaction was ephemeral.
+        edit_original_resp: bool
+            If it's set to true it will edit the original response in case it was an ephemeral, otherwise defaults to
+            false. Note: Only use this if the original response of your interaction was ephemeral.
         """
 
         self.message: Optional[Message] = message
