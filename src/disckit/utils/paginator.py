@@ -223,13 +223,17 @@ class Paginator(BaseView):
         self.extra_buttons_format: bool = extra_buttons_format
         self.ephemeral: bool = ephemeral
 
-    def _send_kwargs(self, page_element: Union[Embed, str], send_ephemeral: bool = False) -> dict[str, Any]:
-        
+    def _send_kwargs(
+        self, page_element: Union[Embed, str], send_ephemeral: bool = False
+    ) -> dict[str, Any]:
         if send_ephemeral is True:
-            payload: dict[str, Any] = {"view": self, "ephemeral":self.ephemeral}
+            payload: dict[str, Any] = {
+                "view": self,
+                "ephemeral": self.ephemeral,
+            }
         else:
             payload: dict[str, Any] = {"view": self}
-            
+
         if isinstance(page_element, str):
             payload["content"] = page_element
             payload["embed"] = None
@@ -242,7 +246,11 @@ class Paginator(BaseView):
         for button in self.extra_buttons:
             self.add_item(button)
 
-    async def start(self, message: Optional[Message] = None, edit_original_resp:bool = False) -> None:
+    async def start(
+        self,
+        message: Optional[Message] = None,
+        edit_original_resp: bool = False,
+    ) -> None:
         """Starts the entire paginator.
 
         Parameters
@@ -250,7 +258,7 @@ class Paginator(BaseView):
         message : Optional[Message]
             If it is not None, the paginator starts by editing this
             message instead of sending a new one
-        
+
         edit_original_resp: bool
             If it's set to true it will edit the original response in case it was an ephemeral, otherwise defaults to
             false. Note: Only use this if the original response of your interaction was ephemeral.
@@ -337,8 +345,8 @@ class Paginator(BaseView):
         if edit_original_resp is True:
             payload_kwargs = self._send_kwargs(element)
             await self.interaction.edit_original_response(**payload_kwargs)
-        
-        else:        
+
+        else:
             if self.interaction.response.is_done():
                 if self.message:
                     payload_kwargs = self._send_kwargs(element)
@@ -359,7 +367,9 @@ class Paginator(BaseView):
 
                 else:
                     payload_kwargs = self._send_kwargs(element, True)
-                    await self.interaction.response.send_message(**payload_kwargs)
+                    await self.interaction.response.send_message(
+                        **payload_kwargs
+                    )
 
         if self._disable_on_timeout and not self.message:
             self.message = await self.interaction.original_response()
@@ -368,7 +378,9 @@ class Paginator(BaseView):
         self.children[
             2
         ].label = f"{self.current_page + 1} / {self.total_pages}"  # pyright:ignore[reportAttributeAccessIssue]
-        kwargs: dict[str, Any] = self._send_kwargs(self.pages[self.current_page])
+        kwargs: dict[str, Any] = self._send_kwargs(
+            self.pages[self.current_page]
+        )
 
         if interaction.response.is_done():
             if not interaction.message:

@@ -57,7 +57,9 @@ class HelpSelect(Select[Any]):
         selected_cog: str = self.values[0]
         if selected_cog == "All Commands":
             all_embeds = []
-            owner_cogs: list[str] = [name.title() for name in UtilConfig.OWNER_ONLY_HELP_COGS]
+            owner_cogs: list[str] = [
+                name.title() for name in UtilConfig.OWNER_ONLY_HELP_COGS
+            ]
             for cog, embeds in self.cog_embed_data.items():
                 if cog.title() not in owner_cogs:
                     all_embeds.extend(embeds)
@@ -208,7 +210,9 @@ class HelpCog(BaseCog, name="Help Cog"):
 
         if required_cog == "All Commands":
             all_embeds = []
-            owner_cogs: list[str] = [name.title() for name in UtilConfig.OWNER_ONLY_HELP_COGS]
+            owner_cogs: list[str] = [
+                name.title() for name in UtilConfig.OWNER_ONLY_HELP_COGS
+            ]
             for cog_name, embeds in requred_embeds.items():
                 if cog_name.title() not in owner_cogs:
                     all_embeds.extend(embeds)
