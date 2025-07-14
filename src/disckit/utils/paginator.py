@@ -58,7 +58,7 @@ class HomeButton(Button["Any"]):
             label=UtilConfig.PAGINATOR_HOME_PAGE_LABEL,
             style=UtilConfig.PAGINATOR_HOME_BUTTON_STYLE,
         )
-        self.author = author
+        self.author: Optional[int] = author
         self.home_page: Union[str, Embed] = home_page
         self.new_view: Optional[View] = new_view
 
