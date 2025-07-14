@@ -85,8 +85,8 @@ async def dis_load_extension(
         if message:
             raise CogLoadError(message=message, cog=cog)
 
-        await bot.load_extension(cog.value)
         if debug_message:
             logger.info(
                 f"Loading extension: {cog.name.title().replace(' ', '')}"
             )
+        await bot.load_extension(cog.value)
