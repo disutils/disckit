@@ -21,7 +21,7 @@ class HelpSelect(Select[Any]):
         valid_help_options: list[str],
         cog_embed_data: dict[str, list[Embed]],
     ) -> None:
-        self.author:int = author
+        self.author: int = author
         self.cog_embed_data: dict[str, list[Embed]] = cog_embed_data
 
         options: list[discord.SelectOption] = [
@@ -146,7 +146,7 @@ class HelpCog(BaseCog, name="Help Cog"):
         return narrowed_commands or commands[:25]
 
     async def get_all_cog_embeds(self) -> dict[str, list[Embed]]:
-        tree: MentionTree = self.bot.tree  
+        tree: MentionTree = self.bot.tree
         kwargs: dict[str, discord.Object] = {}
         cog_command_description: dict[str, list[str]] = {}
         cog_command_map: dict[str, str] = {}
