@@ -21,8 +21,8 @@ class HelpSelect(Select[Any]):
         valid_help_options: list[str],
         cog_embed_data: dict[str, list[Embed]],
     ) -> None:
-        self.author = author
-        self.cog_embed_data = cog_embed_data
+        self.author:int = author
+        self.cog_embed_data: dict[str, list[Embed]] = cog_embed_data
 
         options: list[discord.SelectOption] = [
             discord.SelectOption(
@@ -56,7 +56,7 @@ class HelpSelect(Select[Any]):
 
         selected_cog: str = self.values[0]
         if selected_cog == "All Commands":
-            all_embeds = []
+            all_embeds: list[Any] = []
             owner_cogs: list[str] = [
                 name.title() for name in UtilConfig.OWNER_ONLY_HELP_COGS
             ]
@@ -146,7 +146,7 @@ class HelpCog(BaseCog, name="Help Cog"):
         return narrowed_commands or commands[:25]
 
     async def get_all_cog_embeds(self) -> dict[str, list[Embed]]:
-        tree: MentionTree = self.bot.tree  # pyright:ignore[reportAssignmentType]
+        tree: MentionTree = self.bot.tree  
         kwargs: dict[str, discord.Object] = {}
         cog_command_description: dict[str, list[str]] = {}
         cog_command_map: dict[str, str] = {}
@@ -209,7 +209,7 @@ class HelpCog(BaseCog, name="Help Cog"):
         requred_embeds = await self.get_all_cog_embeds()
 
         if required_cog == "All Commands":
-            all_embeds = []
+            all_embeds: list[Any] = []
             owner_cogs: list[str] = [
                 name.title() for name in UtilConfig.OWNER_ONLY_HELP_COGS
             ]
