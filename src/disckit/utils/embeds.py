@@ -44,15 +44,19 @@ class MainEmbed(Embed):
         title: Optional[str] = None,
         description: Optional[str] = None,
         /,
+        *,
+        url: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
         """
         Parameters
         ----------
-        description
-            | The description of the main embed.
         title
             | The title of the main embed.
+        description
+            | The description of the main embed.
+        url
+            | The URL of the embed.
         """
 
         if "title" in kwargs and title and not description:
@@ -63,8 +67,15 @@ class MainEmbed(Embed):
         else:
             description = kwargs.get("description") or description
         title = kwargs.get("title") or title
+        url = kwargs.get("url") or url
 
-        kwargs.update({"title": title, "description": description})
+        kwargs.update(
+            {
+                "title": title,
+                "description": description,
+                "url": url,
+            }
+        )
 
         super().__init__(
             color=disckit.config.UtilConfig.MAIN_COLOR,
@@ -106,15 +117,19 @@ class ErrorEmbed(Embed):
         title: Optional[str] = None,
         description: Optional[str] = None,
         /,
+        *,
+        url: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
         """
         Parameters
         ----------
-        description
-            | The description of the main embed.
         title
-            | The title of the main embed.
+            | The title of the error embed.
+        description
+            | The description of the error embed.
+        url
+            | The URL of the embed.
         """
 
         if "title" in kwargs and title and not description:
@@ -125,8 +140,15 @@ class ErrorEmbed(Embed):
         else:
             description = kwargs.get("description") or description
         title = kwargs.get("title") or title
+        url = kwargs.get("url") or url
 
-        kwargs.update({"title": title, "description": description})
+        kwargs.update(
+            {
+                "title": title,
+                "description": description,
+                "url": url,
+            }
+        )
 
         if kwargs["title"]:
             kwargs["title"] = (
@@ -173,15 +195,19 @@ class SuccessEmbed(Embed):
         title: Optional[str] = None,
         description: Optional[str] = None,
         /,
+        *,
+        url: Optional[str] = None,
         **kwargs: Any,
     ) -> None:
         """
         Parameters
         ----------
-        description
-            | The description of the main embed.
         title
-            | The title of the main embed.
+            | The title of the success embed.
+        description
+            | The description of the success embed.
+        url
+            | The URL of the embed.
         """
 
         if "title" in kwargs and title and not description:
@@ -192,8 +218,15 @@ class SuccessEmbed(Embed):
         else:
             description = kwargs.get("description") or description
         title = kwargs.get("title") or title
+        url = kwargs.get("url") or url
 
-        kwargs.update({"title": title, "description": description})
+        kwargs.update(
+            {
+                "title": title,
+                "description": description,
+                "url": url,
+            }
+        )
 
         if kwargs["title"]:
             kwargs["title"] = (
