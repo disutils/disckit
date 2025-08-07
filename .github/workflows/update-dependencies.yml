@@ -133,42 +133,6 @@ jobs:
             exit 1
           }
 
-      - name: Export requirements
-        if: steps.check_updates.outputs.updated == 'true'
-        run: |
-          set -e  # Exit immediately if a command fails
-          uv export > requirements.txt.tmp --no-dev || {
-            echo "::error::uv export failed, restoring backup"
-            cp pyproject.toml.bak pyproject.toml
-            exit 1
-          }
-
-          # Ensure UTF-8 encoding
-          python -c "
-          try:
-              with open('requirements.txt.tmp', 'r') as f_in:
-                  content = f_in.read()
-              with open('requirements.txt', 'w', encoding='utf-8') as f_out:
-                  f_out.write(content)
-              print('Successfully exported requirements')
-          except Exception as e:
-              print(f'Error: {e}')
-              import os
-              os.system('cp pyproject.toml.bak pyproject.toml')
-              exit(1)
-          "
-          rm requirements.txt.tmp
-
-      - name: Verify requirements file
-        if: steps.check_updates.outputs.updated == 'true'
-        run: |
-          if [ ! -s requirements.txt ]; then
-            echo "::error::requirements.txt is empty or not generated correctly"
-            cp pyproject.toml.bak pyproject.toml
-            exit 1
-          fi
-          echo "Requirements file verified successfully"
-
       - name: Test installation
         if: steps.check_updates.outputs.updated == 'true'
         run: |
@@ -176,8 +140,8 @@ jobs:
           python -m venv test_env
           source test_env/bin/activate
 
-          # Try installing the requirements
-          if ! pip install -r requirements.txt; then
+          # Try installing using the updated pyproject.toml
+          if ! pip install -e .; then
             echo "::error::Installation test failed, restoring backup"
             cp pyproject.toml.bak pyproject.toml
             exit 1
@@ -198,7 +162,7 @@ jobs:
         run: |
           set -e  # Exit immediately if a command fails
 
-          git add pyproject.toml requirements.txt uv.lock
+          git add pyproject.toml uv.lock
           git commit -m "Update dependencies
 
           ${{ steps.check_updates.outputs.changes }}"
