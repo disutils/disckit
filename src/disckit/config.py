@@ -3,7 +3,7 @@ from __future__ import annotations
 from enum import StrEnum
 from typing import TYPE_CHECKING
 
-from discord import ActivityType, ButtonStyle, Colour
+from discord import ActivityType, ButtonStyle, Colour, Embed
 
 from disckit.utils import default_status_handler
 
@@ -15,6 +15,7 @@ if TYPE_CHECKING:
         List,
         Optional,
         Protocol,
+        Sequence,
         Tuple,
         TypeVar,
         Union,
@@ -34,6 +35,7 @@ __all__ = ("UtilConfig", "CogEnum")
 
 
 _BASE_WORKER_COG_PATH: str = "disckit.cogs.worker."
+_BASE_COMMAND_COG_PATH: str = "disckit.cogs.commands."
 
 
 class UtilConfig:
@@ -106,10 +108,23 @@ class UtilConfig:
     PAGINATOR_LAST_PAGE_EMOJI
         | The emoji for the button controlling the last page in the paginator.
 
-    COOLDOWN_TEXTS: list[str] | tuple[str, ...]
+    COOLDOWN_TEXTS
         | The cooldown text used by the cooldown controller.
         | This config needs to have a single placeholder: {}
         | In each of its string elements.
+
+    OWNER_ONLY_HELP_COGS
+        | Names of the cogs which are only to be viewed by the owner and
+        | not by a regular user in the help command. This only applies to
+        | the autocomplete feature while using the command.
+
+    IGNORE_HELP_COGS
+        | The names of the cogs to be ignored in the autocomplete feature
+        | while running the help command.
+
+    HELP_OWNER_GUILD_ID
+        | The guild ID where all commands are synced to for the help command
+        | to view them. This includes owner only commands as well.
     """
 
     def __init__(self) -> None:
@@ -160,12 +175,31 @@ class UtilConfig:
 
     PAGINATOR_LAST_PAGE_EMOJI: ClassVar[str] = "⏩"
 
-    COOLDOWN_TEXTS: Union[List[str], Tuple[str, ...]] = (
+    COOLDOWN_TEXTS: Sequence[str] = (
         "Chill, the command will be available {}",
         "What's the hurry? The command will be available {}.",
         "I appreciate your enthusiasm but the command can be used {}.",
         "Take a deep breath in, a deep breath out. The command will be available {}.",
     )
+
+    OWNER_ONLY_HELP_COGS: Sequence[str] = ()
+
+    IGNORE_HELP_COGS: Sequence[str] = (
+        "help cog",
+        "status handler",
+        "error handler",
+        "owner id handler",
+    )
+
+    OVERVIEW_HELP_EMBED: Embed = Embed(
+        title="Bot's Overview",
+        description=(
+            "Welcome to the help overview of the bot.\n"
+            "Use the select menu from below to see the description of different command groups."
+        ),
+    )
+
+    HELP_OWNER_GUILD_ID: Optional[int] = None
 
 
 class CogEnum(StrEnum):
@@ -175,5 +209,8 @@ class CogEnum(StrEnum):
     STATUS_HANDLER = _BASE_WORKER_COG_PATH + "status_handler"
     """An extension for the bot's status handling."""
 
-    OWNER_IDS_HANDLER = _BASE_WORKER_COG_PATH + "owner_ids_handler"
+    OWNER_IDS_HANDLER = _BASE_WORKER_COG_PATH + "owner_id_handler"
     """An extension for fetching owner IDs in a URL."""
+
+    HELP_COG = _BASE_COMMAND_COG_PATH + "help"
+    """An extension for the help command."""

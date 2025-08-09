@@ -164,3 +164,7 @@ cython_debug/
 local/
 test.py
 .pypirc
+
+# VS Code and Qodo files
+.vscode
+.qodo

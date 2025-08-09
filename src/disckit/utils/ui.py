@@ -84,9 +84,9 @@ class BaseView(View):
                     else:
                         raise e
             else:
-                traceback.print_stack()
                 raise Warning(
-                    "BaseView.message was not defined to disable the items."
+                    f"{traceback.format_exc()}\n\n"
+                    f"BaseView.message was not defined in view: {self} to disable the items.",
                 )
 
         if self._stop_on_timeout:

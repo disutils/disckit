@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING
 
 from disckit.config import CogEnum, UtilConfig
 from disckit.errors import CogLoadError
+from disckit.utils import MentionTree
 
 if TYPE_CHECKING:
     from discord.ext.commands import AutoShardedBot, Bot
@@ -71,14 +72,21 @@ async def dis_load_extension(
             if not UtilConfig.OWNER_LIST_URL:
                 message = (
                     "Attribute - `UtilConfig.OWNER_LIST_URL` needs to be"
-                    "set to use OwnerIDSHandler cog"
+                    " set to use OwnerIDSHandler cog"
+                )
+
+        if cog == CogEnum.HELP_COG:
+            if not isinstance(bot.tree, MentionTree):
+                message = (
+                    "`bot.tree` Needs to be of disckit.utils.MentionTree type. "
+                    "Pass in `tree_cls` argument in the initialization as the required type."
                 )
 
         if message:
             raise CogLoadError(message=message, cog=cog)
 
-        await bot.load_extension(cog.value)
         if debug_message:
             logger.info(
                 f"Loading extension: {cog.name.title().replace(' ', '')}"
             )
+        await bot.load_extension(cog.value)

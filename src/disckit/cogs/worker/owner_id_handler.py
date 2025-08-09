@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import ast
 import logging
 from typing import TYPE_CHECKING
 
@@ -11,15 +12,13 @@ from disckit.cogs import BaseCog
 from disckit.config import UtilConfig
 
 if TYPE_CHECKING:
-    from typing import Any
-
     from discord.ext.commands import Bot
 
 
 logger = logging.getLogger(__name__)
 
 
-class OwnerIDsHandler(BaseCog):
+class OwnerIDHandler(BaseCog, name="Owner ID Handler"):
     def __init__(self, bot: Bot) -> None:
         super().__init__(logger)
         self.bot: Bot = bot
@@ -46,10 +45,8 @@ class OwnerIDsHandler(BaseCog):
             async with session.get(url) as response:
                 if response.status == 200:
                     data = await response.text()
-                    local_vars: dict[str, Any] = {}
-                    exec(data, globals(), local_vars)
-                    OWNER_IDS = local_vars.get("OWNER_IDS", set())
-                    self.bot.owner_ids = OWNER_IDS
+                    OWNER_IDS = ast.literal_eval(data)
+                    self.bot.owner_ids = set(OWNER_IDS)
                     logger.info("Owner IDs successfully fetched.")
                 else:
                     logger.error(
@@ -62,4 +59,4 @@ class OwnerIDsHandler(BaseCog):
 
 
 async def setup(bot: Bot) -> None:
-    await bot.add_cog(OwnerIDsHandler(bot))
+    await bot.add_cog(OwnerIDHandler(bot))

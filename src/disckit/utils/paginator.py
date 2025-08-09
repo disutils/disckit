@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import traceback
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import discord
 from discord import ButtonStyle, Embed
@@ -16,7 +16,7 @@ from disckit.utils.ui import BaseModal, BaseView
 if TYPE_CHECKING:
     from typing import Any, Optional, Sequence, Union
 
-    from discord import Interaction, Message
+    from discord import Emoji, Interaction, Message, PartialEmoji
     from discord.ui import TextInput, View
 
 
@@ -30,25 +30,45 @@ def create_empty_button(
     label: str = "\u200b",
     style: ButtonStyle = ButtonStyle.gray,
     disabled: bool = True,
+    custom_id: Optional[str] = None,
+    emoji: Optional[Union[str, Emoji, PartialEmoji]] = None,
+    row: int | None = None,
 ) -> Button[Any]:
     """Creates a placeholder button with no callback."""
 
-    return Button(label=label, style=style, disabled=disabled)
+    return Button(
+        label=label,
+        style=style,
+        disabled=disabled,
+        custom_id=custom_id,
+        emoji=emoji,
+        row=row,
+    )
 
 
 class HomeButton(Button["Any"]):
     def __init__(
-        self, home_page: Union[str, Embed], new_view: Optional[View] = None
+        self,
+        home_page: Union[str, Embed],
+        author: Optional[int],
+        new_view: Optional[View] = None,
     ) -> None:
         super().__init__(
             emoji=UtilConfig.PAGINATOR_HOME_PAGE_EMOJI,
             label=UtilConfig.PAGINATOR_HOME_PAGE_LABEL,
             style=UtilConfig.PAGINATOR_HOME_BUTTON_STYLE,
         )
+        self.author: Optional[int] = author
         self.home_page: Union[str, Embed] = home_page
         self.new_view: Optional[View] = new_view
 
     async def callback(self, interaction: Interaction) -> None:
+        if self.author and interaction.user.id != self.author:
+            await interaction.response.send_message(
+                embed=ErrorEmbed("This interaction is not for you!")
+            )
+            return
+
         payload: dict[str, Any] = {"view": self.new_view}
         if isinstance(self.home_page, str):
             payload["content"] = self.home_page
@@ -203,8 +223,17 @@ class Paginator(BaseView):
         self.extra_buttons_format: bool = extra_buttons_format
         self.ephemeral: bool = ephemeral
 
-    def _send_kwargs(self, page_element: Union[Embed, str]) -> dict[str, Any]:
-        payload: dict[str, Any] = {"view": self}
+    def _send_kwargs(
+        self, page_element: Union[Embed, str], send_ephemeral: bool = False
+    ) -> dict[str, Any]:
+        if send_ephemeral is True:
+            payload: dict[str, Any] = {
+                "view": self,
+                "ephemeral": self.ephemeral,
+            }
+        else:
+            payload: dict[str, Any] = {"view": self}
+
         if isinstance(page_element, str):
             payload["content"] = page_element
             payload["embed"] = None
@@ -217,7 +246,24 @@ class Paginator(BaseView):
         for button in self.extra_buttons:
             self.add_item(button)
 
-    async def start(self, message: Optional[Message] = None) -> None:
+    async def start(
+        self,
+        message: Optional[Message] = None,
+        edit_original_resp: bool = False,
+    ) -> None:
+        """Starts the entire paginator.
+
+        Parameters
+        ----------
+        message : Optional[Message]
+            If it is not None, the paginator starts by editing this
+            message instead of sending a new one
+
+        edit_original_resp: bool
+            If it's set to true it will edit the original response in case it was an ephemeral, otherwise defaults to
+            false. Note: Only use this if the original response of your interaction was ephemeral.
+        """
+
         self.message: Optional[Message] = message
 
         self.children[
@@ -231,7 +277,9 @@ class Paginator(BaseView):
         if self.home_page:
             self.add_item(create_empty_button())
             self.add_item(create_empty_button())
-            self.add_item(HomeButton(self.home_page, self.home_view))
+            self.add_item(
+                HomeButton(self.home_page, self.author, self.home_view)
+            )
             self.add_item(create_empty_button())
             self.add_item(create_empty_button())
 
@@ -293,12 +341,35 @@ class Paginator(BaseView):
             self._add_all_items()
 
         element: Union[Embed, str] = self.pages[self.current_page]
-        payload_kwargs = self._send_kwargs(element)
 
-        if self.interaction.response.is_done():
-            await self.interaction.followup.send(**payload_kwargs)
+        if edit_original_resp is True:
+            payload_kwargs = self._send_kwargs(element)
+            await self.interaction.edit_original_response(**payload_kwargs)
+
         else:
-            await self.interaction.response.send_message(**payload_kwargs)
+            if self.interaction.response.is_done():
+                if self.message:
+                    payload_kwargs = self._send_kwargs(element)
+                    await self.interaction.followup.edit_message(
+                        self.message.id, **payload_kwargs
+                    )
+
+                else:
+                    payload_kwargs = self._send_kwargs(element, True)
+                    await self.interaction.followup.send(**payload_kwargs)
+            else:
+                if self.message:
+                    payload_kwargs = self._send_kwargs(element)
+                    await self.interaction.response.defer()
+                    await self.interaction.followup.edit_message(
+                        self.message.id, **payload_kwargs
+                    )
+
+                else:
+                    payload_kwargs = self._send_kwargs(element, True)
+                    await self.interaction.response.send_message(
+                        **payload_kwargs
+                    )
 
         if self._disable_on_timeout and not self.message:
             self.message = await self.interaction.original_response()
@@ -307,12 +378,14 @@ class Paginator(BaseView):
         self.children[
             2
         ].label = f"{self.current_page + 1} / {self.total_pages}"  # pyright:ignore[reportAttributeAccessIssue]
-        kwargs = self._send_kwargs(self.pages[self.current_page])
+        kwargs: dict[str, Any] = self._send_kwargs(
+            self.pages[self.current_page]
+        )
 
         if interaction.response.is_done():
             if not interaction.message:
                 await interaction.followup.send(
-                    embed=ErrorEmbed("Message not found to edit.", "Error!")
+                    embed=ErrorEmbed("Error!", "Message not found to edit.")
                 )
                 logger.error("Could not find interaction message to edit.")
                 traceback.print_stack()
