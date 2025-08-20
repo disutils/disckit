@@ -1,0 +1,203 @@
+name: Dependency Update
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'pyproject.toml'  # Only run on changes to pyproject.toml
+  schedule:
+    - cron: '0 0 * * *'  # Run at midnight UTC every day
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  update-dependencies:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15  # Prevent hanging jobs
+    permissions:
+      contents: write  # Needed for pushing changes
+
+    # Prevent concurrent workflow runs to avoid conflicts
+    concurrency:
+      group: ${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: false
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Fetch all history for proper merging
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.12'
+          cache: 'pip'  # Enable pip caching
+
+      - name: Install tools
+        run: |
+          python -m pip install --upgrade pip
+          pip install uv pip-tools
+
+      - name: Pull latest changes
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git pull origin main
+
+      - name: Check for dependency updates
+        id: check_updates
+        run: |
+          # Check if pyproject.toml exists
+          if [ ! -f "pyproject.toml" ]; then
+            echo "::error::pyproject.toml not found!"
+            exit 1
+          fi
+
+          # Make a backup of pyproject.toml
+          cp pyproject.toml pyproject.toml.bak
+
+          # Extract dependencies from pyproject.toml
+          DEPS=$(grep -E '^\s+"[^"]+"' pyproject.toml | grep -v "dev =" | sed 's/^\s\+"\(.*\)",\?/\1/' | grep -v "^dev$")
+
+          if [ -z "$DEPS" ]; then
+            echo "No dependencies found in pyproject.toml"
+            echo "updated=false" >> $GITHUB_OUTPUT
+            exit 0
+          fi
+
+          UPDATED=false
+          CHANGES=""
+
+          # Check each dependency for updates
+          for DEP in $DEPS; do
+            # Extract name and current version
+            NAME=$(echo $DEP | cut -d'>' -f1 | cut -d'=' -f1 | xargs)
+            CURRENT=$(echo $DEP | grep -oP '(>=|==|>)[^,]*' | head -1 | sed 's/^>=\|==\|>//')
+
+            echo "Checking $NAME (current: $CURRENT)"
+
+            if [ -z "$CURRENT" ] || [ "$CURRENT" = "$NAME" ]; then
+              # Package without version constraint
+              LATEST=$(pip index versions $NAME 2>/dev/null | grep -oP 'Available versions: \K[^,]+' | xargs)
+              if [ ! -z "$LATEST" ]; then
+                sed -i "s|\"$NAME\"|\"$NAME>=$LATEST\"|g" pyproject.toml
+                UPDATED=true
+                CHANGES="$CHANGES\n- Updated $NAME to $LATEST"
+                echo "Updated $NAME to $LATEST"
+              fi
+            else
+              # Package with version constraint
+              LATEST=$(pip index versions $NAME 2>/dev/null | grep -oP 'Available versions: \K[^,]+' | xargs)
+              if [ ! -z "$LATEST" ] && [ "$LATEST" != "$CURRENT" ]; then
+                # Handle semantic versioning - avoid major version jumps that might break compatibility
+                if [[ "$CURRENT" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] && [[ "$LATEST" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+                  CURRENT_MAJOR=$(echo $CURRENT | cut -d. -f1)
+                  LATEST_MAJOR=$(echo $LATEST | cut -d. -f1)
+                  
+                  if [ "$CURRENT_MAJOR" != "$LATEST_MAJOR" ]; then
+                    echo "Skipping major version update from $CURRENT to $LATEST for $NAME to avoid breaking changes"
+                    continue
+                  fi
+                fi
+                
+                # Update the dependency
+                if [[ $DEP == *">="* ]]; then
+                  sed -i "s|\"$NAME>=$CURRENT|\"$NAME>=$LATEST|g" pyproject.toml
+                elif [[ $DEP == *"=="* ]]; then
+                  sed -i "s|\"$NAME==$CURRENT|\"$NAME==$LATEST|g" pyproject.toml
+                elif [[ $DEP == *">"* ]]; then
+                  sed -i "s|\"$NAME>$CURRENT|\"$NAME>$LATEST|g" pyproject.toml
+                fi
+                UPDATED=true
+                CHANGES="$CHANGES\n- Updated $NAME from $CURRENT to $LATEST"
+                echo "Updated $NAME from $CURRENT to $LATEST"
+              else
+                echo "No update needed for $NAME"
+              fi
+            fi
+          done
+
+          echo "updated=$UPDATED" >> $GITHUB_OUTPUT
+          echo "changes<<EOF" >> $GITHUB_OUTPUT
+          echo -e "$CHANGES" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Lock dependencies
+        if: steps.check_updates.outputs.updated == 'true'
+        run: |
+          set -e  # Exit immediately if a command fails
+          uv lock || {
+            echo "::error::Failed to lock dependencies, restoring backup"
+            cp pyproject.toml.bak pyproject.toml
+            exit 1
+          }
+
+      - name: Test installation
+        if: steps.check_updates.outputs.updated == 'true'
+        run: |
+          # Create a temporary virtual environment to test installation
+          python -m venv test_env
+          source test_env/bin/activate
+
+          # Try installing using the updated pyproject.toml
+          if ! pip install -e .; then
+            echo "::error::Installation test failed, restoring backup"
+            cp pyproject.toml.bak pyproject.toml
+            exit 1
+          fi
+
+          deactivate
+          rm -rf test_env
+          echo "Installation test passed successfully"
+
+      - name: Cleanup backup
+        if: always()
+        run: |
+          # Remove backup file if it exists
+          [ -f pyproject.toml.bak ] && rm pyproject.toml.bak
+
+      - name: Commit and push changes
+        if: steps.check_updates.outputs.updated == 'true'
+        run: |
+          set -e  # Exit immediately if a command fails
+
+          git add pyproject.toml uv.lock
+          git commit -m "Update dependencies
+
+          ${{ steps.check_updates.outputs.changes }}"
+
+          # Add retry mechanism for git push
+          MAX_RETRIES=3
+          RETRY_COUNT=0
+          until git push || [ $RETRY_COUNT -eq $MAX_RETRIES ]; do
+            RETRY_COUNT=$((RETRY_COUNT+1))
+            echo "Push failed, retrying ($RETRY_COUNT/$MAX_RETRIES)..."
+            git pull --rebase origin main
+            sleep 5
+          done
+
+          if [ $RETRY_COUNT -eq $MAX_RETRIES ]; then
+            echo "::error::Failed to push changes after $MAX_RETRIES attempts"
+            exit 1
+          fi
+
+      - name: Summary
+        if: always()
+        run: |
+          if [ "${{ steps.check_updates.outputs.updated }}" == "true" ]; then
+            echo "✅ Dependencies updated successfully!" >> $GITHUB_STEP_SUMMARY
+            echo "${{ steps.check_updates.outputs.changes }}" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "✅ No dependency updates needed" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          # Record metrics about the run
+          echo "## Workflow Statistics" >> $GITHUB_STEP_SUMMARY
+          echo "- Run date: $(date)" >> $GITHUB_STEP_SUMMARY
+          echo "- Status: ${{ job.status }}" >> $GITHUB_STEP_SUMMARY
+
+      - name: Notify on failure
+        if: failure()
+        run: |
+          echo "::error::Dependency update workflow failed. Check the logs for details."
