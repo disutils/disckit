@@ -99,7 +99,9 @@ class HelpCog(BaseCog, name="Help Cog"):
         self, interaction: Interaction, current: Optional[str]
     ) -> list[app_commands.Choice[str]]:
         cog_copy: list[str] = ["Overview", "All Commands"]
-        cog_copy.extend(list(self.bot.cogs.keys()))
+        cog_list = list(self.bot.cogs.keys())
+        cog_list.sort()
+        cog_copy.extend(cog_list)
         cog_copy = [name.title() for name in cog_copy]
 
         for cog_name in UtilConfig.IGNORE_HELP_COGS:
