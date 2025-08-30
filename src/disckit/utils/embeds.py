@@ -68,7 +68,11 @@ class MainEmbed(Embed):
             description = kwargs.get("description") or description
         title = kwargs.get("title") or title
         url = kwargs.get("url") or url
-        timestamp = utils.utcnow() if disckit.config.UtilConfig.FOOTER_TIMESTAMP else None
+        timestamp = (
+            utils.utcnow()
+            if disckit.config.UtilConfig.FOOTER_TIMESTAMP
+            else None
+        )
 
         kwargs.update(
             {
@@ -142,7 +146,11 @@ class ErrorEmbed(Embed):
             description = kwargs.get("description") or description
         title = kwargs.get("title") or title
         url = kwargs.get("url") or url
-        timestamp = utils.utcnow() if disckit.config.UtilConfig.FOOTER_TIMESTAMP else None
+        timestamp = (
+            utils.utcnow()
+            if disckit.config.UtilConfig.FOOTER_TIMESTAMP
+            else None
+        )
 
         kwargs.update(
             {
@@ -221,7 +229,11 @@ class SuccessEmbed(Embed):
             description = kwargs.get("description") or description
         title = kwargs.get("title") or title
         url = kwargs.get("url") or url
-        timestamp = utils.utcnow() if disckit.config.UtilConfig.FOOTER_TIMESTAMP else None
+        timestamp = (
+            utils.utcnow()
+            if disckit.config.UtilConfig.FOOTER_TIMESTAMP
+            else None
+        )
 
         kwargs.update(
             {
