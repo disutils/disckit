@@ -68,6 +68,11 @@ class MainEmbed(Embed):
             description = kwargs.get("description") or description
         title = kwargs.get("title") or title
         url = kwargs.get("url") or url
+        timestamp = (
+            utils.utcnow()
+            if disckit.config.UtilConfig.FOOTER_TIMESTAMP
+            else None
+        )
 
         kwargs.update(
             {
@@ -79,7 +84,7 @@ class MainEmbed(Embed):
 
         super().__init__(
             color=disckit.config.UtilConfig.MAIN_COLOR,
-            timestamp=utils.utcnow(),
+            timestamp=timestamp,
             **kwargs,
         )
         self.set_footer(
@@ -141,6 +146,11 @@ class ErrorEmbed(Embed):
             description = kwargs.get("description") or description
         title = kwargs.get("title") or title
         url = kwargs.get("url") or url
+        timestamp = (
+            utils.utcnow()
+            if disckit.config.UtilConfig.FOOTER_TIMESTAMP
+            else None
+        )
 
         kwargs.update(
             {
@@ -157,7 +167,7 @@ class ErrorEmbed(Embed):
 
         super().__init__(
             color=disckit.config.UtilConfig.ERROR_COLOR,
-            timestamp=utils.utcnow(),
+            timestamp=timestamp,
             **kwargs,
         )
         self.set_footer(
@@ -219,6 +229,11 @@ class SuccessEmbed(Embed):
             description = kwargs.get("description") or description
         title = kwargs.get("title") or title
         url = kwargs.get("url") or url
+        timestamp = (
+            utils.utcnow()
+            if disckit.config.UtilConfig.FOOTER_TIMESTAMP
+            else None
+        )
 
         kwargs.update(
             {
@@ -235,7 +250,7 @@ class SuccessEmbed(Embed):
 
         super().__init__(
             color=disckit.config.UtilConfig.SUCCESS_COLOR,
-            timestamp=utils.utcnow(),
+            timestamp=timestamp,
             **kwargs,
         )
         self.set_footer(
