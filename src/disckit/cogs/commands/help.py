@@ -146,7 +146,7 @@ class HelpCog(BaseCog, name="Help Cog"):
         return narrowed_commands or commands[:25]
 
     async def get_all_cog_embeds(self) -> dict[str, list[Embed]]:
-        tree: MentionTree = self.bot.tree
+        tree: MentionTree = self.bot.tree  # type: ignore -- VSC bug
         kwargs: dict[str, discord.Object] = {}
         cog_command_description: dict[str, list[str]] = {}
         cog_command_map: dict[str, str] = {}
