@@ -64,6 +64,9 @@ class UtilConfig:
     FOOTER_TEXT
         | The footer text of `MainEmbed`, `SuccessEmbed` and `ErrorEmbed`.
 
+    FOOTER_TIMESTAMP
+        | Whether to show a timestamp in the footer of `MainEmbed`, `SuccessEmbed` and `ErrorEmbed`.
+
     STATUS_FUNC
         | A tuple having its first element as a coroutine object which will be awaited when-
         | - When the cog first loads.
@@ -143,6 +146,8 @@ class UtilConfig:
     FOOTER_IMAGE: ClassVar[Optional[str]] = None
 
     FOOTER_TEXT: ClassVar[Optional[str]] = None
+
+    FOOTER_TIMESTAMP: ClassVar[bool] = True
 
     STATUS_FUNC: ClassVar[
         Tuple[StatusHandlerProtocol[Any], Tuple[Any, ...]]
