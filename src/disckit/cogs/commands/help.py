@@ -123,12 +123,17 @@ class HelpCog(BaseCog, name="Help Cog"):
                         cog_name.title(),
                     )
 
-        if self.bot.owner_id and interaction.user.id != self.bot.owner_id:
+        if (
+            self.bot.owner_id
+            and interaction.user.id != self.bot.owner_id
+            and interaction.channel_id == UtilConfig.HELP_OWNER_GUILD_ID
+        ):
             remove_commands()
 
         elif (
             self.bot.owner_ids
             and interaction.user.id not in self.bot.owner_ids
+            and interaction.channel_id == UtilConfig.HELP_OWNER_GUILD_ID
         ):
             remove_commands()
 
