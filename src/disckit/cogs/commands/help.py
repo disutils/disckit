@@ -128,6 +128,7 @@ class HelpCog(BaseCog, name="Help Cog"):
             and interaction.user.id != self.bot.owner_id
             and interaction.channel_id == UtilConfig.HELP_OWNER_GUILD_ID
         ):
+            print("REMOVE OWNER EXEC 1")
             remove_commands()
 
         elif (
@@ -135,7 +136,10 @@ class HelpCog(BaseCog, name="Help Cog"):
             and interaction.user.id not in self.bot.owner_ids
             and interaction.channel_id == UtilConfig.HELP_OWNER_GUILD_ID
         ):
+            print("REMOVE OWNER EXEC 2")
             remove_commands()
+        
+        print(cog_copy)
 
         commands: list[app_commands.Choice[str]] = [
             app_commands.Choice(name=option.title(), value=option.title())
@@ -213,14 +217,14 @@ class HelpCog(BaseCog, name="Help Cog"):
         valid_cog_names: list[str] = [cog.name for cog in valid_cogs]
 
         required_cog = group if group in valid_cog_names else "Overview"
-        requred_embeds = await self.get_all_cog_embeds()
+        required_embeds = await self.get_all_cog_embeds()
 
         if required_cog == "All Commands":
             all_embeds: list[Any] = []
             owner_cogs: list[str] = [
                 name.title() for name in UtilConfig.OWNER_ONLY_HELP_COGS
             ]
-            for cog_name, embeds in requred_embeds.items():
+            for cog_name, embeds in required_embeds.items():
                 if cog_name.title() not in owner_cogs:
                     all_embeds.extend(embeds)
 
@@ -228,12 +232,12 @@ class HelpCog(BaseCog, name="Help Cog"):
             all_embeds = [UtilConfig.OVERVIEW_HELP_EMBED]
 
         else:
-            all_embeds = requred_embeds[required_cog]
+            all_embeds = required_embeds[required_cog]
 
         valid_cog_names.remove("Overview")
         view = View()
         view.add_item(
-            HelpSelect(interaction.user.id, valid_cog_names, requred_embeds)
+            HelpSelect(interaction.user.id, valid_cog_names, required_embeds)
         )
 
         if required_cog == "Overview":
