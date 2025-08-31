@@ -19,7 +19,6 @@ if TYPE_CHECKING:
     from discord import Emoji, Interaction, Message, PartialEmoji
     from discord.ui import TextInput, View
 
-
 __all__ = ("create_empty_button", "HomeButton", "PageJumpModal", "Paginator")
 
 
@@ -224,7 +223,9 @@ class Paginator(BaseView):
         self.ephemeral: bool = ephemeral
 
     def _send_kwargs(
-        self, page_element: Union[Embed, str], send_ephemeral: bool = False
+        self,
+        page_element: Union[list[Embed], Embed, str],
+        send_ephemeral: bool = False,
     ) -> dict[str, Any]:
         if send_ephemeral is True:
             payload: dict[str, Any] = {
@@ -238,7 +239,8 @@ class Paginator(BaseView):
             payload["content"] = page_element
             payload["embed"] = None
         else:
-            payload["embed"] = page_element
+            key_type = "embeds" if isinstance(page_element, list) else "embed"
+            payload[key_type] = page_element
             payload["content"] = None
         return payload
 
