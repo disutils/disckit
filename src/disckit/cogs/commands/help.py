@@ -17,10 +17,12 @@ logger = logging.getLogger(__name__)
 class HelpSelect(Select[Any]):
     def __init__(
         self,
+        bot: Bot,
         author: int,
         valid_help_options: list[str],
         cog_embed_data: dict[str, list[Embed]],
     ) -> None:
+        self.bot: Bot = bot
         self.author: int = author
         self.cog_embed_data: dict[str, list[Embed]] = cog_embed_data
 
@@ -60,9 +62,26 @@ class HelpSelect(Select[Any]):
             owner_cogs: list[str] = [
                 name.title() for name in UtilConfig.OWNER_ONLY_HELP_COGS
             ]
-            for cog, embeds in self.cog_embed_data.items():
-                if cog.title() not in owner_cogs:
-                    all_embeds.extend(embeds)
+
+            if (
+                self.bot.owner_ids
+                and interaction.user.id not in self.bot.owner_ids
+                or interaction.guild_id != UtilConfig.HELP_OWNER_GUILD_ID
+                or self.bot.owner_id
+                and interaction.user.id != self.bot.owner_id
+                or interaction.guild_id != UtilConfig.HELP_OWNER_GUILD_ID
+            ):
+                for cog_name, embeds in self.cog_embed_data.items():
+                    if (
+                        cog_name.title() not in owner_cogs
+                        and cog_name.title() != "Help Cog"
+                    ):
+                        all_embeds.extend(embeds)
+
+            else:
+                for cog_name, embeds in self.cog_embed_data.items():
+                    if cog_name.title() != "Help Cog":
+                        all_embeds.extend(embeds)
 
         elif selected_cog == "Overview":
             all_embeds = [UtilConfig.OVERVIEW_HELP_EMBED]
@@ -126,20 +145,16 @@ class HelpCog(BaseCog, name="Help Cog"):
         if (
             self.bot.owner_id
             and interaction.user.id != self.bot.owner_id
-            and interaction.channel_id == UtilConfig.HELP_OWNER_GUILD_ID
+            or interaction.guild_id != UtilConfig.HELP_OWNER_GUILD_ID
         ):
-            print("REMOVE OWNER EXEC 1")
             remove_commands()
 
         elif (
             self.bot.owner_ids
             and interaction.user.id not in self.bot.owner_ids
-            and interaction.channel_id == UtilConfig.HELP_OWNER_GUILD_ID
+            or interaction.guild_id != UtilConfig.HELP_OWNER_GUILD_ID
         ):
-            print("REMOVE OWNER EXEC 2")
             remove_commands()
-        
-        print(cog_copy)
 
         commands: list[app_commands.Choice[str]] = [
             app_commands.Choice(name=option.title(), value=option.title())
@@ -224,9 +239,26 @@ class HelpCog(BaseCog, name="Help Cog"):
             owner_cogs: list[str] = [
                 name.title() for name in UtilConfig.OWNER_ONLY_HELP_COGS
             ]
-            for cog_name, embeds in required_embeds.items():
-                if cog_name.title() not in owner_cogs:
-                    all_embeds.extend(embeds)
+
+            if (
+                self.bot.owner_ids
+                and interaction.user.id not in self.bot.owner_ids
+                or interaction.guild_id != UtilConfig.HELP_OWNER_GUILD_ID
+                or self.bot.owner_id
+                and interaction.user.id != self.bot.owner_id
+                or interaction.guild_id != UtilConfig.HELP_OWNER_GUILD_ID
+            ):
+                for cog_name, embeds in required_embeds.items():
+                    if (
+                        cog_name.title() not in owner_cogs
+                        and cog_name.title() != "Help Cog"
+                    ):
+                        all_embeds.extend(embeds)
+
+            else:
+                for cog_name, embeds in required_embeds.items():
+                    if cog_name.title() != "Help Cog":
+                        all_embeds.extend(embeds)
 
         elif required_cog == "Overview":
             all_embeds = [UtilConfig.OVERVIEW_HELP_EMBED]
@@ -237,7 +269,9 @@ class HelpCog(BaseCog, name="Help Cog"):
         valid_cog_names.remove("Overview")
         view = View()
         view.add_item(
-            HelpSelect(interaction.user.id, valid_cog_names, required_embeds)
+            HelpSelect(
+                self.bot, interaction.user.id, valid_cog_names, required_embeds
+            )
         )
 
         if required_cog == "Overview":
