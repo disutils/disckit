@@ -17,10 +17,12 @@ logger = logging.getLogger(__name__)
 class HelpSelect(Select[Any]):
     def __init__(
         self,
+        bot: Bot,
         author: int,
         valid_help_options: list[str],
         cog_embed_data: dict[str, list[Embed]],
     ) -> None:
+        self.bot: Bot = bot
         self.author: int = author
         self.cog_embed_data: dict[str, list[Embed]] = cog_embed_data
 
@@ -60,9 +62,26 @@ class HelpSelect(Select[Any]):
             owner_cogs: list[str] = [
                 name.title() for name in UtilConfig.OWNER_ONLY_HELP_COGS
             ]
-            for cog, embeds in self.cog_embed_data.items():
-                if cog.title() not in owner_cogs:
-                    all_embeds.extend(embeds)
+
+            if (
+                self.bot.owner_ids
+                and interaction.user.id not in self.bot.owner_ids
+                or interaction.guild_id != UtilConfig.HELP_OWNER_GUILD_ID
+                or self.bot.owner_id
+                and interaction.user.id != self.bot.owner_id
+                or interaction.guild_id != UtilConfig.HELP_OWNER_GUILD_ID
+            ):
+                for cog_name, embeds in self.cog_embed_data.items():
+                    if (
+                        cog_name.title() not in owner_cogs
+                        and cog_name.title() != "Help Cog"
+                    ):
+                        all_embeds.extend(embeds)
+
+            else:
+                for cog_name, embeds in self.cog_embed_data.items():
+                    if cog_name.title() != "Help Cog":
+                        all_embeds.extend(embeds)
 
         elif selected_cog == "Overview":
             all_embeds = [UtilConfig.OVERVIEW_HELP_EMBED]
@@ -99,7 +118,9 @@ class HelpCog(BaseCog, name="Help Cog"):
         self, interaction: Interaction, current: Optional[str]
     ) -> list[app_commands.Choice[str]]:
         cog_copy: list[str] = ["Overview", "All Commands"]
-        cog_copy.extend(list(self.bot.cogs.keys()))
+        cog_list = list(self.bot.cogs.keys())
+        cog_list.sort()
+        cog_copy.extend(cog_list)
         cog_copy = [name.title() for name in cog_copy]
 
         for cog_name in UtilConfig.IGNORE_HELP_COGS:
@@ -121,12 +142,17 @@ class HelpCog(BaseCog, name="Help Cog"):
                         cog_name.title(),
                     )
 
-        if self.bot.owner_id and interaction.user.id != self.bot.owner_id:
+        if (
+            self.bot.owner_id
+            and interaction.user.id != self.bot.owner_id
+            or interaction.guild_id != UtilConfig.HELP_OWNER_GUILD_ID
+        ):
             remove_commands()
 
         elif (
             self.bot.owner_ids
             and interaction.user.id not in self.bot.owner_ids
+            or interaction.guild_id != UtilConfig.HELP_OWNER_GUILD_ID
         ):
             remove_commands()
 
@@ -146,7 +172,7 @@ class HelpCog(BaseCog, name="Help Cog"):
         return narrowed_commands or commands[:25]
 
     async def get_all_cog_embeds(self) -> dict[str, list[Embed]]:
-        tree: MentionTree = self.bot.tree
+        tree: MentionTree = self.bot.tree  # type: ignore -- VSC bug
         kwargs: dict[str, discord.Object] = {}
         cog_command_description: dict[str, list[str]] = {}
         cog_command_map: dict[str, str] = {}
@@ -206,27 +232,46 @@ class HelpCog(BaseCog, name="Help Cog"):
         valid_cog_names: list[str] = [cog.name for cog in valid_cogs]
 
         required_cog = group if group in valid_cog_names else "Overview"
-        requred_embeds = await self.get_all_cog_embeds()
+        required_embeds = await self.get_all_cog_embeds()
 
         if required_cog == "All Commands":
             all_embeds: list[Any] = []
             owner_cogs: list[str] = [
                 name.title() for name in UtilConfig.OWNER_ONLY_HELP_COGS
             ]
-            for cog_name, embeds in requred_embeds.items():
-                if cog_name.title() not in owner_cogs:
-                    all_embeds.extend(embeds)
+
+            if (
+                self.bot.owner_ids
+                and interaction.user.id not in self.bot.owner_ids
+                or interaction.guild_id != UtilConfig.HELP_OWNER_GUILD_ID
+                or self.bot.owner_id
+                and interaction.user.id != self.bot.owner_id
+                or interaction.guild_id != UtilConfig.HELP_OWNER_GUILD_ID
+            ):
+                for cog_name, embeds in required_embeds.items():
+                    if (
+                        cog_name.title() not in owner_cogs
+                        and cog_name.title() != "Help Cog"
+                    ):
+                        all_embeds.extend(embeds)
+
+            else:
+                for cog_name, embeds in required_embeds.items():
+                    if cog_name.title() != "Help Cog":
+                        all_embeds.extend(embeds)
 
         elif required_cog == "Overview":
             all_embeds = [UtilConfig.OVERVIEW_HELP_EMBED]
 
         else:
-            all_embeds = requred_embeds[required_cog]
+            all_embeds = required_embeds[required_cog]
 
         valid_cog_names.remove("Overview")
         view = View()
         view.add_item(
-            HelpSelect(interaction.user.id, valid_cog_names, requred_embeds)
+            HelpSelect(
+                self.bot, interaction.user.id, valid_cog_names, required_embeds
+            )
         )
 
         if required_cog == "Overview":
